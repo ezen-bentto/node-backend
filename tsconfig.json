@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                // 최신 JS 기능을 사용하겠다
+    "module": "ESNext",               /* ES Module 방식을 사용합니다. */
+    "lib": ["DOM", "ESNext"], 
+    "skipLibCheck": true,              // 타입 정의 검사 생략 (속도 ↑)
+    "esModuleInterop": true,           // commonjs <-> esm interop
+    "allowSyntheticDefaultImports": true, // default import 허용
+    "strict": true,                    // 타입 검사를 엄격히
+    "forceConsistentCasingInFileNames": true, // 대소문자 불일치 감지
+    "noFallthroughCasesInSwitch": true,       // switch 문 누락 방지
+    "moduleResolution": "node",        // 모듈 찾는 방식
+    "isolatedModules": true,           // 개별 파일 단위로 처리 (ts-node 용)
+    "outDir": "./dist",                // 빌드 결과물 위치
+    "baseUrl": "./",                   // 경로 기준점
+    "emitDecoratorMetadata": true,     // 데코레이터 메타데이터 포함 (NestJS 등에서 사용)
+    "experimentalDecorators": true,    // 데코레이터 기능 활성화
+    "typeRoots": ["./@types", "./node_modules/@types"], // 타입 정의 경로
+    "paths": {
+      "@/*": ["src/*"]                 // 경로 별칭 (예: import x from "@/utils")
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"] // ts-node에서 paths 설정 작동하게 함
+  },
+  "include": ["src", "__mocks__"],         // 컴파일 포함 경로
+  "exclude": ["src/**/*.test.ts", "src/**/__mocks__/*.ts"]
+}
