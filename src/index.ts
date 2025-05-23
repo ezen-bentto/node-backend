@@ -1,12 +1,7 @@
-import express from "express";
+import app from "./app";
 
-const app : express.Express = express();
+const PORT = process.env.POST || 4000;
 
-app.get('/', (req : express.Request, res : express.Response) => {
-  res.send('Hello Typescript!');
-  res.statusCode = 200;
-})
-
-app.listen(3000, ()=> {
-  console.log("Server is listening on port 3000");
+app.listen(PORT, () => {
+  console.log(`Server is listening on port : ${PORT}`);
 });
