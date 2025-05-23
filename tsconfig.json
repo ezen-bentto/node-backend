@@ -18,7 +18,11 @@
     "typeRoots": ["./@types", "./node_modules/@types"], // 커스텀 및 외부 타입 정의 검색 경로
     "paths": {
       "@/*": ["src/*"] // import 경로 별칭 (예: @/utils → src/utils)
-    }
+    },
+    "noEmit": true, // 개발용에서는 JS 파일 안 만들어도 되니까 설정
+    "declaration": false, // 타입 선언도 dev에서는 필요 없음
+    "sourceMap": true, // 디버깅용 소스맵은 dev에서만 쓰자
+    "removeComments": false // dev에선 주석이 남아있는 게 좋지
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"] // ts-node 실행 시 paths 설정 인식하게 함
