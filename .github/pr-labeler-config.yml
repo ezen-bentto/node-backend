@@ -1,0 +1,16 @@
+feature:
+  - "^feat:"
+fix:
+  - "^fix:"
+docs:
+  - "^docs:"
+test:
+  - "^test:"
+style:
+  - "^style:"
+refactor:
+  - "^refactor:"
+chore:
+  - "^style:"
+move:
+  - "^move:"

@@ -1,0 +1,76 @@
+name: Notify Discord on PR Merge to Main
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify-on-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if PR is merged and target is main
+        run: |
+          merged=$(jq -r '.pull_request.merged' "$GITHUB_EVENT_PATH")
+          base_branch=$(jq -r '.pull_request.base.ref' "$GITHUB_EVENT_PATH")
+
+          if [[ "$merged" != "true" ]]; then
+            echo "PR not merged. Skipping."
+            exit 0
+          fi
+
+          if [[ "$base_branch" != "main" ]]; then
+            echo "PR not merged into main. Skipping."
+            exit 0
+          fi
+
+          echo "merged=true" >> $GITHUB_ENV
+
+      - name: Get PR Info
+        id: pr_info
+        run: |
+          title=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
+          url=$(jq -r ".pull_request.html_url" "$GITHUB_EVENT_PATH")
+          actor=$(jq -r ".pull_request.user.login" "$GITHUB_EVENT_PATH")
+          changed_files=$(jq -r ".pull_request.changed_files" "$GITHUB_EVENT_PATH")
+
+          echo "title=$title" >> $GITHUB_ENV
+          echo "url=$url" >> $GITHUB_ENV
+          echo "actor=$actor" >> $GITHUB_ENV
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+      - name: Notify Discord on Merge
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [[ "${{ env.changed_files }}" -eq 0 ]]; then
+            change_msg="⚠️ 변경된 코드 없음"
+          else
+            change_msg="🔧 변경 파일 수: ${{ env.changed_files }}"
+          fi
+
+          payload=$(jq -n \
+            --arg title "${{ env.title }}" \
+            --arg url "${{ env.url }}" \
+            --arg actor "${{ env.actor }}" \
+            --arg change "$change_msg" \
+            '{
+              "embeds": [
+                {
+                  "title": "✅ main 브랜치에 PR 머지 완료!",
+                  "description": "**작성자-** \($actor)\n**PR Message-** \($title)\n🔗 [PR 보러가기](\($url))\n\n\($change)",
+                  "color": 3066993,
+                  "timestamp": now | todateiso8601,
+                  "footer": {
+                    "text": "GitHub Actions - main 브랜치 머지 알림"
+                  }
+                }
+              ]
+            }')
+
+          echo "$payload" > payload.json
+
+          curl -H "Content-Type: application/json" \
+              -X POST \
+              -d @payload.json \
+              "$DISCORD_WEBHOOK"

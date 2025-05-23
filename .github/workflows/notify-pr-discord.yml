@@ -1,0 +1,101 @@
+name: Label PR & Notify Discord
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  label-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run PR Labeler
+        uses: technote-space/pr-labeler-action@v4.3.3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR Info and Labels
+        id: pr_info
+        run: |
+          title=$(jq -r ".pull_request.title" "$GITHUB_EVENT_PATH")
+          url=$(jq -r ".pull_request.html_url" "$GITHUB_EVENT_PATH")
+          actor="${{ github.actor }}"
+
+          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+
+          emoji="📝"
+          color=3447003
+
+          for label in $labels; do
+            case $label in
+              feature)
+                emoji="✨"
+                color=15844367
+                ;;
+              fix)
+                emoji="🐛"
+                color=15158332
+                ;;
+              docs)
+                emoji="📚"
+                color=3447003
+                ;;
+              refactor)
+                emoji="🛠️"
+                color=9807270
+                ;;
+              test)
+                emoji="🧪"
+                color=10181046
+                ;;
+              chore)
+                emoji="🔧"
+                color=10181046
+                ;;
+              style)
+                emoji="💄"
+                color=10181046
+                ;;
+              move)
+                emoji="🚚"
+                color=10181046
+                ;;
+            esac
+          done
+
+          echo "emoji=$emoji" >> $GITHUB_ENV
+          echo "color=$color" >> $GITHUB_ENV
+          echo "title=$title" >> $GITHUB_ENV
+          echo "url=$url" >> $GITHUB_ENV
+          echo "actor=$actor" >> $GITHUB_ENV
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          payload=$(jq -n \
+            --arg emoji "$emoji" \
+            --arg title "$title" \
+            --arg url "$url" \
+            --arg actor "$actor" \
+            --argjson color "$color" \
+            '{
+              "embeds": [
+                {
+                  "title": "\($emoji) 새 Pull Request!",
+                  "description": "**작성자-** \($actor)\n**PR Message-** \($title)\n🔗 [PR 보러가기](\($url))",
+                  "color": $color,
+                  "timestamp": now | todateiso8601,
+                  "footer": {
+                    "text": "GitHub Actions - PR 알림봇"
+                  }
+                }
+              ]
+            }')
+
+          echo "$payload" > payload.json
+
+          curl -H "Content-Type: application/json" \
+              -X POST \
+              -d @payload.json \
+              "$DISCORD_WEBHOOK"
