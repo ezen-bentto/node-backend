@@ -57,12 +57,12 @@ jobs:
             '{
               "embeds": [
                 {
-                  "title": "✅ main 브랜치에 PR 머지 완료!",
+                  "title": "✅Node repo : main 브랜치에 PR 머지 완료!",
                   "description": "**작성자-** \($actor)\n**PR Message-** \($title)\n🔗 [PR 보러가기](\($url))\n\n\($change)",
                   "color": 3066993,
                   "timestamp": now | todateiso8601,
                   "footer": {
-                    "text": "GitHub Actions - main 브랜치 머지 알림"
+                    "text": "GitHub Actions - nodejs main 브랜치 머지 알림"
                   }
                 }
               ]

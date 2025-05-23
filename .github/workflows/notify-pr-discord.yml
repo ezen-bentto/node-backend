@@ -2,7 +2,7 @@ name: Label PR & Notify Discord
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
   label-and-notify:
@@ -82,12 +82,12 @@ jobs:
             '{
               "embeds": [
                 {
-                  "title": "\($emoji) 새 Pull Request!",
+                  "title": "\($emoji) 새 NodeJS Pull Request!",
                   "description": "**작성자-** \($actor)\n**PR Message-** \($title)\n🔗 [PR 보러가기](\($url))",
                   "color": $color,
                   "timestamp": now | todateiso8601,
                   "footer": {
-                    "text": "GitHub Actions - PR 알림봇"
+                    "text": "GitHub Actions - NodeJS PR 알림봇"
                   }
                 }
               ]
