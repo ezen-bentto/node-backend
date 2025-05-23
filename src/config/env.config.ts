@@ -1,18 +1,17 @@
 // src/config/env.config.ts
 import dotenv from "dotenv";
-import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from "./참고-setting";
 dotenv.config();
 
 export const ENV = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 4000,
   nodeEnv: process.env.NODE_ENV || "development",
 
   db: {
-    host: DB_HOST!,
-    port: DB_PORT,
-    user: DB_USER!,
-    password: DB_PASSWORD!,
-    database: DB_DATABASE!,
+    host: process.env.DB_HOST as string,
+    port: Number(process.env.DB_PORT as string),
+    user: process.env.DB_USER as string,
+    password: process.env.DB_PASSWORD as string,
+    database: process.env.DB_DATABASE as string,
   },
 
   jwt: {

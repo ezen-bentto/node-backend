@@ -1,7 +1,7 @@
-import express from "express";
-import { registerMiddlewares } from "@/middlewares/index.middleware";
-import { notFoundHandler } from "@/middlewares/error.middleware";
-import DemoRouter from "@/routes/demo.routes";
+import express from 'express';
+import { registerMiddlewares } from '@/middlewares/index.middleware';
+import { notFoundHandler } from '@/middlewares/error.middleware';
+import DemoRouter from '@/routes/demo.routes';
 
 const app = express();
 
@@ -9,8 +9,7 @@ const app = express();
 registerMiddlewares(app);
 
 // ✅ 2. 라우터 연결
-app.use("api/demo", DemoRouter);
-// app.use("api/demo", DemoRouter); 어떤 라우터
+app.use('/api/demo', DemoRouter);
 
 // ✅ 3. 에러 핸들러 등록
 app.use(notFoundHandler); // 404 핸들러

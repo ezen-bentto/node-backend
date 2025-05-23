@@ -1,6 +1,7 @@
-import pool from "@/config/db";
+import { getDBConnection } from '@/config/db.config';
 
 export const findAll = async () => {
-  const [row] = await pool.query("SELECT id, name, email, created_at AS createdAt FROM demo");
+  const db = getDBConnection();
+  const row = await db.query('SELECT id, name, email FROM demo');
   return row;
 };

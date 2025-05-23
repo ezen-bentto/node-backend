@@ -1,5 +1,7 @@
-import { DemoModel } from "@/models/demo.model";
+import { DemoModel } from '@/models/demo.model';
+import { DemoResponse } from '@/schemas/demo.schema';
 
-export const get = async () => {
+// 반환 타입 명시
+export const get = async (): Promise<DemoResponse[]> => {
   return await DemoModel.findAll();
 };
