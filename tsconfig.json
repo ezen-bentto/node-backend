@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020", // 출력되는 JS 코드의 ECMAScript 버전
-    "module": "Node16", // ESM 방식으로 모듈 변환 + exports map 지원 (Node.js 16+)
+    "module": "CommonJS", // 
     "lib": ["DOM", "ESNext"], // DOM 및 최신 JS 기능 사용 가능
     "skipLibCheck": true, // 의존성 타입 검사 생략 (빌드 속도 ↑)
     "esModuleInterop": true, // CommonJS 모듈을 ES6 스타일로 import 가능하게
@@ -9,7 +9,7 @@
     "strict": true, // 모든 엄격한 타입 검사 활성화
     "forceConsistentCasingInFileNames": true, // 대소문자 일관성 강제 (윈도우/리눅스 환경 차이 방지)
     "noFallthroughCasesInSwitch": true, // switch 문에서 case 누락 방지
-    "moduleResolution": "node16", // Node.js 16 방식 모듈 해석 (exports map 등 지원)
+    "moduleResolution": "node", // Node.js 16 방식 모듈 해석 (exports map 등 지원)
     "isolatedModules": true, // 개별 파일 단위 타입 검사 (ts-node, vite 등과 호환)
     "outDir": "./dist", // 컴파일된 JS 파일 저장 위치
     "baseUrl": "./", // 경로 기반 import의 기준 디렉토리

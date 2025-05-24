@@ -2,7 +2,7 @@ import { DemoResponseSchema } from '@/schemas/demo.schema';
 import { DemoService } from '@/service/demo.service';
 import { Request, RequestHandler, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const get: RequestHandler = async (req: Request, res: Response) => {
   const data = await DemoService.get();
