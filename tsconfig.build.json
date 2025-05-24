@@ -1,19 +1,26 @@
 {
-  "extends": "./tsconfig.json", // 기본 설정은 tsconfig.json에서 상속받음
   "compilerOptions": {
-    "noEmit": false, // 실제로 JavaScript 파일을 출력함
-    "declaration": true, // .d.ts 타입 선언 파일 생성
-    "declarationMap": true, // 선언 파일용 소스맵 생성 (디버깅 편의 ↑)
-    "sourceMap": true, // JS 파일에도 소스맵 생성
-    "removeComments": true, // 빌드시 주석 제거 (코드 가독성↑, 용량↓)
-    "outDir": "./dist", // 출력 디렉토리 (JS, .d.ts 파일이 생성될 위치)
-    "emitDeclarationOnly": false // 선언만 출력하지 않고 JS도 같이 출력
+    "target": "ES2020",
+    "module": "Node16", // 또는 "" (서버 실행환경 맞춰서)
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "noEmit": false,
+    "emitDeclarationOnly": false,
+    "strict": true,
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "typeRoots": ["./@types", "./node_modules/@types"],
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src"], // 빌드 대상 소스 코드 경로
-  "exclude": [
-    "**/*.test.ts", // 테스트 파일 제외
-    "**/__mocks__/**", // 목 데이터 폴더 제외
-    "node_modules", // 외부 모듈 제외
-    "dist" // 이미 빌드된 결과물은 다시 빌드하지 않음
-  ]
+  "include": ["src"],
+  "exclude": ["**/*.test.ts", "**/__mocks__/**", "node_modules", "dist"]
 }
