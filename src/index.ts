@@ -9,5 +9,9 @@ app.listen(PORT, () => {
   console.log("🚀 Jenkins ENDSSH 수정 후 테스트");
   console.log("🚀 EC2 GITHUB WOOKS IP 등록 후 테스트");
   console.log("🚀 SSH KEY 오류 수정 후 테스트");
+  console.log("🚀 SSH KEY 오류 수정 후 테스트2");
+  console.log("🚀 jenkins 파일 분리 후 테스트");
+  console.log("🚀 jenkins 파일 분리 후 테스트2");
+
 
 });
