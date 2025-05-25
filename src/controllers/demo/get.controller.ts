@@ -12,11 +12,7 @@ export const get: RequestHandler = async (req: Request, res: Response, next: Nex
     const data = await DemoService.get();
     const parsed = z.array(DemoResponseSchema).safeParse(data);
     if (!parsed.success) {
-      throw new AppError(
-        INTERNAL_SERVER_ERROR,
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        ERROR_CODES.INTERNAL_ERROR
-      );
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INTERNAL_ERROR);
     }
 
     res.status(StatusCodes.OK).json({ data: parsed.data });
