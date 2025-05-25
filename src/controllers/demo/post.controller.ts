@@ -1,20 +1,23 @@
-import { OK_JOIN } from '@/constants/message';
+import { ERROR_CODES } from '@/constants/error.constant';
+import { BAD_REQUEST_VALUE, OK_JOIN } from '@/constants/message.constant';
 import { DemoCreateSchema } from '@/schemas/demo.schema';
 import { DemoService } from '@/service/demo.service';
-import { Request, Response } from 'express';
+import { AppError } from '@/utils/AppError';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-export const post = async (req: Request, res: Response) => {
+export const post = async (req: Request, res: Response, next: NextFunction) => {
   const parsed = DemoCreateSchema.safeParse(req.body);
-
   if (!parsed.success) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: parsed.error.message });
+    // 조건절로 error 보낼땐 next
+    next(new AppError(BAD_REQUEST_VALUE, StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
     return;
   }
-  const result = await DemoService.post(parsed.data);
 
-  if (result.affectedRows === 1) {
+  try {
+    await DemoService.post(parsed.data);
     res.status(StatusCodes.CREATED).json({ message: OK_JOIN });
-    return;
-  } else res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Invalid response format' });
+  } catch (err) {
+    next(err);
+  }
 };
