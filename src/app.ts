@@ -1,6 +1,6 @@
 import express from 'express';
 import { registerMiddlewares } from '@/middlewares/index.middleware';
-import { notFoundHandler } from '@/middlewares/error.middleware';
+import { errorHandler } from '@/middlewares/error.middleware';
 import DemoRouter from '@/routes/demo.routes';
 
 const app = express();
@@ -12,7 +12,6 @@ registerMiddlewares(app);
 app.use('/api/demo', DemoRouter);
 
 // ✅ 3. 에러 핸들러 등록
-app.use(notFoundHandler); // 404 핸들러
-// app.use(errorHandler);            // 에러 핸들러
+app.use(errorHandler);
 
 export default app;

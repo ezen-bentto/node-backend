@@ -1,11 +1,21 @@
 // notFoundHandler.ts
-import { NOT_FOUND_DATA } from "@/constants/message";
-import { Request, Response, NextFunction } from "express";
-import { getReasonPhrase, StatusCodes } from "http-status-codes";
+import { INTERNAL_SERVER_ERROR } from '@/constants/message.constant';
+import { AppError } from '@/utils/AppError';
+import { Request, Response, NextFunction } from 'express';
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 
-export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
-  res.status(StatusCodes.NOT_FOUND).json({
-    error: getReasonPhrase(StatusCodes.NOT_FOUND),
-    message: NOT_FOUND_DATA,
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({
+      status: getReasonPhrase(err.statusCode),
+      message: err.message,
+    });
+    return;
+  }
+
+  console.error('🚨', err);
+  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+    message: INTERNAL_SERVER_ERROR,
   });
 };

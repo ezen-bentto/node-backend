@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020", // 출력되는 JS 코드의 ECMAScript 버전
     "module": "CommonJS", // 
-    "lib": ["DOM", "ESNext"], // DOM 및 최신 JS 기능 사용 가능
+    // "lib": ["DOM", "ESNext"], // DOM 및 최신 JS 기능 사용 가능
     "skipLibCheck": true, // 의존성 타입 검사 생략 (빌드 속도 ↑)
     "esModuleInterop": true, // CommonJS 모듈을 ES6 스타일로 import 가능하게
     "allowSyntheticDefaultImports": true, // default export 없어도 default import 허용
