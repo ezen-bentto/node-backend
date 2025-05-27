@@ -8,9 +8,10 @@ import { StatusCodes } from 'http-status-codes';
 
 export const post = async (req: Request, res: Response, next: NextFunction) => {
   const parsed = DemoCreateSchema.safeParse(req.body);
+
   if (!parsed.success) {
     // 조건절로 error 보낼땐 next
-    next(new AppError(BAD_REQUEST_VALUE, StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+    next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
     return;
   }
 
