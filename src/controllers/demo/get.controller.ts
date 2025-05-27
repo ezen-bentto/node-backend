@@ -7,15 +7,17 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
+import { client } from '@/config/redis.config'
+
 export const get: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await DemoService.get();
-    const parsed = z.array(DemoResponseSchema).safeParse(data);
-    if (!parsed.success) {
-      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INTERNAL_ERROR);
-    }
+    await client.v4.set('key', 'test');
+    const value = await client.v4.get('key');
 
-    res.status(StatusCodes.OK).json({ data: parsed.data });
+    res.status(200).json({
+      message: 'Value stored in Redis',
+      value,
+    });
   } catch (err) {
     next(err);
   }
