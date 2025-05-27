@@ -1,4 +1,4 @@
-import { getDecodedData } from './getDecodedData';
+import { getDecodedData } from './decodeToken';
 
 export const refreshExpiredCheck = (refreshToken: string, currentDate: number): boolean => {
   let result: boolean;
