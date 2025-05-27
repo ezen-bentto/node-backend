@@ -2,6 +2,7 @@ import express from 'express';
 import { registerMiddlewares } from '@/middlewares/index.middleware';
 import { errorHandler } from '@/middlewares/error.middleware';
 import DemoRouter from '@/routes/demo.routes';
+import ContestRouter from '@/routes/contest.routes';
 
 const app = express();
 
@@ -10,6 +11,7 @@ registerMiddlewares(app);
 
 // ✅ 2. 라우터 연결
 app.use('/api/demo', DemoRouter);
+app.use('/api/contest', ContestRouter);
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);
