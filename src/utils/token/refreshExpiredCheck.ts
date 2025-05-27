@@ -1,8 +1,8 @@
-import { getDecodedData } from './decodeToken';
+import { decodeToken } from './decodeToken';
 
 export const refreshExpiredCheck = (refreshToken: string, currentDate: number): boolean => {
   let result: boolean;
-  const { exp } = getDecodedData(refreshToken);
+  const { exp } = decodeToken(refreshToken);
   if (exp && exp < currentDate) {
     result = true;
   } else {
