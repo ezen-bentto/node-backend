@@ -1,10 +1,10 @@
 // src/config/env.config.ts
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
 export const ENV = {
   port: process.env.PORT || 4000,
-  nodeEnv: process.env.NODE_ENV || "development",
+  nodeEnv: process.env.NODE_ENV || 'development',
 
   db: {
     host: process.env.DB_HOST as string,
@@ -15,8 +15,8 @@ export const ENV = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET!,
-    expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+    secret: process.env.JWT_SECRET as string,
+    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
   },
 
   aws: {
@@ -26,6 +26,6 @@ export const ENV = {
     bucket: process.env.AWS_S3_BUCKET_NAME!,
   },
 
-  corsOrigin: process.env.CORS_ORIGIN || "*",
-  logLevel: process.env.LOG_LEVEL || "info",
+  corsOrigin: process.env.CORS_ORIGIN || '*',
+  logLevel: process.env.LOG_LEVEL || 'info',
 };

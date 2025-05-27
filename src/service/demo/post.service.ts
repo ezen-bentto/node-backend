@@ -17,5 +17,6 @@ export const post = async (data: DemoCreate) => {
   } catch (err: unknown) {
     // 예: 중복 키 에러 처리
     handleDbError(err);
+    throw err;
   }
 };
