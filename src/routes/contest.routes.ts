@@ -7,6 +7,5 @@ router.get('/detail', ContestController.detail);
 router.get('/list', ContestController.list);
 router.post('/create', ContestController.create);
 router.post('/update', ContestController.update);
-router.post('/delete', ContestController.remove);
 
 export default router;

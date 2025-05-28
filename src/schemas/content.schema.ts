@@ -2,13 +2,17 @@ import { z } from 'zod';
 
 // 공모전 create [POST]
 export const ContestCreateSchema = z.object({
-  writerId: z.number().min(50),
+  writerId: z.number().min(0),
   title: z.string(),
   img: z.string(),
   organizer: z.string(),
   prize: z.string(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: "Invalid date format"
+  }),
+  endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: "Invalid date format"
+  }),
   homepage: z.string(),
   participants: z.string(),
   benefits: z.string(),
