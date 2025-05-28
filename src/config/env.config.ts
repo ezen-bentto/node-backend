@@ -27,6 +27,12 @@ export const ENV = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
     bucket: process.env.AWS_S3_BUCKET_NAME!,
   },
+  
+  kakao: {
+  clientId: process.env.KAKAO_CLIENT_ID as string,
+  clientSecret: process.env.KAKAO_CLIENT_SECRET as string,
+  redirectUri: process.env.KAKAO_REDIRECT_URI as string,
+  },
 
   corsOrigin: process.env.CORS_ORIGIN || '*',
   logLevel: process.env.LOG_LEVEL || 'info',
