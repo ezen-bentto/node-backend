@@ -9,16 +9,17 @@ export class AuthController {
   private kakaoAuthService = new KakaoAuthService();
   private authModel = new AuthModel();
 
-  // 카카오 로그인 콜백 처리
-  kakaoCallback = async (req: Request, res: Response) => {
+  // 명시적으로 Promise<void> 반환 타입 지정
+  kakaoCallback = async (req: Request, res: Response): Promise<void> => {
     try {
       const { code } = req.query;
 
       if (!code || typeof code !== 'string') {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           message: '인증 코드가 없습니다.',
         });
+        return;
       }
 
       // 1. 카카오 액세스 토큰 획득
@@ -50,21 +51,6 @@ export class AuthController {
       const { accessToken: jwtAccessToken, refreshToken } = 
         this.kakaoAuthService.generateTokens(user.id);
 
-      const response: AuthResponse = {
-        success: true,
-        data: {
-          user: {
-            id: user.id,
-            email: user.email,
-            nickname: user.nickname,
-            profileImage: user.profile_image,
-          },
-          accessToken: jwtAccessToken,
-          refreshToken,
-        },
-        message: '로그인 성공',
-      };
-
       // 7. 프론트엔드로 리다이렉트 (토큰을 쿼리 파라미터로 전달)
       const redirectUrl = `${ENV.corsOrigin}/login/callback?token=${jwtAccessToken}&refresh=${refreshToken}`;
       res.redirect(redirectUrl);
@@ -75,8 +61,8 @@ export class AuthController {
     }
   };
 
-  // 카카오 로그인 URL 제공
-  getKakaoLoginUrl = (req: Request, res: Response) => {
+  // 명시적으로 void 반환 타입 지정
+  getKakaoLoginUrl = (req: Request, res: Response): void => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&response_type=code`;
     
     res.json({

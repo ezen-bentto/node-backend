@@ -11,10 +11,9 @@ registerMiddlewares(app);
 
 // ✅ 2. 라우터 연결
 app.use('/api/demo', DemoRouter);
+app.use('/api/auth', authRouter);
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);
-
-app.use('/api/auth', authRouter);
 
 export default app;
