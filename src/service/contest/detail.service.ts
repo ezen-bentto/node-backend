@@ -3,15 +3,22 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/constants/error.constant';
 import { handleDbError } from '@/utils/handleDbError';
 import { client } from '@/config/redis.config';
+import { NextFunction } from 'express';
+import { ContestSelectDetail } from '@/schemas/content.schema';
 
-export const detail = async () => {
+export const detail = async (data:ContestSelectDetail) => {
   try {
-    // 조회수 cnt
+    // 조회수 set
     await client.v4.set('views', 0);
 
-    // 상세페이지 들어오면 incr
+    // userId 확인
+    
+
+    // 없는 Id면 incr로 조회수 증가
     const newValue: number = await client.incr('views');
     console.log(`total: ${newValue}`);
+
+    // 만료시간 설정
 
     // 모델 연결
 

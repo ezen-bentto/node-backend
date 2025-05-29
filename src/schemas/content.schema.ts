@@ -49,4 +49,5 @@ export const ContestDeleteSchema = z.object({
 });
 
 export type ContestCreate = z.infer<typeof ContestCreateSchema>;
+export type ContestSelectDetail = z.infer<typeof ContestSelectDetailSchema>;
 export type ContestUpdate = z.infer<typeof ContestUpdateSchema>;
