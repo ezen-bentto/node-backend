@@ -5,9 +5,23 @@ import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
 
-export const create = async (data: ContestCreate) => {
+/**
+ *
+ * 공모전 등록 서비스
+ *
+ * @function regContest
+ * @date 2025/05/30
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/05/30           한유리             신규작성  
+ * @param data
+ */
+export const regContest = async (data: ContestCreate) => {
   try {
-    const res = await ContestModel.create(data);
+    const res = await ContestModel.regContest(data);
 
     if(res.affectedRows != 1){
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);

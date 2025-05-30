@@ -6,22 +6,22 @@ import { client } from '@/config/redis.config';
 import { NextFunction } from 'express';
 import { ContestSelectDetail } from '@/schemas/content.schema';
 
-export const detail = async (data:ContestSelectDetail) => {
+/**
+ *
+ * 공모전 삭제 서비스
+ *
+ * @function delContest
+ * @date 2025/05/30
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/05/30           한유리             신규작성  
+ * @param data
+ */
+export const delContest = async () => {
   try {
-    // 조회수 set
-    await client.v4.set('views', 0);
-
-    // userId 확인
-    
-
-    // 없는 Id면 incr로 조회수 증가
-    const newValue: number = await client.incr('views');
-    console.log(`total: ${newValue}`);
-
-    // 만료시간 설정
-
-    // 모델 연결
-
     return;
   } catch (err: unknown) {
     handleDbError(err);

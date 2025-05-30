@@ -1,10 +1,10 @@
-import { regContest } from "./contest/register.model";
+import { handleDbError } from '@/utils/handleDbError';
 
 /**
  *
- * 공모전 모델 모음
+ * 공모전 수정 서비스
  *
- * @function getContestDetail
+ * @function modContest
  * @date 2025/05/30
  * @history
  * -------------------------------------------------------
@@ -12,6 +12,13 @@ import { regContest } from "./contest/register.model";
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리             신규작성  
- * @param 없음
+ * @param 
  */
-export const ContestModel = {regContest};
+export const modContest = async () => {
+  try {
+    return;
+  } catch (err: unknown) {
+    handleDbError(err);
+    throw err;
+  }
+};

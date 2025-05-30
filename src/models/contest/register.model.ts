@@ -2,7 +2,21 @@ import { getDBConnection } from "@/config/db.config";
 import { ContestCreate } from "@/schemas/content.schema";
 import { InsertResult } from "@/types/db/response.type";
 
-export const create = async (props: ContestCreate): Promise<InsertResult> => {
+/**
+ *
+ * 공모전 등록 모델
+ *
+ * @function regContest
+ * @date 2025/05/30
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/05/30           한유리             신규작성  
+ * @param props
+ */
+export const regContest = async (props: ContestCreate): Promise<InsertResult> => {
   // DB 컬럼명 (snake_case)
   const keys = [
     "writer_id",
@@ -43,4 +57,4 @@ export const create = async (props: ContestCreate): Promise<InsertResult> => {
   return res;
 };
 
-export default create;
+export default regContest;

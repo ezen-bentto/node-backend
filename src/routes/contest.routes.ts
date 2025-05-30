@@ -1,11 +1,26 @@
 import ContestController from '@/controllers/contest.controller';
 import { Router } from 'express';
 
+/**
+ *
+ * 공모전 관련 API 라우터
+ *
+ * @function router
+ * @date 2025/05/30
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/05/30           한유리             신규작성  
+ * @param 
+ */
 const router = Router();
 
-router.get('/detail', ContestController.detail);
-router.get('/list', ContestController.list);
-router.post('/create', ContestController.create);
-router.post('/update', ContestController.update);
+router.get('/getDetail', ContestController.getContestDetail);
+router.get('/getList', ContestController.getContestList);
+router.post('/register', ContestController.regContest);
+router.post('/modify', ContestController.modContest);
+router.post('/delete', ContestController.delContest);
 
 export default router;
