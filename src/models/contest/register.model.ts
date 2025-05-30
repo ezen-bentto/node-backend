@@ -1,5 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
-import { ContestCreate } from "@/schemas/content.schema";
+import { regContest as regSchema } from "@/schemas/content.schema";
 import { InsertResult } from "@/types/db/response.type";
 
 /**
@@ -18,7 +18,7 @@ import { InsertResult } from "@/types/db/response.type";
  * @param props - 공모전 등록에 필요한 데이터 객체 (ContestCreate 타입)
  * @returns InsertResult - 삽입 결과
  */
-export const regContest = async (props: ContestCreate): Promise<InsertResult> => {
+export const regContest = async (props: regSchema): Promise<InsertResult> => {
   // DB 컬럼명 (snake_case)
   const keys = [
     "writer_id",

@@ -4,11 +4,6 @@ import { z } from 'zod';
  *
  * 공모전 스키마 정의
  *
- * 공모전 관련 API의 요청 데이터 검증을 위해
- * Zod 라이브러리를 사용하여 각 기능별 스키마를 정의합니다.
- * 등록, 상세 조회, 수정, 삭제 시 필요한 데이터 형식과
- * 유효성 조건을 명시하여 안정적인 데이터 처리와 에러 방지를 지원합니다.
- *
  * @function regContestSchema, getContestDetailSchema, modContestSchema, delContestSchema
  * @date 2025/05/30
  * @history
@@ -66,6 +61,11 @@ export const delContestSchema = z.object({
   id: z.number(),
 });
 
-export type ContestCreate = z.infer<typeof regContestSchema>;
-export type ContestSelectDetail = z.infer<typeof getContestDetailSchema>;
-export type ContestUpdate = z.infer<typeof modContestSchema>;
+export type regContest = z.infer<typeof regContestSchema>;
+export type regContestView = z.infer<typeof regContestSchema> & {
+  views: number;
+};
+export type getContestDetail = z.infer<typeof getContestDetailSchema> & {
+  ip: string;
+};
+export type modContest = z.infer<typeof modContestSchema>;

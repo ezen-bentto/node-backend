@@ -30,16 +30,16 @@ export const getContestDetail: RequestHandler = async (req: Request, res: Respon
   try {
     // id 쿼리 파라미터 추출
     const { id } = req.query;
+    const ip = req.ip; //string
     const contestId = parseInt(id as string, 10);
     const parsed = getContestDetailSchema.safeParse({id: contestId});
 
-    if (!parsed.success) {
+    if (!parsed.success || ip === undefined) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }
 
-    // DB 조회 or 서비스 호출 부분
-    const data = ContestService.getContestDetail(parsed.data);
+    const data = ContestService.getContestDetail({ id: parsed.data.id, ip:ip }); // or ...parsed.data
     res.status(StatusCodes.OK).json({ data: parsed.data });
     return;
   } catch (err) {
