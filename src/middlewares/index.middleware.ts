@@ -2,13 +2,24 @@ import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import { ENV } from '@/config/env.config';
+
 
 // Express 앱에 필요한 미들웨어를 한 번에 등록하는 함수
 export const registerMiddlewares = (app: express.Application) => {
   // CORS(Cross-Origin Resource Sharing) 미들웨어를 가져온다.
   // 외부 도메인에서의 API 요청을 허용하기 위해 사용됨
   // CORS 활성화: 기본 설정으로 모든 출처(origin)에 대해 허용
-  app.use(cors());
+  app.use(cors({
+    origin: ENV.corsOrigin,           // 프론트엔드 URL (React 앱이 5173번 포트에서 실행 중) -- env 파일에서 가져오기
+    methods: ['GET', 'POST'],         // 허용할 HTTP 메소드
+    allowedHeaders: ['Cache-Control', 'no-cache, no-store, must-revalidate']  // 허용할 헤더
+  }
+  ));
+
+  // no-cache: 요청이 있을 때마다 서버에 새로운 데이터를 요청하도록 강제
+  // no-store: 서버에서 받은 데이터를 브라우저가 저장하지 않도록 함함
+  // must-revalidate: 리소스가 만료되었을 경우, 다시 요청을 보내기 전에 서버에 유효성을 검증하도록 강제
 
   // JSON 형태의 요청 바디(body)를 파싱할 수 있게 해줌
   app.use(express.json());
