@@ -9,6 +9,9 @@ import { StatusCodes } from 'http-status-codes';
  *
  * 공모전 등록 서비스
  *
+ * 클라이언트로부터 전달받은 공모전 정보를
+ * 데이터베이스에 저장하고, 저장 결과를 반환합니다.
+ *
  * @function regContest
  * @date 2025/05/30
  * @history
@@ -17,7 +20,7 @@ import { StatusCodes } from 'http-status-codes';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리             신규작성  
- * @param data
+ * @param data - 공모전 등록에 필요한 데이터 객체
  */
 export const regContest = async (data: ContestCreate) => {
   try {

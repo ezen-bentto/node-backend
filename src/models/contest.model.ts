@@ -2,9 +2,10 @@ import { regContest } from "./contest/register.model";
 
 /**
  *
- * 공모전 모델 모음
+ * 공모전 모델 모음  
+ * 공모전 관련 DB 모델 함수들을 하나로 묶어 export 합니다.
  *
- * @function getContestDetail
+ * @function ContestModel
  * @date 2025/05/30
  * @history
  * -------------------------------------------------------

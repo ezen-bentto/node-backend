@@ -3,9 +3,9 @@ import { Router } from 'express';
 
 /**
  *
- * 공모전 관련 API 라우터
+ * 공모전 관련 API 라우터 모음
  *
- * @function router
+ * @constant router
  * @date 2025/05/30
  * @history
  * -------------------------------------------------------
@@ -13,7 +13,6 @@ import { Router } from 'express';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리             신규작성  
- * @param 
  */
 const router = Router();
 
