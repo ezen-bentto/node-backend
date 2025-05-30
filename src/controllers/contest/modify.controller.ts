@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
  *
  * 공모전 수정 페이지
  *
- * @function getContestList
+ * @function modContest
  * @date 2025/05/30
  * @history
  * -------------------------------------------------------
