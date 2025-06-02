@@ -18,7 +18,7 @@ import { InsertResult } from "@/types/db/response.type";
  * @param props - 공모전 등록에 필요한 데이터 객체 (ContestCreate 타입)
  * @returns InsertResult - 삽입 결과
  */
-export const regContest = async (props: regSchema): Promise<InsertResult> => {
+const regContest = async (props: regSchema): Promise<InsertResult> => {
   // DB 컬럼명 (snake_case)
   const keys = [
     "writer_id",
@@ -37,13 +37,13 @@ export const regContest = async (props: regSchema): Promise<InsertResult> => {
 
   // props (camelCase) → DB 컬럼 순서에 맞춰 값 추출
   const values = [
-    props.writerId,
+    props.writer_id,
     props.title,
     props.img,
     props.organizer,
     props.prize,
-    props.startDate,
-    props.endDate,
+    props.start_date,
+    props.end_date,
     props.homepage,
     props.participants,
     props.benefits,

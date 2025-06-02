@@ -11,6 +11,7 @@ export const client = createClient({
 
 client.on('error', (error) => {
   console.error('Redis error:', error);
+  // err 던지기
 });
 
 client.on('connect', () => {

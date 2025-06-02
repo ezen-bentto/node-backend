@@ -17,14 +17,14 @@ import { z } from 'zod';
 
 // 공모전 create [POST]
 export const regContestSchema = z.object({
-  writerId: z.number().min(0),
+  writer_id: z.string(),
   title: z.string(),
   img: z.string(),
   organizer: z.string(),
   prize: z.string(),
-  startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+  start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
-  endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+  end_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
   homepage: z.string(),
   participants: z.string(),
@@ -42,18 +42,19 @@ export const getContestDetailSchema = z.object({
 
 // 공모전 상세 UPDATE [POST]
 export const modContestSchema = z.object({
-  writerId: z.number().min(50),
-  title: z.string().optional(),
-  img: z.string().optional(),
-  organizer: z.string().optional(),
-  prize: z.string().optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  homepage: z.string().optional(),
-  participants: z.string().optional(),
-  benefits: z.string().optional(),
-  contest_tag: z.string().optional(),
-  article: z.string().optional(),
+  writer_id: z.string(),
+  title: z.string(),
+  img: z.string(),
+  organizer: z.string(),
+  prize: z.string(),
+  start_date: z.date(),
+  end_date: z.date(),
+  homepage: z.string(),
+  participants: z.string(),
+  benefits: z.string(),
+  contest_tag: z.string(),
+  article: z.string(),
+  views: z.string()
 });
 
 // 공모전 상세 삭제 UPDATE [POST]
@@ -62,10 +63,10 @@ export const delContestSchema = z.object({
 });
 
 export type regContest = z.infer<typeof regContestSchema>;
-export type regContestView = z.infer<typeof regContestSchema> & {
-  views: number;
+export type detailContest = z.infer<typeof regContestSchema> & {
+  views: string;
 };
-export type getContestDetail = z.infer<typeof getContestDetailSchema> & {
+export type getDetailParam = z.infer<typeof getContestDetailSchema> & {
   ip: string;
 };
 export type modContest = z.infer<typeof modContestSchema>;

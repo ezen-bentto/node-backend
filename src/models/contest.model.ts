@@ -1,5 +1,6 @@
-import { getContestDetail } from "./contest/getDetail.mode";
-import { regContest } from "./contest/register.model";
+import addCntViews from "./contest/addCntViews.model";
+import getContestDetail from "./contest/getDetail.model";
+import regContest from "./contest/register.model";
 
 /**
  *
@@ -16,4 +17,4 @@ import { regContest } from "./contest/register.model";
  *        2025/05/30           한유리             신규작성  
  * @param 없음
  */
-export const ContestModel = {regContest, getContestDetail};
+export const ContestModel = {regContest, getContestDetail, addCntViews};

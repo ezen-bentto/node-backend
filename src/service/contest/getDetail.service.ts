@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/constants/error.constant';
 import { handleDbError } from '@/utils/handleDbError';
 import { client } from '@/config/redis.config';
-import { getContestDetail as getDetailSchema } from '@/schemas/content.schema';
+import { detailContest, getDetailParam} from '@/schemas/content.schema';
 import { ContestModel } from '@/models/contest.model';
 
 /**
@@ -26,34 +26,36 @@ import { ContestModel } from '@/models/contest.model';
  *        2025/05/30           한유리             신규작성  
  * @param data 조회할 공모전의 상세 정보 요청 데이터 (ID 등)
  */
-export const getContestDetail = async ({ ip, id }: getDetailSchema) => {
+export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<detailContest> => {
   try {
     // 실제 공모전 상세 조회 (DB)
-    const contest = await ContestModel.getContestDetail(id);
+    const contestData = await ContestModel.getContestDetail(id);
 
-    console.log(contest);
-
-    if (contest === undefined){
+    if (contestData === undefined){
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
-      return;
     }
-
+    
     // ip redis 조회
     const ipKey = `contest${id}:ip${ip}`;
-    const data = await client.get(ipKey);
+    const cash = await client.v4.get(ipKey);
 
     // 만약 redis에 해당 게시글에 대하여 ip가 없을 경우
-    if (data == null) {
+    if (cash == null) {
       // redis에 해당 ip를 추가
-      await client.set(ipKey, 1);
+      await client.v4.set(ipKey, 1);
       // 유효기간을 24시간 설정
-      await client.expire(ipKey, 86400);
+      await client.v4.expire(ipKey, 1);
       // 게시글 조회수 증가
-      // contest.viewCount++;
+      const viewsCnt = parseInt(contestData.views) + 1;
+      contestData.views = viewsCnt.toString();
       // 조회수 컬럼만 올리는 로직
+      const viewsRes = await ContestModel.addCntViews(viewsCnt, id);
+      if (viewsRes.affectedRows !== 1){
+        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
+      }
     }
 
-    return contest;
+    return contestData;
   } catch (err: unknown) {
     handleDbError(err);
     throw err;
