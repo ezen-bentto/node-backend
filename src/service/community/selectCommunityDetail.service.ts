@@ -1,5 +1,6 @@
 import { CommunityModel } from '@/models/community.model';
 import { handleDbError } from '@/utils/handleDbError';
+import logger from '@/utils/common/logger';
 
 /**
  *
@@ -12,13 +13,17 @@ import { handleDbError } from '@/utils/handleDbError';
  *
  *        2025/06/03           김혜미               신규작성 
  *  
- * @param communityId   상세 조회할 커뮤니티 ID
+ * @param communityId 
  */
 export const selectCommunityDetail = async (communityId: number) => {
+    logger.info('커뮤니티 상세 조회 서비스 호출');
     try {
         const res = await CommunityModel.selectCommunityDetail(communityId);
+        logger.info('커뮤니티 상세 조회 서비스 종료');
+
         return res;
     } catch (err: unknown) {
+        logger.error('커뮤니티 상세 조회 서비스 오류 발생', err);
         handleDbError(err);
         throw err;
     }

@@ -1,5 +1,9 @@
 import { CommunityService } from '@/service/community.service';
 import { Request, Response, NextFunction } from 'express';
+import logger from '@/utils/common/logger';
+import { AppError } from '@/utils/AppError';
+import { StatusCodes } from 'http-status-codes';
+import { ERROR_CODES } from '@/constants/error.constant';
 
 /**
  * ```
@@ -17,22 +21,27 @@ export const getCommunityDetail = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        logger.info(`커뮤니티 글 상세 요청 시작 : ${req.ip}`);
+
         const communityId = Number(req.query.communityId);
 
         if (isNaN(communityId) || communityId <= 0) {
-            res.status(400).json({ message: '유효하지 않은 communityId입니다.' });
+            logger.warn(`커뮤니티 글 상세 요청 검증 실패 : ${JSON.stringify(req.query)}`);
+            next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
         }
 
         const result = await CommunityService.selectCommunityDetail(communityId);
 
         if (!result) {
-            res.status(404).json({ message: '해당 커뮤니티 글을 찾을 수 없습니다.' });
+            next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
         }
+        logger.info(`커뮤니티 글 상세 조회 성공 : ${JSON.stringify(result)}`);
 
-        res.status(200).json(result);
-    } catch (error) {
-        next(error);
+        res.status(StatusCodes.OK).json({ data: result });
+    } catch (err) {
+        logger.error('커뮤니티 글 상세 조회 중 오류 발생', err);
+        next(err);
     }
 };

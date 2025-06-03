@@ -1,6 +1,10 @@
 import { CommunitySelectRequest } from '@/schemas/commnutiy.schema';
 import { selectCommunityList } from '@/service/community/selectCommunityList.service';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
+import logger from '@/utils/common/logger';
+import { AppError } from '@/utils/AppError';
+import { StatusCodes } from 'http-status-codes';
+import { ERROR_CODES } from '@/constants/error.constant';
 
 /**
  * ```
@@ -18,26 +22,27 @@ export const getCommunityList = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        logger.info(`커뮤니티 목록 요청 시작 : ${req.ip}`);
         const parsed = CommunitySelectRequest.safeParse(req.query);
 
         if (!parsed.success) {
-            res.status(400).json({
-                message: '잘못된 요청 파라미터입니다.',
-                errors: parsed.error.format(),
-            });
+            logger.warn(`커뮤니티 목록 요청 검증 실패 : ${JSON.stringify(req.body)}`);
+            next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
         }
 
         const { page = '1', size = '10' } = req.query;
 
-        const result = await selectCommunityList(
+        const data = await selectCommunityList(
             parsed.data,
             parseInt(page as string, 10),
             parseInt(size as string, 10)
         );
+        logger.info(`커뮤니티 목록 조회 성공 : ${JSON.stringify(data.list)}`);
 
-        res.status(200).json(result);
-    } catch (error) {
-        next(error);
+        res.status(StatusCodes.OK).json({ data: data });
+    } catch (err) {
+        logger.error('커뮤니티 목록 조회 중 오류 발생', err);
+        next(err);
     }
 };
