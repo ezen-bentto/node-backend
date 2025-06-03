@@ -11,24 +11,24 @@ export const updateCommunity = async (
         const sql = `
         UPDATE community
         SET
-        community_type = ?,
         contest_id = ?,
         category_type = ?,
         start_date = ?,
         end_date = ?,
         recruit_end_date = ?,
+        age_group = ?,
         content = ?,
         mod_date = NOW()
         WHERE community_id = ? AND author_id = ? AND del_yn = 'N'
     `;
 
         const values = [
-            props.communityType,
             props.contestId,
             props.categoryType,
             props.startDate,
             props.endDate,
             props.recruitEndDate,
+            props.ageGroup,
             props.content,
             communityId,
             userId

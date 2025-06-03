@@ -14,7 +14,6 @@ export const deleteCommunity = async (props: CommunityDeleteRequest, userId: num
         const db = getDBConnection();
         const result = await db.query(sql, [props.communityId, userId]);
 
-        console.log("삭제(soft delete) 결과:", result);
         return result;
     } catch (error) {
         console.error("커뮤니티 삭제 실패:", error);
