@@ -2,6 +2,7 @@ import { ERROR_CODES } from '@/constants/error.constant';
 import { CommunityUpdateRequest } from '@/schemas/commnutiy.schema';
 import { CommunityService } from '@/service/community.service';
 import { AppError } from '@/utils/AppError';
+import { sanitizeHtml } from '@/utils/common/sanitizeHtml';
 import { serializeBigInt } from '@/utils/common/serializeBigInt';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -28,7 +29,13 @@ export const modCommunityPost: RequestHandler = async (
     }
 
     try {
-        const result = await CommunityService.updateCommunityPost(parsed.data);
+        // content XSS 필터링 적용
+        const cleanData = {
+            ...parsed.data,
+            content: sanitizeHtml(parsed.data.content || ''),
+        };
+
+        const result = await CommunityService.updateCommunityPost(cleanData);
 
         const data = serializeBigInt(result);
 

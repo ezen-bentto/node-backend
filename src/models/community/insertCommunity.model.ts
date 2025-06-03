@@ -2,10 +2,10 @@ import { getDBConnection } from "@/config/db.config";
 import { CommunityRegisterRequest } from "@/schemas/commnutiy.schema";
 import { InsertResult } from "@/types/db/response.type";
 
-// model = mapper.xml
-// 커뮤니티 글 Insert
-export const insertCommunity = async (props: CommunityRegisterRequest, userId: number): Promise<InsertResult> => {
-  // DB 컬럼명 (snake_case)
+export const insertCommunity = async (
+  props: CommunityRegisterRequest,
+  userId: number
+): Promise<InsertResult> => {
   const keys = [
     "community_type",
     "category_type",
@@ -13,38 +13,39 @@ export const insertCommunity = async (props: CommunityRegisterRequest, userId: n
     "start_date",
     "end_date",
     "recruit_end_date",
+    "age_group",
     "content",
     "author_id",
     "reg_date",
     "mod_date",
   ];
 
-  // props (camelCase) → DB 컬럼 순서에 맞춰 값 추출
   const values = [
     props.communityType,
-    props.categoryType,
-    props.contestId,
-    props.startDate,
-    props.endDate,
-    props.recruitEndDate,
+    props.categoryType ?? null,
+    props.contestId ?? null,
+    props.startDate ?? null,
+    props.endDate ?? null,
+    props.recruitEndDate ?? null,
+    props.ageGroup ?? null,
     props.content,
     userId,
   ];
 
-  let res = null;
   try {
     const sql = `INSERT INTO community (${keys.join(", ")}) VALUES (${keys
       .map((key) => (key === "reg_date" || key === "mod_date" ? "NOW()" : "?"))
       .join(", ")})`;
 
     const db = getDBConnection();
-    res = await db.query(sql, values);
-    console.log('INSERT 결과:', res);
-  } catch (error) {
-    console.log(error);
-  }
+    const res = await db.query(sql, values);
 
-  return res;
+    console.log("INSERT 결과:", res);
+    return res as InsertResult;
+  } catch (error) {
+    console.error("커뮤니티 글 등록 중 오류:", error);
+    throw new Error("커뮤니티 글 등록 중 오류 발생");
+  }
 };
 
 export default insertCommunity;
