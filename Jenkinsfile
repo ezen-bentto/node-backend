@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         SSH_KEY_ID = 'ec2-ssh-key'                     // 크리덴셜 ID 문자열 (SSH 키용)
-        DISCORD_WEBHOOK_URL = credentials('discord-webhook-url')
+        DISCORD_WEBHOOK_URL = credentials('discord-backend')
         BACKEND_EC2_IP = credentials('backend-ec2-ip')
-        GITHUB_REPO = credentials('github-repo-url')
+        GITHUB_REPO = credentials('github-back-url')
         DB_HOST = credentials('db-host')
         DB_PORT = credentials('db-port')
         DB_USER = credentials('db-user')
