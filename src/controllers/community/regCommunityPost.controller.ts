@@ -6,6 +6,7 @@ import { serializeBigInt } from '@/utils/common/serializeBigInt';
 import { sanitizeHtml } from '@/utils/common/sanitizeHtml';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import logger from '@/utils/common/logger';
 
 /**
  * ```
@@ -21,9 +22,11 @@ export const regCommunityPost: RequestHandler = async (
     res: Response,
     next: NextFunction
 ) => {
+    logger.info(`커뮤니티 글 등록 요청 시작 : ${req.ip}`);
     const parsed = CommunityRegisterRequest.safeParse(req.body);
 
     if (!parsed.success) {
+        logger.warn(`커뮤니티 글 등록 요청 검증 실패 : ${JSON.stringify(req.body)}`);
         next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
         return;
     }
@@ -36,13 +39,14 @@ export const regCommunityPost: RequestHandler = async (
         };
 
         const result = await CommunityService.createCommunityPost(cleanData);
+        logger.info(`커뮤니티 글 등록 성공 : ${JSON.stringify(result.insertId)}`);
+
         const data = serializeBigInt(result);
 
         res.status(StatusCodes.OK).json({ data: data });
         return;
     } catch (err) {
-        console.error('커뮤니티 글 등록 중 오류:', err); // 이 부분이 있어야 원인 추적 가능
-
+        logger.error('커뮤니티 글 등록 중 오류 발생', err);
         next(err);
     }
 };
