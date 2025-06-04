@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { kakaoConfig } from '../../config/kakao.config';
 import { ENV } from '../../config/env.config';
 import { KakaoUserInfo, SocialUser, AuthResponse } from '../../types/auth.type';
@@ -25,9 +25,9 @@ export class KakaoAuthService {
       );
 
       return response.data.access_token;
-    } catch (error) {
-      console.error('카카오 토큰 요청 실패:', error);
-      throw new Error('카카오 인증 실패');
+    } catch (error: any) {
+      console.error('카카오 토큰 요청 실패:', error.response?.data || error.message);
+      throw new Error(`카카오 인증 실패: ${error.message}`);
     }
   }
 
@@ -40,13 +40,15 @@ export class KakaoAuthService {
         },
       });
 
-      const { id, kakao_account } = response.data;
-      
+      const data = response.data;
+      const kakaoAccount = data.kakao_account || {};
+      const profile = kakaoAccount.profile || {};
+
       return {
-        socialId: String(id),
-        email: kakao_account.email || '',
-        nickname: kakao_account.profile?.nickname || '',
-        profileImage: kakao_account.profile?.profile_image_url,
+        socialId: String(data.id),
+        email: kakaoAccount.email ?? '', // email 없으면 빈 문자열
+        nickname: profile.nickname ?? '카카오 사용자', // 닉네임 없으면 기본값
+        profileImage: profile.profile_image_url ?? '', // 프로필 이미지 없으면 빈 문자열
         provider: 'kakao',
       };
     } catch (error) {
@@ -54,20 +56,15 @@ export class KakaoAuthService {
       throw new Error('사용자 정보 조회 실패');
     }
   }
-
   // JWT 토큰 생성
   generateTokens(userId: number) {
-    const accessToken = jwt.sign(
-      { userId, type: 'access' },
-      ENV.jwt.secret,
-      { expiresIn: ENV.jwt.expiresIn } as jwt.SignOptions
-    );
+    const accessToken = jwt.sign({ userId, type: 'access' }, ENV.jwt.secret, {
+      expiresIn: ENV.jwt.expiresIn,
+    } as jwt.SignOptions);
 
-    const refreshToken = jwt.sign(
-      { userId, type: 'refresh' },
-      ENV.jwt.refreshSecret,
-      { expiresIn: ENV.jwt.refreshExpiresIn } as jwt.SignOptions
-    );
+    const refreshToken = jwt.sign({ userId, type: 'refresh' }, ENV.jwt.refreshSecret, {
+      expiresIn: ENV.jwt.refreshExpiresIn,
+    } as jwt.SignOptions);
 
     return { accessToken, refreshToken };
   }
