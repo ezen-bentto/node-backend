@@ -1,8 +1,14 @@
 import express from 'express';
 import { registerMiddlewares } from '@/middlewares/index.middleware';
 import { errorHandler } from '@/middlewares/error.middleware';
+<<<<<<< HEAD
 import DemoRouter from '@/routes/demo.routes';
 import { authRouter } from './routes/auth.routes';
+=======
+// import DemoRouter from '@/routes/demo.routes';
+import CommunityRouter from '@/routes/community.routes';
+
+>>>>>>> 356b615ba003c917680cfdf20b470168aefc280c
 
 const app = express();
 
@@ -10,8 +16,19 @@ const app = express();
 registerMiddlewares(app);
 
 // ✅ 2. 라우터 연결
+<<<<<<< HEAD
 app.use('/api/demo', DemoRouter);
 app.use('/api/auth', authRouter);
+=======
+// demo
+// app.use('/api/demo', DemoRouter);
+
+// 커뮤니티
+console.log("여기까지옴");
+
+app.use('/api/community', CommunityRouter);
+
+>>>>>>> 356b615ba003c917680cfdf20b470168aefc280c
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);
