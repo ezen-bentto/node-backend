@@ -1,6 +1,6 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { ContestModel } from '@/models/contest.model';
-import { ContestCreate } from '@/schemas/content.schema';
+import { regContest as regContestParams } from '@/schemas/content.schema';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
@@ -22,7 +22,7 @@ import { StatusCodes } from 'http-status-codes';
  *        2025/05/30           한유리             신규작성  
  * @param data - 공모전 등록에 필요한 데이터 객체
  */
-export const regContest = async (data: ContestCreate) => {
+export const regContest = async (data: regContestParams) => {
   try {
     const res = await ContestModel.regContest(data);
 

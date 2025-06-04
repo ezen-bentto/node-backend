@@ -3,6 +3,7 @@ import { registerMiddlewares } from '@/middlewares/index.middleware';
 import { errorHandler } from '@/middlewares/error.middleware';
 import DemoRouter from '@/routes/demo.routes';
 import ContestRouter from '@/routes/contest.routes';
+import "./jobs/index.ts";
 
 const app = express();
 

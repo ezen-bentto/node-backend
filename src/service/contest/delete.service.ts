@@ -4,7 +4,6 @@ import { ERROR_CODES } from '@/constants/error.constant';
 import { handleDbError } from '@/utils/handleDbError';
 import { client } from '@/config/redis.config';
 import { NextFunction } from 'express';
-import { ContestSelectDetail } from '@/schemas/content.schema';
 
 /**
  *

@@ -37,22 +37,29 @@ export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<deta
     
     // ip redis 조회
     const ipKey = `contest${id}:ip${ip}`;
-    const cash = await client.v4.get(ipKey);
+    const viewsKey = `contest:${id}:views`;
+
+    // get contest:1:views
+    console.log(viewsKey);
+
+    const isVisited = await client.v4.get(ipKey);
 
     // 만약 redis에 해당 게시글에 대하여 ip가 없을 경우
-    if (cash == null) {
+    if (isVisited == null) {
       // redis에 해당 ip를 추가
       await client.v4.set(ipKey, 1);
       // 유효기간을 24시간 설정
       await client.v4.expire(ipKey, 1);
       // 게시글 조회수 증가
-      const viewsCnt = parseInt(contestData.views) + 1;
-      contestData.views = viewsCnt.toString();
-      // 조회수 컬럼만 올리는 로직
-      const viewsRes = await ContestModel.addCntViews(viewsCnt, id);
-      if (viewsRes.affectedRows !== 1){
-        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
-      }
+      await client.v4.incr(viewsKey);
+
+      // contestData.views = viewsCnt.toString();
+      // // 조회수 컬럼만 올리는 로직
+      // const viewsRes = await ContestModel.addCntViews(viewsCnt, id);
+      // if (viewsRes.affectedRows !== 1){
+      //   throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
+      // }
+
     }
 
     return contestData;
