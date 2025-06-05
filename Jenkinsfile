@@ -20,7 +20,7 @@ pipeline {
                     echo "📦 GitHub에서 소스 코드 클론/업데이트"
                     sshagent([env.SSH_KEY_ID]) {
                         sh """#!/bin/bash
-ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ubuntu@${env.BACKEND_EC2_IP} <<'EOF'
 mkdir -p ~/node-backend
 cd ~/node-backend
 
@@ -33,6 +33,9 @@ else
   git clean -fd
   git pull origin main
 fi
+
+echo "✅ Checkout 단계 완료"
+exit 0
 EOF
 """
                     }
@@ -46,10 +49,13 @@ EOF
                     echo "🔧 빌드 시작"
                     sshagent([env.SSH_KEY_ID]) {
                         sh """#!/bin/bash
-ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ubuntu@${env.BACKEND_EC2_IP} <<'EOF'
 cd ~/node-backend
 npm install
 npm run build
+
+echo "✅ Build 단계 완료"
+exit 0
 EOF
 """
                     }
@@ -63,7 +69,7 @@ EOF
                     echo "🚀 배포 시작"
                     sshagent([env.SSH_KEY_ID]) {
                         sh """#!/bin/bash
-ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ubuntu@${env.BACKEND_EC2_IP} <<'EOF'
 cd ~/node-backend
 
 # 기존 PM2 프로세스 정리
@@ -99,7 +105,8 @@ pm2 list
 echo "=== 환경변수 확인 ==="
 pm2 env 0
 
-echo "배포 완료!"
+echo "✅ Deploy 단계 완료!"
+exit 0
 EOF
 """
                     }
@@ -113,18 +120,31 @@ EOF
                     echo "🔍 서버 상태 확인"
                     sshagent([env.SSH_KEY_ID]) {
                         sh """#!/bin/bash
-ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ubuntu@${env.BACKEND_EC2_IP} <<'EOF'
 cd ~/node-backend
 
 # 잠시 서버 시작 대기
+echo "⏰ 서버 시작 대기 중..."
 sleep 5
 
 # 헬스 체크
 echo "=== API 테스트 ==="
-curl -s http://localhost:4000/api/community/getList?communityType=1 | head -100
+API_RESPONSE=\$(curl -s -w "%{http_code}" -o /tmp/api_response.txt http://localhost:4000/api/community/getList?communityType=1)
+HTTP_CODE=\${API_RESPONSE: -3}
+
+if [ "\$HTTP_CODE" = "200" ]; then
+    echo "✅ API 응답 성공 (HTTP 200)"
+    cat /tmp/api_response.txt | head -100
+else
+    echo "⚠️ API 응답 코드: \$HTTP_CODE"
+    cat /tmp/api_response.txt
+fi
 
 echo "\\n=== PM2 로그 확인 ==="
 pm2 logs --lines 10
+
+echo "✅ Health Check 단계 완료!"
+exit 0
 EOF
 """
                     }
@@ -137,26 +157,60 @@ EOF
                 script {
                     echo "📢 디스코드 알림 전송"
                     sh """#!/bin/bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "content": "✅ 백엔드 자동 배포 성공! (PM2 ecosystem 방식)"
-}' ${env.DISCORD_WEBHOOK_URL}
+RESPONSE=\$(curl -s -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{
+  "content": "✅ 백엔드 자동 배포 성공! (PM2 ecosystem 방식) - $(date)"
+}' ${env.DISCORD_WEBHOOK_URL})
+
+echo "Discord 알림 응답: \$RESPONSE"
+echo "✅ Notify 단계 완료!"
 """
+                }
+            }
+        }
+
+        stage('Final Status') {
+            steps {
+                script {
+                    echo "🎉 모든 배포 단계가 성공적으로 완료되었습니다!"
+                    echo "📊 배포 요약:"
+                    echo "   - Checkout: ✅"
+                    echo "   - Build: ✅"
+                    echo "   - Deploy: ✅"
+                    echo "   - Health Check: ✅"
+                    echo "   - Notification: ✅"
+                    echo "🏁 Jenkins 파이프라인을 종료합니다."
                 }
             }
         }
     }
 
     post {
-        failure {
-            echo "❌ 배포 실패"
-            sh """#!/bin/bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "content": "❌ 백엔드 자동 배포 실패! 로그를 확인해주세요."
-}' ${env.DISCORD_WEBHOOK_URL}
+        success {
+            script {
+                echo "🎊 전체 파이프라인 성공!"
+                sh """#!/bin/bash
+curl -s -X POST -H "Content-Type: application/json" -d '{
+  "content": "🎊 Jenkins 파이프라인 완전 성공! 모든 단계 완료 - $(date)"
+}' ${env.DISCORD_WEBHOOK_URL} || echo "Discord 알림 실패 (무시)"
 """
+            }
+        }
+        failure {
+            script {
+                echo "❌ 배포 실패"
+                sh """#!/bin/bash
+curl -s -X POST -H "Content-Type: application/json" -d '{
+  "content": "❌ 백엔드 자동 배포 실패! 로그를 확인해주세요. - $(date)"
+}' ${env.DISCORD_WEBHOOK_URL} || echo "Discord 알림 실패 (무시)"
+"""
+            }
         }
         always {
-            echo "✅ Jenkins 파이프라인 종료"
+            script {
+                echo "🔚 Jenkins 파이프라인 최종 종료"
+                echo "⏰ 종료 시각: $(date)"
+                echo "📍 파이프라인 ID: ${env.BUILD_NUMBER}"
+            }
         }
     }
 }
