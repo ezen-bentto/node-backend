@@ -39,7 +39,7 @@ export const regCommunityPost: RequestHandler = async (
         };
 
         const result = await CommunityService.createCommunityPost(cleanData);
-        logger.info(`커뮤니티 글 등록 성공 : ${JSON.stringify(result.insertId)}`);
+        logger.info(`커뮤니티 글 등록 성공 : ${JSON.stringify(serializeBigInt(result.insertId))}`);
 
         const data = serializeBigInt(result);
 
