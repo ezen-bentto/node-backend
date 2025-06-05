@@ -1,5 +1,7 @@
 import { getDBConnection } from "@/config/db.config";
 import { CommunitySelectRequest } from "@/schemas/commnutiy.schema";
+import logger from '@/utils/common/logger';
+
 
 interface CommunityRow {
     community_id: number;
@@ -107,6 +109,9 @@ export const selectCommunityList = async (
 
         const [countRows] = await db.query(countSql, values);
         const totalCount = Number(countRows[0]?.totalCount || 0);
+
+        logger.debug(`최종 whereSQL: ${whereSQL}`);
+        logger.debug(`최종 values: ${JSON.stringify(values)}`);
 
         return {
             page,
