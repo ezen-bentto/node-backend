@@ -15,7 +15,7 @@ import { z } from 'zod';
  * @param 없음
  */
 
-// 공모전 create [POST]
+// 공모전 create
 export const regContestSchema = z.object({
   writer_id: z.string(),
   title: z.string(),
@@ -33,14 +33,28 @@ export const regContestSchema = z.object({
   article: z.string(),
 });
 
-// 공모전 select [GET]
+// 공모전 리스트
+export const getContestListSchema = z.object({
+  title: z.string(),
+  img: z.string(),
+  organizer: z.string(),
+  prize: z.string(),
+  start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: "Invalid date format"}),
+  end_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: "Invalid date format"}),
+  participants: z.string(),
+  benefits: z.string(),
+  contest_tag: z.string(),
+  views: z.string()
+});
 
-// 공모전 상세 select [GET]
+// 공모전 상세 select
 export const getContestDetailSchema = z.object({
   id: z.number(),
 });
 
-// 공모전 상세 UPDATE [POST]
+// 공모전 상세 UPDATE
 export const modContestSchema = z.object({
   writer_id: z.string(),
   title: z.string(),
@@ -57,12 +71,13 @@ export const modContestSchema = z.object({
   views: z.string()
 });
 
-// 공모전 상세 삭제 UPDATE [POST]
+// 공모전 상세 삭제 UPDATE
 export const delContestSchema = z.object({
   id: z.number(),
 });
 
 export type regContest = z.infer<typeof regContestSchema>;
+export type getContestList = z.infer<typeof getContestListSchema>;
 export type detailContest = z.infer<typeof regContestSchema> & {
   views: string;
 };

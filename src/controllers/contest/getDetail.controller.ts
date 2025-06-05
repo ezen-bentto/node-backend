@@ -34,10 +34,7 @@ export const getContestDetail: RequestHandler = async (req: Request, res: Respon
     const contestId = parseInt(id as string, 10);
     const parsed = getContestDetailSchema.safeParse({id: contestId});
 
-    console.log(parsed);
-
     if (!parsed.success || ip === undefined) {
-      console.log("hihihihihihi")
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }

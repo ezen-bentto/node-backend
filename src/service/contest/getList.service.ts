@@ -1,4 +1,7 @@
+import { ContestModel } from '@/models/contest.model';
+import { getContestList as getContestLisParam } from '@/schemas/content.schema';
 import { handleDbError } from '@/utils/handleDbError';
+import { promises } from 'dns';
 
 /**
  *
@@ -17,9 +20,10 @@ import { handleDbError } from '@/utils/handleDbError';
  *        2025/05/30           한유리             신규작성  
  * @param 없음
  */
-export const getContestList = async () => {
+export const getContestList = async (): Promise<getContestLisParam> => {
   try {
-    return;
+    const contestData = await ContestModel.selectList();
+    return contestData;
   } catch (err: unknown) {
     handleDbError(err);
     throw err;
