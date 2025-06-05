@@ -65,9 +65,66 @@ EOF
                         sh """#!/bin/bash
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
-pkill -f 'node /home/ubuntu/node-backend/*.js' || true
-nohup node /home/ubuntu/node-backend/your-app.js > /dev/null 2>&1 &
+
+# 기존 PM2 프로세스 정리
+pm2 stop all || true
+pm2 delete all || true
+
+# PM2 ecosystem 파일 생성 (환경변수 포함)
+cat > ecosystem.config.js << 'EOL'
+module.exports = {
+  apps: [{
+    name: 'backend-api',
+    script: './dist/index.js',
+    instances: 1,
+    env: {
+      NODE_ENV: 'production',
+      DB_HOST: '${env.DB_HOST}',
+      DB_PORT: '${env.DB_PORT}',
+      DB_USER: '${env.DB_USER}',
+      DB_PASSWORD: '${env.DB_PASSWORD}',
+      DB_NAME: '${env.DB_NAME}'
+    }
+  }]
+};
+EOL
+
+# PM2로 ecosystem 파일 사용해서 시작
+pm2 start ecosystem.config.js
+
+# 배포 상태 확인
+echo "=== PM2 프로세스 상태 ==="
+pm2 list
+
+echo "=== 환경변수 확인 ==="
+pm2 env 0
+
 echo "배포 완료!"
+EOF
+"""
+                    }
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    echo "🔍 서버 상태 확인"
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """#!/bin/bash
+ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
+cd ~/node-backend
+
+# 잠시 서버 시작 대기
+sleep 5
+
+# 헬스 체크
+echo "=== API 테스트 ==="
+curl -s http://localhost:4000/api/community/getList?communityType=1 | head -100
+
+echo "\\n=== PM2 로그 확인 ==="
+pm2 logs --lines 10
 EOF
 """
                     }
@@ -81,7 +138,7 @@ EOF
                     echo "📢 디스코드 알림 전송"
                     sh """#!/bin/bash
 curl -X POST -H "Content-Type: application/json" -d '{
-  "content": "✅ 백엔드 자동 배포 성공!"
+  "content": "✅ 백엔드 자동 배포 성공! (PM2 ecosystem 방식)"
 }' ${env.DISCORD_WEBHOOK_URL}
 """
                 }
@@ -94,7 +151,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
             echo "❌ 배포 실패"
             sh """#!/bin/bash
 curl -X POST -H "Content-Type: application/json" -d '{
-  "content": "❌ 백엔드 자동 배포 실패!"
+  "content": "❌ 백엔드 자동 배포 실패! 로그를 확인해주세요."
 }' ${env.DISCORD_WEBHOOK_URL}
 """
         }
