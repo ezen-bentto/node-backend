@@ -55,6 +55,12 @@ cd ~/node-backend
 # Node.js 및 Yarn 버전 확인
 echo "=== 환경 정보 ==="
 node --version
+
+# Yarn 설치 확인 및 설치
+if ! command -v yarn &> /dev/null; then
+    echo "Yarn이 설치되지 않음. npm을 통해 Yarn 설치"
+    npm install -g yarn
+fi
 yarn --version
 
 # TypeScript 컴파일러 확인
@@ -121,11 +127,11 @@ module.exports = {
     node_args: '--max-old-space-size=512',
     env: {
       NODE_ENV: 'production',
-      DB_HOST: '''' + env.DB_HOST + '''',
-      DB_PORT: '''' + env.DB_PORT + '''',
-      DB_USER: '''' + env.DB_USER + '''',
-      DB_PASSWORD: '''' + env.DB_PASSWORD + '''',
-      DB_NAME: '''' + env.DB_NAME + ''''
+      DB_HOST: process.env.DB_HOST || 'localhost',
+      DB_PORT: process.env.DB_PORT || '3306',
+      DB_USER: process.env.DB_USER || 'root',
+      DB_PASSWORD: process.env.DB_PASSWORD || '',
+      DB_NAME: process.env.DB_NAME || 'test'
     },
     error_file: './logs/err.log',
     out_file: './logs/out.log',
@@ -144,8 +150,13 @@ if [ ! -f "./dist/index.js" ]; then
     exit 1
 fi
 
-# PM2로 ecosystem 파일 사용해서 시작
+# PM2로 ecosystem 파일 사용해서 시작 (환경변수 전달)
 echo "=== PM2 애플리케이션 시작 ==="
+DB_HOST=''' + env.DB_HOST + ''' \
+DB_PORT=''' + env.DB_PORT + ''' \
+DB_USER=''' + env.DB_USER + ''' \
+DB_PASSWORD=''' + env.DB_PASSWORD + ''' \
+DB_NAME=''' + env.DB_NAME + ''' \
 pm2 start ecosystem.config.js
 
 # 시작 대기
