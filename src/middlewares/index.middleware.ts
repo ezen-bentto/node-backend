@@ -13,7 +13,10 @@ export const registerMiddlewares = (app: express.Application) => {
   app.use(cors({
     origin: ENV.corsOrigin,           // 프론트엔드 URL (React 앱이 5173번 포트에서 실행 중) -- env 파일에서 가져오기
     methods: ['GET', 'POST'],         // 허용할 HTTP 메소드
-    allowedHeaders: ['Cache-Control', 'no-cache, no-store, must-revalidate']  // 허용할 헤더
+    //allowedHeaders: ['Cache-Control', 'no-cache, no-store, must-revalidate']  // 허용할 헤더
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
+
+
   }
   ));
 
