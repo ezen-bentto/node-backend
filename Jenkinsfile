@@ -62,9 +62,14 @@ EOF
                 script {
                     echo "🚀 배포 시작"
                     sshagent([env.SSH_KEY_ID]) {
-                        sh """#!/bin/bash
+sh """#!/bin/bash
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
+echo "DB_HOST=${env.DB_HOST}" > .env
+echo "DB_PORT=${env.DB_PORT}" >> .env
+echo "DB_USER=${env.DB_USER}" >> .env
+echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
+echo "DB_NAME=${env.DB_NAME}" >> .env
 pkill -f 'node /home/ubuntu/node-backend/*.js' || true
 nohup node /home/ubuntu/node-backend/dist/index.js > /dev/null 2>&1 &
 echo "배포 완료!"
