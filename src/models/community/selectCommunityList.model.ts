@@ -33,6 +33,12 @@ export const selectCommunityList = async (
 ): Promise<CommunityListResult> => {
     const { communityType, categoryType, ageGroup, sort } = filter;
 
+    // 🚀 디버깅 시작
+    console.log('🚀 selectCommunityList 호출됨');
+    console.log('📝 필터 파라미터:', JSON.stringify(filter, null, 2));
+    console.log('📝 페이징:', { page, size });
+    console.log('📝 communityType 타입:', typeof communityType, '값:', communityType);
+
     const offset = (page - 1) * size;
     const values: (string | number)[] = [];
     const whereClauses: string[] = [];
@@ -90,12 +96,46 @@ export const selectCommunityList = async (
         ${whereSQL}
     `;
 
+    // 🔍 쿼리 정보 출력
+    console.log('📊 최종 WHERE절:', whereSQL);
+    console.log('📊 WHERE 파라미터:', JSON.stringify(values));
+    console.log('📊 LIST 쿼리:\n', listSql);
+    console.log('📊 COUNT 쿼리:\n', countSql);
+
     try {
         const db = getDBConnection();
         const listValues = [...values, offset, size];
 
+        console.log('📊 최종 LIST 파라미터:', JSON.stringify(listValues));
+
+        // 🔍 EXPLAIN으로 실행 계획 확인
+        const explainSql = `EXPLAIN ${listSql}`;
+        console.log('🔍 EXPLAIN 쿼리 실행 시작...');
+        const explainStartTime = Date.now();
+
+        try {
+            const explainResult = await db.query(explainSql, listValues);
+            console.log('📈 EXPLAIN 결과:', JSON.stringify(explainResult, null, 2));
+            console.log('⏱️ EXPLAIN 실행시간:', Date.now() - explainStartTime, 'ms');
+        } catch (explainError) {
+            console.log('❌ EXPLAIN 실행 오류:', explainError);
+        }
+
+        // 🔍 실제 데이터 쿼리 실행
+        console.log('🔍 LIST 쿼리 실행 시작...');
+        const listStartTime = Date.now();
         const result = await db.query(listSql, listValues);
+        const listEndTime = Date.now();
+        console.log('⏱️ LIST 쿼리 실행시간:', listEndTime - listStartTime, 'ms');
+
         const list = Array.isArray(result) ? result : [];
+        console.log('📦 조회된 데이터 개수:', list.length);
+
+        if (list.length > 0) {
+            console.log('📋 첫 번째 데이터:', JSON.stringify(list[0], null, 2));
+        } else {
+            console.log('⚠️ 조회된 데이터가 없습니다!');
+        }
 
         // ✅ BigInt → Number 변환 처리
         const parsedList = list.map(row => {
@@ -107,20 +147,40 @@ export const selectCommunityList = async (
             return converted;
         });
 
+        // 🔍 COUNT 쿼리 실행
+        console.log('🔍 COUNT 쿼리 실행 시작...');
+        const countStartTime = Date.now();
         const [countRows] = await db.query(countSql, values);
+        const countEndTime = Date.now();
+        console.log('⏱️ COUNT 쿼리 실행시간:', countEndTime - countStartTime, 'ms');
+
         const totalCount = Number(countRows[0]?.totalCount || 0);
+        console.log('📊 전체 데이터 개수:', totalCount);
 
         logger.debug(`최종 whereSQL: ${whereSQL}`);
         logger.debug(`최종 values: ${JSON.stringify(values)}`);
 
-        return {
+        const finalResult = {
             page,
             size,
             totalCount,
             totalPages: Math.ceil(totalCount / size),
             list: parsedList as CommunityRow[],
         };
+
+        console.log('✅ selectCommunityList 완료:', {
+            page: finalResult.page,
+            size: finalResult.size,
+            totalCount: finalResult.totalCount,
+            totalPages: finalResult.totalPages,
+            listLength: finalResult.list.length
+        });
+
+        return finalResult;
     } catch (error) {
+        console.log('❌ selectCommunityList 에러 발생:', error);
+        console.log('❌ 에러 상세:', JSON.stringify(error, null, 2));
+
         return {
             page,
             size,
