@@ -10,7 +10,7 @@ pipeline {
         DB_PORT = credentials('db-port')
         DB_USER = credentials('db-user')
         DB_PASSWORD = credentials('db-password')
-        DB_NAME = credentials('db-name')
+        DB_DATABASE = credentials('db-name')
     }
 
     stages {
@@ -69,7 +69,7 @@ echo "DB_HOST=${env.DB_HOST}" > .env
 echo "DB_PORT=${env.DB_PORT}" >> .env
 echo "DB_USER=${env.DB_USER}" >> .env
 echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
-echo "DB_NAME=${env.DB_NAME}" >> .env
+echo "DB_NAME=${env.DB_DATABASE}" >> .env
 pkill -f 'node /home/ubuntu/node-backend/*.js' || true
 nohup node /home/ubuntu/node-backend/dist/index.js > /dev/null 2>&1 &
 echo "배포 완료!"
