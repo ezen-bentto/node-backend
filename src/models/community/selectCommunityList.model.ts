@@ -1,5 +1,6 @@
 import { getDBConnection } from "@/config/db.config";
 import { CommunitySelectRequest } from "@/schemas/commnutiy.schema";
+import logger from '@/utils/common/logger';
 
 interface CommunityRow {
     community_id: number;
@@ -35,19 +36,15 @@ export const selectCommunityList = async (
     const values: (string | number)[] = [];
     const whereClauses: string[] = [];
 
-    // 문자열 타입
+    // 필터 조건 구성
     whereClauses.push(`c.community_type = ?`);
     values.push(String(communityType));
 
-    // 숫자 타입
     if (typeof categoryType === "number") {
         whereClauses.push(`c.category_type = ?`);
         values.push(categoryType);
-    } else if (categoryType === null) {
-        whereClauses.push(`c.category_type IS NULL`);
     }
 
-    // 문자열 하드코딩
     if (ageGroup === "1") {
         whereClauses.push(`c.age_group = '1'`);
     } else if (ageGroup === "2") {
@@ -92,10 +89,13 @@ export const selectCommunityList = async (
         const db = getDBConnection();
         const listValues = [...values, offset, size];
 
+        logger.info(`📌 커뮤니티 목록 쿼리 실행`);
+        logger.info(`📌 WHERE절: ${whereSQL}`);
+        logger.info(`📌 VALUES: ${JSON.stringify(values)}`);
+
         const result = await db.query(listSql, listValues);
         const list = Array.isArray(result) ? result : [];
 
-        // ✅ BigInt → Number 변환 처리
         const parsedList = list.map(row => {
             const converted: Record<string, any> = {};
             for (const key in row) {
@@ -108,14 +108,19 @@ export const selectCommunityList = async (
         const [countRows] = await db.query(countSql, values);
         const totalCount = Number(countRows[0]?.totalCount || 0);
 
-        return {
+        const finalResult = {
             page,
             size,
             totalCount,
             totalPages: Math.ceil(totalCount / size),
             list: parsedList as CommunityRow[],
         };
+
+        logger.info(`📊 목록 조회 완료: totalCount=${totalCount}, listLength=${parsedList.length}`);
+
+        return finalResult;
     } catch (error) {
+        logger.error('❌ selectCommunityList 에러 발생', error);
         return {
             page,
             size,
