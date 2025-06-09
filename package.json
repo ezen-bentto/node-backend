@@ -66,7 +66,7 @@
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.2",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0",
+    "multer": "^2.0.1",
     "multer-s3": "^3.0.1",
     "redis": "^4.6.13",
     "tsconfig-paths": "^4.2.0",
