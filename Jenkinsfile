@@ -2,10 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1375511926389346454/ETahsdlttk0nUul0nPo7vlXn5D0bvjfxzk25mGuZfIsy_npHlghw-fPy6-Gqpkt69LWz'
-        SSH_KEY = credentials('ec2-ssh-key') // Jenkins에 등록한 SSH 키 ID
-        BACKEND_EC2_IP = '3.37.0.90'
-        GITHUB_REPO = 'https://github.com/ezen-bentto/node-backend.git'
+        SSH_KEY_ID = 'ec2-ssh-key'
+        DISCORD_WEBHOOK_URL = credentials('discord-backend')
+        BACKEND_EC2_IP = credentials('backend-ec2-ip')
+        GITHUB_REPO = credentials('github-back-url')
+        DB_HOST = credentials('db-host')
+        DB_PORT = credentials('db-port')
+        DB_USER = credentials('db-user')
+        DB_PASSWORD = credentials('db-password')
+        DB_DATABASE = credentials('db-name')
     }
 
     stages {
@@ -13,8 +18,8 @@ pipeline {
             steps {
                 script {
                     echo "📦 GitHub에서 소스 코드 클론/업데이트"
-                    sshagent(['ec2-ssh-key']) {
-                        sh """#!/bin/bash
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 mkdir -p ~/node-backend
 cd ~/node-backend
@@ -24,6 +29,8 @@ if [ ! -d ".git" ]; then
   git clone ${env.GITHUB_REPO} .
 else
   echo "Git repository found. Pulling latest changes."
+  git reset --hard
+  git clean -fd
   git pull origin main
 fi
 EOF
@@ -37,8 +44,8 @@ EOF
             steps {
                 script {
                     echo "🔧 빌드 시작"
-                    sshagent(['ec2-ssh-key']) {
-                        sh """#!/bin/bash
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
 npm install
@@ -53,14 +60,25 @@ EOF
         stage('Deploy') {
             steps {
                 script {
-                    echo "🚀 배포 시작"
-                    sshagent(['ec2-ssh-key']) {
-                        sh """#!/bin/bash
+                    echo "🚀 PM2를 사용해 서버 재시작"
+                    sshagent([env.SSH_KEY_ID]) {
+                        sh """
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
-pkill -f 'node /home/ubuntu/node-backend/*.js' || true
-nohup node /home/ubuntu/node-backend/your-app.js > /dev/null 2>&1 &
-echo "배포 완료!"
+echo "DB_HOST=${env.DB_HOST}" > .env
+echo "DB_PORT=${env.DB_PORT}" >> .env
+echo "DB_USER=${env.DB_USER}" >> .env
+echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
+echo "DB_DATABASE=${env.DB_DATABASE}" >> .env
+
+# PM2로 실행 중이면 reload, 아니면 start
+if pm2 list | grep -q "backend-api"; then
+    pm2 reload backend-api
+else
+    pm2 start dist/index.js --name backend-api
+fi
+
+pm2 save
 EOF
 """
                     }
@@ -72,11 +90,11 @@ EOF
             steps {
                 script {
                     echo "📢 디스코드 알림 전송"
-                    sh """#!/bin/bash
-                    curl -X POST -H "Content-Type: application/json" -d '{
-                      "content": "✅ 백엔드 자동 배포 성공!"
-                    }' ${env.DISCORD_WEBHOOK_URL}
-                    """
+                    sh """
+curl -X POST -H "Content-Type: application/json" -d '{
+  "content": "✅ 백엔드 PM2 자동 배포 성공!"
+}' ${env.DISCORD_WEBHOOK_URL}
+"""
                 }
             }
         }
@@ -85,11 +103,11 @@ EOF
     post {
         failure {
             echo "❌ 배포 실패"
-            sh """#!/bin/bash
-            curl -X POST -H "Content-Type: application/json" -d '{
-              "content": "❌ 백엔드 자동 배포 실패!"
-            }' ${env.DISCORD_WEBHOOK_URL}
-            """
+            sh """
+curl -X POST -H "Content-Type: application/json" -d '{
+  "content": "❌ 백엔드 PM2 자동 배포 실패!"
+}' ${env.DISCORD_WEBHOOK_URL}
+"""
         }
         always {
             echo "✅ Jenkins 파이프라인 종료"
