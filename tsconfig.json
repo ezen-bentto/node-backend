@@ -27,6 +27,6 @@
   "ts-node": {
     "require": ["tsconfig-paths/register"] // ts-node 실행 시 paths 설정 인식하게 함
   },
-  "include": ["src", "__mocks__"], // 컴파일 대상 디렉토리
+  "include": ["src", "__mocks__", "src/controllers/demo/.controller.ts"], // 컴파일 대상 디렉토리
   "exclude": ["src/**/*.test.ts", "src/**/__mocks__/*.ts"] // 테스트 및 목 파일은 제외
 }

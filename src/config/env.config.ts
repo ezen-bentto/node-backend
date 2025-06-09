@@ -29,4 +29,9 @@ export const ENV = {
 
   corsOrigin: process.env.CORS_ORIGIN || '*',
   logLevel: process.env.LOG_LEVEL || 'info',
+
+  redis: {
+    host: process.env.REDIS_HOST!,
+    port: Number(process.env.REDIS_PORT!),
+  }
 };
