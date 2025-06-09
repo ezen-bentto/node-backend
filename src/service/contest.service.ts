@@ -3,7 +3,7 @@ import { getContestDetail } from './contest/getDetail.service';
 import { getContestList } from './contest/getList.service';
 import { modContest } from './contest/modify.service';
 import { delContest } from './contest/delete.service';
-import { getContestDetailEdit } from './contest/getDetailEdit.service';
+import { getContestById } from './contest/getContestById.service';
 
 
 /**
@@ -24,4 +24,4 @@ import { getContestDetailEdit } from './contest/getDetailEdit.service';
  *        2025/05/30           한유리              신규작성  
  * @param 없음
  */
-export const ContestService = { regContest, getContestDetail, getContestList, modContest, delContest, getContestDetailEdit };
+export const ContestService = { regContest, getContestDetail, getContestList, modContest, delContest, getContestById };

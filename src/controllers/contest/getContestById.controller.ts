@@ -26,9 +26,8 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 에러 처리용 next 함수
  */
 
-export const getContestDetailEdit: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const getContestById: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // id 쿼리 파라미터 추출
     const { id } = req.query;
     const contestId = parseInt(id as string, 10);
     const parsed = getContestDetailSchema.safeParse({id: contestId});
@@ -38,7 +37,7 @@ export const getContestDetailEdit: RequestHandler = async (req: Request, res: Re
       return;
     }
 
-    const data = await ContestService.getContestDetailEdit({ id: contestId });
+    const data = await ContestService.getContestById({ id: contestId });
     data.writer_id = data.writer_id.toString();
     
     res.status(StatusCodes.OK).json({ data: data });

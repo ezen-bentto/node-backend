@@ -24,9 +24,9 @@ import { StatusCodes } from 'http-status-codes';
  *        2025/06/09           한유리             신규작성  
  * @param 없음
  */
-export const modContest = async (data: modContestParam) => {
+export const modContest = async (contestId: number, data: Partial<modContestParam>) => {
   try {
-    const res = await ContestModel.modContest(data); 
+    const res = await ContestModel.modContest(contestId, data); 
     
     if(res.affectedRows != 1){
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.UPDATE_FAIL);

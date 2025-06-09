@@ -6,7 +6,7 @@ import { detailContest } from "@/schemas/content.schema";
  * 공모전 상세조회 수정 모델  
  * 전달받은 contestId로 게시글 상세 페이지를 불러온다.
  *
- * @function getContestDetailEdit
+ * @function getContestById
  * @date 2025/06/09
  * @history
  * -------------------------------------------------------
@@ -17,7 +17,7 @@ import { detailContest } from "@/schemas/content.schema";
  * @param id
  * @returns detailContest
  */
-const getContestDetailEdit = async (id: number): Promise<detailContest> => {  
+const getContestById = async (id: number): Promise<detailContest> => {  
   const sql = `SELECT title,
                       organizer,
                       prize,
@@ -37,4 +37,4 @@ const getContestDetailEdit = async (id: number): Promise<detailContest> => {
   return res[0];
 };
 
-export default getContestDetailEdit;
+export default getContestById;

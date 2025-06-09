@@ -42,19 +42,17 @@ export const modContest: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
-    // const existing = await ContestService.getContestById(contestId);
-    // if (!existing) {
-    //   next(new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND));
-    //   return;
-    // }
+    const existing = await ContestService.getContestById({id: contestId});
+    if (!existing) {
+      next(new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND));
+      return;
+    }
 
     // TODO: 로그인 id와 existing.witerId 비교
 
-    // const mergedData = { ...existing, ...parsed.data };
-    // const updatedContest = await ContestService.modContest(contestId, mergedData);
-
-    const data = ContestService.modContest(parsed.data);
-    res.status(StatusCodes.OK).json({ data: data });
+    const mergedData = { ...existing, ...parsed.data };
+    const updatedContest = await ContestService.modContest(contestId, mergedData);
+    res.status(StatusCodes.OK).json({ data: updatedContest });
     return;
   } catch (err) {
     next(err);
