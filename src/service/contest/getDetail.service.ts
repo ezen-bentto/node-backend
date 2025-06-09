@@ -2,9 +2,9 @@ import { AppError } from '@/utils/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/constants/error.constant';
 import { handleDbError } from '@/utils/handleDbError';
-import { client } from '@/config/redis.config';
-import { detailContest, getDetailParam} from '@/schemas/content.schema';
+import { detailContest, getDetailParam } from '@/schemas/content.schema';
 import { ContestModel } from '@/models/contest.model';
+import trackViewByIp from '@/utils/common/trackViewByIp';
 
 /**
  *
@@ -23,7 +23,8 @@ import { ContestModel } from '@/models/contest.model';
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/05/30           한유리             신규작성  
+ *        2025/05/30           한유리             신규작성
+ *        2025/06/09           이철욱             조회수 로직 공통 함수로 분리
  * @param data 조회할 공모전의 상세 정보 요청 데이터 (ID 등)
  */
 export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<detailContest> => {
@@ -31,36 +32,12 @@ export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<deta
     // 실제 공모전 상세 조회 (DB)
     const contestData = await ContestModel.getContestDetail(id);
 
-    if (contestData === undefined){
+    if (contestData === undefined) {
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
     }
-    
-    // ip redis 조회
-    const ipKey = `contest${id}:ip${ip}`;
-    const viewsKey = `contest:${id}:views`;
 
-    // get contest:1:views
-    console.log(viewsKey);
-
-    const isVisited = await client.v4.get(ipKey);
-
-    // 만약 redis에 해당 게시글에 대하여 ip가 없을 경우
-    if (isVisited == null) {
-      // redis에 해당 ip를 추가
-      await client.v4.set(ipKey, 1);
-      // 유효기간을 24시간 설정
-      await client.v4.expire(ipKey, 1);
-      // 게시글 조회수 증가
-      await client.v4.incr(viewsKey);
-
-      // contestData.views = viewsCnt.toString();
-      // // 조회수 컬럼만 올리는 로직
-      // const viewsRes = await ContestModel.addCntViews(viewsCnt, id);
-      // if (viewsRes.affectedRows !== 1){
-      //   throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
-      // }
-
-    }
+    // 조회수 증가 (IP 기준)
+    await trackViewByIp('contest', id, ip);
 
     return contestData;
   } catch (err: unknown) {
