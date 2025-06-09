@@ -15,9 +15,10 @@ import { detailContest, regContest } from "@/schemas/content.schema";
  *
  *        2025/05/30           한유리             신규작성  
  * @param id
- * @returns InsertResult - 삽입 결과
+ * @returns detailContest
  */
 const getContestDetail = async (id: number): Promise<detailContest> => {  
+  // TODO: 조회할 것만 불러오기
   const sql = `SELECT * FROM contest WHERE id = ?`;
 
   const db = getDBConnection();

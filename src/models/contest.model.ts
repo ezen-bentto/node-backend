@@ -1,5 +1,7 @@
 import addCntViews from "./contest/addCntViews.model";
+import delContest from "./contest/delete.model";
 import getContestDetail from "./contest/getDetail.model";
+import modContest from "./contest/modify.model";
 import regContest from "./contest/register.model";
 import selectList from "./contest/selectList.mode";
 
@@ -18,4 +20,4 @@ import selectList from "./contest/selectList.mode";
  *        2025/05/30           한유리             신규작성  
  * @param 없음
  */
-export const ContestModel = {regContest, getContestDetail, addCntViews, selectList};
+export const ContestModel = {regContest, getContestDetail, addCntViews, selectList, delContest, modContest};

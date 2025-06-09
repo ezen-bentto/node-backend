@@ -56,6 +56,7 @@ export const getContestDetailSchema = z.object({
 
 // 공모전 상세 UPDATE
 export const modContestSchema = z.object({
+  id: z.number(),
   writer_id: z.string(),
   title: z.string(),
   img: z.string(),
@@ -85,3 +86,4 @@ export type getDetailParam = z.infer<typeof getContestDetailSchema> & {
   ip: string;
 };
 export type modContest = z.infer<typeof modContestSchema>;
+export type delContest = z.infer<typeof delContestSchema>;
