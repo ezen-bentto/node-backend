@@ -2,8 +2,7 @@ import { AppError } from '@/utils/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/constants/error.constant';
 import { handleDbError } from '@/utils/handleDbError';
-import { client } from '@/config/redis.config';
-import { detailContest, getDetailParam } from '@/schemas/content.schema';
+import { delContest, detailContest } from '@/schemas/content.schema';
 import { ContestModel } from '@/models/contest.model';
 
 /**
@@ -22,7 +21,7 @@ import { ContestModel } from '@/models/contest.model';
  *        2025/06/09           한유리             신규작성
  * @param data 조회할 공모전의 상세 정보 요청 데이터 (ID 등)
  */
-export const getContestDetailEdit = async ({ id }: getDetailParam): Promise<detailContest> => {
+export const getContestDetailEdit = async ({ id }: delContest): Promise<detailContest> => {
   try {
     const contestData = await ContestModel.getContestDetail(id);
 
