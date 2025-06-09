@@ -1,4 +1,9 @@
+import { ERROR_CODES } from '@/constants/error.constant';
+import { ContestModel } from '@/models/contest.model';
+import { modContest as modContestParam} from '@/schemas/content.schema';
+import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  *
@@ -10,18 +15,24 @@ import { handleDbError } from '@/utils/handleDbError';
  * 오류 발생 시 적절히 처리합니다.
  *
  * @function modContest
- * @date 2025/05/30
+ * @date 2025/06/09
  * @history
  * -------------------------------------------------------
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/05/30           한유리             신규작성  
+ *        2025/06/09           한유리             신규작성  
  * @param 없음
  */
-export const modContest = async () => {
+export const modContest = async (data: modContestParam) => {
   try {
-    return;
+    const res = await ContestModel.modContest(data); 
+    
+    if(res.affectedRows != 1){
+      throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.UPDATE_FAIL);
+    }
+
+    return res;
   } catch (err: unknown) {
     handleDbError(err);
     throw err;
