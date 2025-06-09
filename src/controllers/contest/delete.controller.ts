@@ -35,8 +35,10 @@ export const delContest : RequestHandler = async (req: Request, res: Response, n
       return;
     }
 
-    // const data = ContestService.delContest({id: contestId});
-    // res.status(StatusCodes.OK).json({ data: data });
+    // TODO: 로그인 id와 witerId 비교
+
+    const data = ContestService.delContest({id: contestId});
+    res.status(StatusCodes.OK).json({ data: data });
     return;
   } catch (err) {
     next(err);

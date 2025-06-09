@@ -3,6 +3,7 @@ import { getContestDetail } from './contest/getDetail.controller';
 import { getContestList } from './contest/getList.controller';
 import { modContest } from './contest/modify.controller';
 import { delContest } from './contest/delete.controller';
+import { getContestDetailEdit } from './contest/getDetailEdit.controller';
 
 /**
  *
@@ -21,6 +22,6 @@ import { delContest } from './contest/delete.controller';
  * @param 없음
  */
 
-const ContestController = { getContestDetail, getContestList, regContest, modContest, delContest };
+const ContestController = { getContestDetail, getContestList, regContest, modContest, delContest, getContestDetailEdit };
 
 export default ContestController;
