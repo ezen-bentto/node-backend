@@ -36,8 +36,8 @@ export const modContest: RequestHandler = async (req: Request, res: Response, ne
 
     const { id } = req.query;
     const contestId = parseInt(id as string, 10);
-    
-    if (!parsed.success) {
+
+    if (isNaN(contestId)) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }
@@ -49,9 +49,9 @@ export const modContest: RequestHandler = async (req: Request, res: Response, ne
     }
 
     // TODO: 로그인 id와 existing.witerId 비교
-
-    const mergedData = { ...existing, ...parsed.data };
-    const updatedContest = await ContestService.modContest(contestId, mergedData);
+    
+    const updatedContest = await ContestService.modContest(contestId, parsed.data);
+    
     res.status(StatusCodes.OK).json({ data: updatedContest });
     return;
   } catch (err) {

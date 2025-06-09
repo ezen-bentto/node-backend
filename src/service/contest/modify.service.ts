@@ -27,6 +27,7 @@ import { StatusCodes } from 'http-status-codes';
 export const modContest = async (contestId: number, data: Partial<modContestParam>) => {
   try {
     const res = await ContestModel.modContest(contestId, data); 
+    console.log(contestId, data)
     
     if(res.affectedRows != 1){
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.UPDATE_FAIL);

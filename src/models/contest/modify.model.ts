@@ -18,6 +18,8 @@ import { modContest as modContestParam} from "@/schemas/content.schema";
  * @returns
  */
 const modContest = async (contestId: number, data: Partial<modContestParam>) => {
+  
+    console.log("모델입니다.")
   // 전달된 필드만 업데이트하는 동적 쿼리
   const updateFields = [];
   const values = [];
@@ -67,12 +69,18 @@ const modContest = async (contestId: number, data: Partial<modContestParam>) => 
   }
   values.push(contestId);
 
-  const sql = `UPDATE contest SET ${updateFields.join(',')} WHERE id = ? `;
+  console.log(updateFields)
+
+  const sql = `UPDATE contest SET ${updateFields.join(', ')} WHERE id = ? `;
+
+  console.log(sql);
 
   const db = getDBConnection();
-  const res = await db.query(sql, values);
+  const [result] = await db.query(sql, values);
 
-  return res[0];
+  console.log('쿼리 결과:', result);
+
+  return result;
 };
 
 export default modContest;
