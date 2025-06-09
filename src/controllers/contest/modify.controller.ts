@@ -1,4 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
+import { OK_UPDATE_COMMENT } from '@/constants/message.constant';
 import { modContestSchema } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
@@ -50,9 +51,9 @@ export const modContest: RequestHandler = async (req: Request, res: Response, ne
 
     // TODO: 로그인 id와 existing.witerId 비교
     
-    const updatedContest = await ContestService.modContest(contestId, parsed.data);
+    await ContestService.modContest(contestId, parsed.data);
     
-    res.status(StatusCodes.OK).json({ data: updatedContest });
+    res.status(StatusCodes.OK).json({ message: OK_UPDATE_COMMENT });
     return;
   } catch (err) {
     next(err);

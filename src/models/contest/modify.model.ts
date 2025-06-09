@@ -1,5 +1,6 @@
 import { getDBConnection } from "@/config/db.config";
 import { modContest as modContestParam} from "@/schemas/content.schema";
+import { InsertResult } from "@/types/db/response.type";
 
 /**
  *
@@ -14,72 +15,45 @@ import { modContest as modContestParam} from "@/schemas/content.schema";
  * -------------------------------------------------------
  *
  *        2025/06/09           한유리             신규작성  
- * @param props
+ * @param contestId
+ * @param data
  * @returns
  */
-const modContest = async (contestId: number, data: Partial<modContestParam>) => {
-  
-    console.log("모델입니다.")
-  // 전달된 필드만 업데이트하는 동적 쿼리
-  const updateFields = [];
-  const values = [];
+const modContest = async (contestId: number, data: Partial<modContestParam>): Promise<InsertResult> => {
+ const db = getDBConnection();
 
-  if(data.title !== undefined){
-    updateFields.push('title = ?');
-    values.push(data.title);
+  const allowedFields = [
+    "title",
+    "organizer",
+    "prize",
+    "start_date",
+    "end_date",
+    "homepage",
+    "participants",
+    "benefits",
+    "contest_tag",
+    "article",
+  ] as const;
+
+  // 필드별 동적 구성
+  const updateFields: string[] = [];
+  const values: any[] = [];
+
+  for (const key of allowedFields) {
+    if (data[key] !== undefined) {
+      updateFields.push(`${key} = ?`);
+      values.push(data[key]);
+    }
   }
-  if (data.organizer !== undefined) {
-    updateFields.push('organizer = ?');
-    values.push(data.organizer);
-  }
-  if (data.prize !== undefined) {
-    updateFields.push('prize = ?');
-    values.push(data.prize);
-  }
-  if (data.start_date !== undefined) {
-    updateFields.push('start_date = ?');
-    values.push(data.start_date);
-  }
-  if (data.end_date !== undefined) {
-    updateFields.push('end_date = ?');
-    values.push(data.end_date);
-  }
-  if (data.homepage !== undefined) {
-    updateFields.push('homepage = ?');
-    values.push(data.homepage);
-  }
-  if (data.participants !== undefined) {
-    updateFields.push('participants = ?');
-    values.push(data.participants);
-  }
-  if (data.benefits !== undefined) {
-    updateFields.push('benefits = ?');
-    values.push(data.benefits);
-  }
-  if (data.contest_tag !== undefined) {
-    updateFields.push('contest_tag = ?');
-    values.push(data.contest_tag);
-  }
-  if (data.article !== undefined) {
-    updateFields.push('article = ?');
-    values.push(data.article);
-  }
+
   if (updateFields.length === 0) {
-    throw new Error('수정할 데이터가 없습니다.');
+    throw new Error("수정할 데이터가 없습니다.");
   }
+
+  const sql = `UPDATE contest SET ${updateFields.join(", ")} WHERE id = ?`;
   values.push(contestId);
 
-  console.log(updateFields)
-
-  const sql = `UPDATE contest SET ${updateFields.join(', ')} WHERE id = ? `;
-
-  console.log(sql);
-
-  const db = getDBConnection();
-  const [result] = await db.query(sql, values);
-
-  console.log('쿼리 결과:', result);
-
+  const result = await db.query(sql, values);
   return result;
 };
 
