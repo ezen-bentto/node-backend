@@ -1,3 +1,4 @@
+//src\utils\token\decodeToken.ts
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export const decodeToken = (token: string): JwtPayload => {

@@ -1,3 +1,4 @@
+// src/config/kakao.config.ts
 import { ENV } from './env.config';
 
 export const kakaoConfig = {
