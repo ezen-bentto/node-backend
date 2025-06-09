@@ -1,5 +1,4 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { INTERNAL_SERVER_ERROR } from '@/constants/message.constant';
 import { DemoResponseSchema } from '@/schemas/demo.schema';
 import { DemoService } from '@/service/demo.service';
 import { AppError } from '@/utils/AppError';
