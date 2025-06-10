@@ -35,6 +35,7 @@ export const regContestSchema = z.object({
 
 // 공모전 리스트
 export const getContestListSchema = z.object({
+  id: z.string(),
   title: z.string(),
   img: z.string(),
   organizer: z.string(),

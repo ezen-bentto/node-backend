@@ -31,7 +31,7 @@ export const ENV = {
   logLevel: process.env.LOG_LEVEL || 'info',
 
   redis: {
-    host: process.env.REDIS_HOST!,
-    port: Number(process.env.REDIS_PORT!),
+    host: process.env.REDIS_HOST || 'localhost',
+    port: Number(process.env.REDIS_PORT || 6379),
   }
 };

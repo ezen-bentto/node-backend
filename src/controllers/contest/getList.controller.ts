@@ -1,6 +1,7 @@
 import { ContestService } from '@/service/contest.service';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { optionResult } from "@/types/db/request.type";
 
 /**
  * 공모전 목록 조회 핸들러
@@ -24,7 +25,26 @@ import { StatusCodes } from 'http-status-codes';
 
 export const getContestList: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await ContestService.getContestList();
+    const {search, sortBy, sortOrder} = req.query;
+    
+    const options: optionResult = {};
+    if (search && typeof search === 'string') {
+      options.search = search;
+    }
+    
+    if (sortBy && (sortBy === 'views' || sortBy === 'latest' || sortBy === 'deadline')) {
+      options.sortBy = sortBy;
+    }
+    
+    if (sortOrder && (sortOrder === 'ASC' || sortOrder === 'DESC')) {
+      options.sortOrder = sortOrder;
+    }
+
+    const data = await ContestService.getContestList(options);
+    for(let i=0; i<data.length; i++){
+      data[i].views = data[i].views.toString();
+      data[i].id = data[i].id.toString();
+    }
     res.status(StatusCodes.OK).json({ data: data });
     return;
   } catch (err) {
