@@ -37,7 +37,7 @@ export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<deta
     }
 
     // 조회수 증가 (IP 기준)
-    await trackViewByIp('contest', id, ip);
+    await trackViewByIp('contest', id, ip, contestData.views);
 
     return contestData;
   } catch (err: unknown) {
