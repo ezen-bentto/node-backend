@@ -12,7 +12,7 @@ export const ENV = {
     user: process.env.DB_USER as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_DATABASE as string,
-    timezone: 'Asia/Seoul',
+    // timezone: 'Asia/Seoul',
   },
 
   jwt: {
