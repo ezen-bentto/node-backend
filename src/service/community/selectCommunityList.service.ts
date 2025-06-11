@@ -1,5 +1,4 @@
 import { CommunityModel } from '@/models/community.model';
-import { CommunitySelectRequest } from '@/schemas/commnutiy.schema';
 import { handleDbError } from '@/utils/handleDbError';
 import logger from '@/utils/common/logger';
 
@@ -15,18 +14,18 @@ import logger from '@/utils/common/logger';
  *
  *        2025/06/03           김혜미               신규작성 
  *  
- * @param data    CommunitySelectRequest
+ * @param communityType    communityType
  * @param page    현재 페이지 번호
  * @param size    페이지 당 항목 수
  */
 export const selectCommunityList = async (
-    data: CommunitySelectRequest,
+    communityType: string,
     page: number,
     size: number
 ) => {
     logger.info('커뮤니티 목록 서비스 호출');
     try {
-        const res = await CommunityModel.selectCommunityList(data, page, size);
+        const res = await CommunityModel.selectCommunityList(communityType, page, size);
         logger.info('커뮤니티 목록 서비스 종료');
 
         return res;

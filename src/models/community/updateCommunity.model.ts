@@ -1,5 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
-import { CommunityUpdateRequest } from "@/schemas/commnutiy.schema";
+import { CommunityUpdateRequest } from "@/schemas/community.schema";
 import { UpdateResult } from "@/types/db/response.type";
 
 export const updateCommunity = async (
@@ -17,6 +17,7 @@ export const updateCommunity = async (
         end_date = ?,
         recruit_end_date = ?,
         age_group = ?,
+        title = ?,
         content = ?,
         mod_date = NOW()
         WHERE community_id = ? AND author_id = ? AND del_yn = 'N'
@@ -29,6 +30,7 @@ export const updateCommunity = async (
             props.endDate,
             props.recruitEndDate,
             props.ageGroup,
+            props.title,
             props.content,
             communityId,
             userId
