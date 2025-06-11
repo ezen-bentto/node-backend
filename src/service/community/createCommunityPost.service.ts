@@ -1,7 +1,7 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { CommunityModel } from '@/models/community.model';
 import { RecruitmentDetailModel } from '@/models/recruitmentDetail.model';
-import { CommunityRegisterRequest } from '@/schemas/commnutiy.schema';
+import { CommunityRegisterRequest } from '@/schemas/community.schema';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
