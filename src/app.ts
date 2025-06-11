@@ -1,11 +1,12 @@
 import express from 'express';
 import { registerMiddlewares } from '@/middlewares/index.middleware';
 import { errorHandler } from '@/middlewares/error.middleware';
-
+import { syncViewsToDb } from './jobs/syncviews.job';
 import DemoRouter from '@/routes/demo.routes';
 import ContestRouter from '@/routes/contest.routes';
 import CommunityRouter from '@/routes/community.routes';
-import { syncViewsToDb } from './jobs/syncviews.job';
+import CommonRouter from '@/routes/common.routes';
+import CommentRouter from '@/routes/comment.routes';
 
 const app = express();
 
@@ -17,6 +18,9 @@ registerMiddlewares(app);
 app.use('/api/demo', DemoRouter);
 app.use('/api/contest', ContestRouter);
 app.use('/api/community', CommunityRouter);
+app.use('/api/comment', CommentRouter);
+app.use('/api/common', CommonRouter);
+
 
 // 레디스 값 DB에 삽입
 setInterval(() => {
