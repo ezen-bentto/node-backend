@@ -25,7 +25,7 @@ import { optionResult } from "@/types/db/request.type";
 
 export const getContestList: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const {search, sortBy, sortOrder} = req.query;
+    const {search, sortBy, sortOrder, page, limit} = req.query;
     
     const options: optionResult = {};
     if (search && typeof search === 'string') {
@@ -40,12 +40,28 @@ export const getContestList: RequestHandler = async (req: Request, res: Response
       options.sortOrder = sortOrder;
     }
 
+    if (page && typeof page === 'string') {
+      const pageNum = parseInt(page, 10);
+      if (pageNum > 0) {
+        options.page = pageNum;
+      }
+    }
+
+    if (limit && typeof limit === 'string') {
+      const limitNum = parseInt(limit, 10);
+      if (limitNum > 0) {
+        options.limit = limitNum;
+      }
+    }
+
     const data = await ContestService.getContestList(options);
+
     for(let i=0; i<data.length; i++){
       data[i].views = data[i].views.toString();
       data[i].id = data[i].id.toString();
     }
-    res.status(StatusCodes.OK).json({ data: data });
+    
+    res.status(StatusCodes.OK).json({ data: data, pagination: {currentPage: options.page, limit: options.limit }});
     return;
   } catch (err) {
     next(err);

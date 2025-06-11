@@ -8,19 +8,33 @@ import { optionResult } from "@/types/db/request.type";
  * 게시글 페이지를 불러온다.
  *
  * @function selectList
- * @date 2025/06/10
+ * @date 2025/06/11
  * @history
  * -------------------------------------------------------
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/06/10          한유리             신규작성  
- * @param 
+ *        2025/06/11          한유리             신규작성  
+ * @param options
  * @returns getContestList
  */
 
 const selectList = async (options: optionResult = {}): Promise<getContestList[]> => {
-  const {search, sortBy = 'latest', sortOrder = 'DESC'} = options;
+  const {
+    search, 
+    sortBy = 'latest',
+    sortOrder = 'DESC',
+    page = 1 ,
+    limit = 16
+  } = options;
+  
+  const sortOptions = {
+    views: 'views',
+    latest: 'start_date',
+    deadline: 'end_date'
+  };
+  
+  const sortColumn = sortOptions[sortBy];
 
   let sql = `SELECT id,
                     title,
@@ -49,15 +63,13 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
     sql += ` WHERE ${conditions.join(' AND ')}`;
   }
 
-  // DB 컬럼명 일치
-  const sortOptions = {
-    views: 'views',
-    latest: 'start_date',
-    deadline: 'end_date'
-  };
+  // ORDER BY
+  sql += ` ORDER BY ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`
 
-  const sortColumn = sortOptions[sortBy];
-  sql += ` ORDER BY ${sortColumn} ${sortOrder}`
+  // 페이징
+  const offset = (page-1) * limit;
+  sql += ` LIMIT ? OFFSET ? `;
+  values.push(limit, offset);
 
   const db = getDBConnection();
   const res = await db.query(sql, values);
