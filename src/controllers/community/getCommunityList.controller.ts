@@ -1,6 +1,5 @@
-import { CommunitySelectRequest } from '@/schemas/commnutiy.schema';
 import { selectCommunityList } from '@/service/community/selectCommunityList.service';
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import logger from '@/utils/common/logger';
 import { AppError } from '@/utils/AppError';
 import { StatusCodes } from 'http-status-codes';
@@ -22,23 +21,43 @@ export const getCommunityList = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        logger.info(`커뮤니티 목록 요청 시작 : ${req.ip}`);
-        const parsed = CommunitySelectRequest.safeParse(req.query);
+        logger.info(`community_type: ${req.query.community_type}, type: ${typeof req.query.community_type}`);
 
-        if (!parsed.success) {
-            logger.warn(`커뮤니티 목록 요청 검증 실패 : ${JSON.stringify(req.body)}`);
+        logger.info(`커뮤니티 목록 요청 시작 : ${req.ip}`);
+
+        // 쿼리 파라미터에서 값 추출
+        const { community_type, page = '1', size = '10' } = req.query;
+
+        // 기본 validation
+        if (community_type && typeof community_type !== 'string') {
+            logger.warn(`커뮤니티 목록 요청 검증 실패 : community_type이 문자열이 아님`);
             next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
         }
 
-        const { page = '1', size = '10' } = req.query;
+        // 페이지, 사이즈 validation
+        const pageNum = parseInt(page as string, 10);
+        const sizeNum = parseInt(size as string, 10);
+
+        if (isNaN(pageNum) || pageNum < 1) {
+            logger.warn(`커뮤니티 목록 요청 검증 실패 : 잘못된 page 값 ${page}`);
+            next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+            return;
+        }
+
+        if (isNaN(sizeNum) || sizeNum < 1 || sizeNum > 100) {
+            logger.warn(`커뮤니티 목록 요청 검증 실패 : 잘못된 size 값 ${size}`);
+            next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+            return;
+        }
 
         const data = await selectCommunityList(
-            parsed.data,
-            parseInt(page as string, 10),
-            parseInt(size as string, 10)
+            community_type as string || '', // community_type이 없으면 빈 문자열
+            pageNum,
+            sizeNum
         );
-        logger.info(`커뮤니티 목록 조회 성공 : ${JSON.stringify(data.list)}`);
+
+        logger.info(`커뮤니티 목록 조회 성공 : 총 ${data.totalCount}개, 현재 페이지 ${data.list.length}개`);
 
         res.status(StatusCodes.OK).json({ data: data });
     } catch (err) {

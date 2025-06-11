@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { CommunityUpdateRequest } from '@/schemas/commnutiy.schema';
+import { CommunityUpdateRequest } from '@/schemas/community.schema';
 import { CommunityService } from '@/service/community.service';
 import { AppError } from '@/utils/AppError';
 import { sanitizeHtml } from '@/utils/common/sanitizeHtml';
