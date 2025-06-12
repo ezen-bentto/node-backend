@@ -1,6 +1,7 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { CommunityModel } from '@/models/community.model';
-import { CommunityDeleteRequest } from '@/schemas/commnutiy.schema';
+import { RecruitmentDetailModel } from '@/models/recruitmentDetail.model';
+import { CommunityDeleteRequest } from '@/schemas/community.schema';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
@@ -23,6 +24,7 @@ export const deleteCommunityPost = async (data: CommunityDeleteRequest) => {
     // TODO : session에서 userId 값 꺼내기
     // index값은? 화면에서 넘겨받기
     const userId = 5;
+    const community_id = data.communityId;
 
     logger.info(`커뮤니티 글 삭제 서비스 호출(userId: ${userId})`);
 
@@ -35,7 +37,10 @@ export const deleteCommunityPost = async (data: CommunityDeleteRequest) => {
         }
         logger.debug(`커뮤니티 글 delete 성공 : ${res.affectedRows}`);
 
-        // TODO : 모집상세도 같이 삭제 처리
+        // 모집상세도 같이 삭제 처리(있으면 삭제 없으면 넘어감)
+        if (typeof community_id === "number") {
+            await RecruitmentDetailModel.deleteRecruitmentDetail(community_id);
+        }
 
         logger.info(`커뮤니티 글 삭제 서비스 종료(userId: ${userId})`);
         return res;

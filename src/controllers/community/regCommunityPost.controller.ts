@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { CommunityRegisterRequest } from '@/schemas/commnutiy.schema';
+import { CommunityRegisterRequest } from '@/schemas/community.schema';
 import { CommunityService } from '@/service/community.service';
 import { AppError } from '@/utils/AppError';
 import { serializeBigInt } from '@/utils/common/serializeBigInt';

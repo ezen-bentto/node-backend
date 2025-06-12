@@ -1,5 +1,4 @@
 import { getDBConnection } from "@/config/db.config";
-import { CommunitySelectRequest } from "@/schemas/commnutiy.schema";
 import logger from '@/utils/common/logger';
 
 interface CommunityRow {
@@ -11,10 +10,14 @@ interface CommunityRow {
     end_date: string | null;
     recruit_end_date: string | null;
     age_group: string | null;
+    title: string;
     content: string;
+    nickname: string;
     author_id: number;
     reg_date: string;
     mod_date: string;
+    scrap_count: number;
+    comment_count: number;
 }
 
 interface CommunityListResult {
@@ -26,72 +29,87 @@ interface CommunityListResult {
 }
 
 export const selectCommunityList = async (
-    filter: CommunitySelectRequest,
+    communityType: string,
     page: number,
     size: number
 ): Promise<CommunityListResult> => {
-    const { communityType, categoryType, ageGroup, sort } = filter;
 
     const offset = (page - 1) * size;
-    const values: (string | number)[] = [];
-    const whereClauses: string[] = [];
+    let values: (string | number)[] = [];
+    let whereClause = '';
 
-    // 필터 조건 구성
-    whereClauses.push(`c.community_type = ?`);
-    values.push(String(communityType));
-
-    if (typeof categoryType === "number") {
-        whereClauses.push(`c.category_type = ?`);
-        values.push(categoryType);
+    // communityType 조건 추가
+    if (communityType) {
+        whereClause = 'AND c.community_type = ?';
+        values.push(communityType);
     }
-
-    if (ageGroup === "1") {
-        whereClauses.push(`c.age_group = '1'`);
-    } else if (ageGroup === "2") {
-        whereClauses.push(`c.age_group IN ('1', '2')`);
-    }
-
-    const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
-
-    const sortMapping: Record<"1" | "2", string> = {
-        "1": "c.reg_date DESC",
-        "2": "c.end_date ASC",
-    };
-    const orderBy = sortMapping[sort as "1" | "2"] || "c.reg_date DESC";
 
     const listSql = `
         SELECT 
             c.community_id,
+            c.contest_id,
+            c.author_id,
+            u.nickname,
             c.community_type,
             c.category_type,
-            c.contest_id,
+            c.age_group,
             c.start_date,
             c.end_date,
             c.recruit_end_date,
-            c.age_group,
+            c.title,
             c.content,
+            c.reg_date,
+            c.mod_date,
+            COUNT(DISTINCT s.scrap_id) AS scrap_count,
+            COUNT(DISTINCT cm.comment_id) AS comment_count
+        FROM community c
+        LEFT JOIN scrap s 
+            ON s.target_id = c.community_id 
+            AND s.target_type = '2' 
+            AND s.del_yn = 'N'
+        LEFT JOIN comment cm
+            ON c.community_id = cm.post_id 
+            AND cm.del_yn = 'N'
+        LEFT JOIN user u
+            ON u.user_id = c.author_id
+        WHERE c.del_yn='N'
+        ${whereClause}
+        GROUP BY 
+            c.community_id,
+            c.contest_id,
             c.author_id,
+            u.nickname,
+            c.community_type,
+            c.category_type,
+            c.age_group,
+            c.start_date,
+            c.end_date,
+            c.recruit_end_date,
+            c.title,
+            c.content,
             c.reg_date,
             c.mod_date
-        FROM community c
-        ${whereSQL}
-        ORDER BY ${orderBy}
-        LIMIT ?, ?
+        ORDER BY c.reg_date DESC
+        LIMIT ? OFFSET ?
     `;
 
+    // 전체 개수 조회 쿼리
     const countSql = `
-        SELECT COUNT(*) as totalCount
+        SELECT COUNT(DISTINCT c.community_id) as totalCount
         FROM community c
-        ${whereSQL}
+        LEFT JOIN scrap s 
+            ON s.target_id = c.community_id 
+            AND s.target_type = '2' 
+            AND s.del_yn = 'N'
+        LEFT JOIN comment cm
+            ON c.community_id = cm.post_id 
+            AND cm.del_yn = 'N'
+        ${whereClause}
     `;
 
     try {
         const db = getDBConnection();
-        const listValues = [...values, offset, size];
-
-        logger.info(`📌 커뮤니티 목록 쿼리 실행`);
-        logger.info(`📌 WHERE절: ${whereSQL}`);
-        logger.info(`📌 VALUES: ${JSON.stringify(values)}`);
+        const listValues = [...values, size, offset];
 
         const result = await db.query(listSql, listValues);
         const list = Array.isArray(result) ? result : [];
@@ -105,7 +123,8 @@ export const selectCommunityList = async (
             return converted;
         });
 
-        const [countRows] = await db.query(countSql, values);
+        const countResult = await db.query(countSql, values);
+        const countRows = Array.isArray(countResult) ? countResult : [];
         const totalCount = Number(countRows[0]?.totalCount || 0);
 
         const finalResult = {
@@ -116,11 +135,11 @@ export const selectCommunityList = async (
             list: parsedList as CommunityRow[],
         };
 
-        logger.info(`📊 목록 조회 완료: totalCount=${totalCount}, listLength=${parsedList.length}`);
+        logger.info(`목록 조회 완료: totalCount=${totalCount}, listLength=${parsedList.length}`);
 
         return finalResult;
     } catch (error) {
-        logger.error('❌ selectCommunityList 에러 발생', error);
+        logger.error('selectCommunityList 에러 발생', error);
         return {
             page,
             size,

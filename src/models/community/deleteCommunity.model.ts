@@ -1,5 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
-import { CommunityDeleteRequest } from "@/schemas/commnutiy.schema";
+import { CommunityDeleteRequest } from "@/schemas/community.schema";
 import { DeleteResult } from "@/types/db/response.type";
 
 // 커뮤니티 글 Delete

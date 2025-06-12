@@ -15,14 +15,16 @@ export interface CommunityDetail {
     end_date: string;
     recruit_end_date: string;
     age_group: string;
+    title: string;
     content: string;
     author_id: number;
+    nickname: string;
     reg_date: string;
-    mod_date: string;
     recruitment_detail_list: RecruitmentDetail[];
 }
 
 // BigInt → Number 변환 함수
+// TODO Check
 const convertBigIntToNumber = (obj: any): any => {
     if (Array.isArray(obj)) {
         return obj.map(convertBigIntToNumber);
@@ -49,7 +51,24 @@ export const selectCommunityDetail = async (
     const db = getDBConnection();
 
     const [communityRows] = await db.query(
-        `SELECT * FROM community WHERE community_id = ? AND del_yn = 'N'`,
+        `SELECT 
+            c.community_id,
+            c.contest_id,
+            c.author_id,
+            u.nickname AS nickname,
+            c.community_type,
+            c.start_date,
+            c.end_date,
+            c.recruit_end_date,
+            c.content,
+            c.category_type,
+            c.age_group,
+            c.title,
+            c.reg_date
+        FROM community c
+        JOIN user u 
+        ON u.user_id = c.author_id
+        WHERE c.community_id = ? AND c.del_yn = 'N'`,
         [communityId]
     );
 
@@ -61,18 +80,25 @@ export const selectCommunityDetail = async (
 
     const community = rows[0];
 
-    // 날짜 필드 명시적 ISO 문자열 변환
+    // 날짜 변환 함수
+    const toISOStringSafe = (date: any): string | null =>
+        date instanceof Date ? date.toISOString() : null;
+
     const communityWithStringDates = {
         ...community,
-        start_date: community.start_date?.toISOString(),
-        end_date: community.end_date?.toISOString(),
-        recruit_end_date: community.recruit_end_date?.toISOString(),
-        reg_date: community.reg_date?.toISOString(),
-        mod_date: community.mod_date?.toISOString(),
+        start_date: toISOStringSafe(community?.start_date),
+        end_date: toISOStringSafe(community?.end_date),
+        recruit_end_date: toISOStringSafe(community?.recruit_end_date),
+        reg_date: toISOStringSafe(community?.reg_date),
     };
 
     const detailQueryResult = await db.query(
-        `SELECT recruitment_detail_id, role, count FROM recruitment_detail WHERE community_id = ? AND del_yn = 'N'`,
+        `SELECT 
+            recruitment_detail_id, 
+            role, 
+            count 
+        FROM recruitment_detail 
+        WHERE community_id = ? AND del_yn = 'N'`,
         [communityId]
     );
 

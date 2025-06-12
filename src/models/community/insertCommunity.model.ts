@@ -1,5 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
-import { CommunityRegisterRequest } from "@/schemas/commnutiy.schema";
+import { CommunityRegisterRequest } from "@/schemas/community.schema";
 import { InsertResult } from "@/types/db/response.type";
 
 export const insertCommunity = async (
@@ -14,6 +14,7 @@ export const insertCommunity = async (
     "end_date",
     "recruit_end_date",
     "age_group",
+    "title",
     "content",
     "author_id",
     "reg_date",
@@ -21,13 +22,14 @@ export const insertCommunity = async (
   ];
 
   const values = [
-    props.communityType,
+    props.communityType ?? null,
     props.categoryType ?? null,
     props.contestId ?? null,
     props.startDate ?? null,
     props.endDate ?? null,
     props.recruitEndDate ?? null,
     props.ageGroup ?? null,
+    props.title,
     props.content,
     userId,
   ];

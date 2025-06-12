@@ -12,7 +12,7 @@ export const ENV = {
     user: process.env.DB_USER as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_DATABASE as string,
-    timezone: 'Asia/Seoul',
+    // timezone: 'Asia/Seoul',
   },
 
   jwt: {
@@ -39,7 +39,7 @@ export const ENV = {
   logLevel: process.env.LOG_LEVEL || 'info',
 
   redis: {
-    host: process.env.REDIS_HOST!,
-    port: Number(process.env.REDIS_PORT!),
+    host: process.env.REDIS_HOST || 'localhost',
+    port: Number(process.env.REDIS_PORT || 6379),
   }
 };

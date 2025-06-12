@@ -15,6 +15,7 @@ export const CommunityRegisterRequest = z
         recruitEndDate: z.string().optional().nullable(),
         categoryType: z.number().min(1).optional().nullable(),
         ageGroup: z.string().optional().nullable(), // 모집 연령
+        title: z.string().min(1, '제목을 입력해주세요.'),
         content: z.string().min(1, '내용을 입력해주세요.'),
 
         // 모집상세 배열 추가
@@ -78,19 +79,14 @@ export const CommunityRegisterRequest = z
             }
         }
 
-        // === [3] 자유: 날짜 형식만 검증, 모집상세가 있으면 에러
+        // === [3] 자유: 모집상세가 있으면 에러
         if (communityType === '3') {
-            if (startDate && isNaN(Date.parse(startDate))) {
-                ctx.addIssue({ path: ['startDate'], message: '시작일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
-            }
-            if (endDate && isNaN(Date.parse(endDate))) {
-                ctx.addIssue({ path: ['endDate'], message: '종료일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
-            }
-            if (recruitEndDate && isNaN(Date.parse(recruitEndDate))) {
-                ctx.addIssue({ path: ['recruitEndDate'], message: '모집 종료일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
-            }
             if (recruitments && recruitments.length > 0) {
-                ctx.addIssue({ path: ['recruitments'], message: '자유글에는 모집 상세를 포함할 수 없습니다.', code: z.ZodIssueCode.custom });
+                ctx.addIssue({
+                    path: ['recruitments'],
+                    message: '자유글은 모집 상세 정보를 포함할 수 없습니다.',
+                    code: z.ZodIssueCode.custom,
+                });
             }
         }
     });
@@ -104,10 +100,11 @@ export const CommunityUpdateRequest = z
         startDate: z.string().optional().nullable(),
         endDate: z.string().optional().nullable(),
         recruitEndDate: z.string().optional().nullable(),
+        title: z.string().min(1, '제목을 입력해주세요.'),
         content: z.string().trim().min(1, '내용을 입력해주세요.'),
         categoryType: z.number().min(1).optional().nullable(),
         ageGroup: z.string().optional().nullable(),
-        recruitments: z.array(RecruitmentDetailUpdateRequest).optional(), // ✅ 추가
+        recruitments: z.array(RecruitmentDetailUpdateRequest).optional(),
     })
     .superRefine((data, ctx) => {
         const {
@@ -159,26 +156,15 @@ export const CommunityUpdateRequest = z
             }
         }
 
-        // 자유 (3)
+        // === [3] 자유: 모집상세가 있으면 에러
         if (communityType === '3') {
-            if (startDate && isNaN(Date.parse(startDate))) {
-                ctx.addIssue({ path: ['startDate'], message: '시작일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
+            if (recruitments && recruitments.length > 0) {
+                ctx.addIssue({
+                    path: ['recruitments'],
+                    message: '자유글은 모집 상세 정보를 포함할 수 없습니다.',
+                    code: z.ZodIssueCode.custom,
+                });
             }
-            if (endDate && isNaN(Date.parse(endDate))) {
-                ctx.addIssue({ path: ['endDate'], message: '종료일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
-            }
-            if (recruitEndDate && isNaN(Date.parse(recruitEndDate))) {
-                ctx.addIssue({ path: ['recruitEndDate'], message: '모집 종료일 형식이 올바르지 않습니다.', code: z.ZodIssueCode.custom });
-            }
-        }
-
-        // 모집상세 validation
-        if ((communityType === '1' || communityType === '2') && (!recruitments || recruitments.length === 0)) {
-            ctx.addIssue({
-                path: ['recruitments'],
-                message: '모집상세 정보를 하나 이상 입력해주세요.',
-                code: z.ZodIssueCode.custom,
-            });
         }
     });
 
@@ -187,27 +173,7 @@ export const CommunityDeleteRequest = z.object({
     communityId: z.number().min(1).optional().nullable(),
 })
 
-// 4. 커뮤니티 목록 조회 SELECT [GET]
-export const CommunitySelectRequest = z.object({
-    // 커뮤니티 타입: 필수 ('1': 공모전, '2': 스터디, '3': 자유게시판)
-    communityType: z.enum(['1', '2', '3'], {
-        required_error: '커뮤니티 타입은 필수입니다.',
-    }),
-
-    // 카테고리 타입: 선택 (int)
-    categoryType: z
-        .union([z.string(), z.number()])
-        .transform((val) => (val === '' || val == null ? undefined : Number(val)))
-        .optional(),
-
-    // 모집 연령: 선택 ('1': 대학생, '2': 제한 없음)
-    ageGroup: z.enum(['1', '2']).optional(),
-
-    // 정렬 기준: 선택 ('1': 최신순, '2': 마감일순, '3': 북마크순)
-    sort: z.enum(['1', '2', '3']).optional().default('1'),
-});
 
 export type CommunityRegisterRequest = z.infer<typeof CommunityRegisterRequest>;
 export type CommunityUpdateRequest = z.infer<typeof CommunityUpdateRequest>;
 export type CommunityDeleteRequest = z.infer<typeof CommunityDeleteRequest>;
-export type CommunitySelectRequest = z.infer<typeof CommunitySelectRequest>;
