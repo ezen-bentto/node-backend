@@ -41,8 +41,7 @@ export const syncViewsToDb = async (target: 'contest' | 'community' | 'policy') 
       // 타겟에 따라 처리
       switch (target) {
         case 'contest':
-          console.log('contset 실행');
-          console.log(key);
+          // console.log(key);
           await ContestModel.addCntViews(viewsCount, id);
           break;
         case 'community':
