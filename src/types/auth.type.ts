@@ -16,7 +16,7 @@ export interface SocialUser {
   email: string;
   nickname: string;
   profileImage?: string;
-  provider: 'kakao' | 'naver' | 'google'; // 소셜 로그인 서비스 제공자
+  provider: 'kakao' | 'naver' | 'google';
 }
 
 // --- DB에서 조회되는 사용자 정보의 실제 형태 ---
@@ -29,10 +29,9 @@ export interface User {
   profile_image?: string;
   user_type: '개인' | '기업' | '관리자'; // DB의 user_types 테이블과 조인된 값
   approval_status?: '대기' | '승인' | '반려' | '취소'; // DB의 approval_statuses 테이블과 조인된 값
+  provider?: 'kakao' | 'naver' | 'google' | 'email';
   // created_at, updated_at 등 다른 DB 컬럼이 있다면 여기에 추가
-  // 만약 DB에 provider 컬럼이 있다면 여기에 추가: provider?: 'kakao' | 'naver' | 'google' | 'email';
 }
-// ------------------------------------------
 
 // JWT payload 및 req.user에 사용될 사용자 정보 (DB의 User 테이블과 매핑)
 export interface AuthUser {
@@ -45,7 +44,6 @@ export interface AuthUser {
   userType?: '개인' | '기업' | '관리자'; // user_type.type 값
   approvalStatus?: '대기' | '승인' | '반려' | '취소'; // approval_status.status 값 (기업회원용)
 }
-
 
 export interface AuthResponse {
   success: boolean;
