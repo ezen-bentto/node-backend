@@ -42,8 +42,6 @@ export const getContestDetail: RequestHandler = async (req: Request, res: Respon
     const data = await ContestService.getContestDetail({ id: contestId, ip:ip }); // or ...parsed.data
     data.writer_id = data.writer_id.toString();
     data.views = data.views.toString();
-
-    // TODO: 커뮤니티 모집글
     
     res.status(StatusCodes.OK).json({ data: data });
     return;
