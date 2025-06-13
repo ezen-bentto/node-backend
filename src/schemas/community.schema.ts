@@ -95,6 +95,7 @@ export const CommunityRegisterRequest = z
 // 2. 커뮤니티 글 UPDATE [POST]
 export const CommunityUpdateRequest = z
     .object({
+        communityId: z.number().min(1),
         communityType: z.enum(['1', '2', '3']),
         contestId: z.number().min(1).optional().nullable(),
         startDate: z.string().optional().nullable(),

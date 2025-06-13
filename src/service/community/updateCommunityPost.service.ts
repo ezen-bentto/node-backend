@@ -29,7 +29,7 @@ export const updateCommunityPost = async (data: CommunityUpdateRequest) => {
 
     logger.info(`커뮤니티 글 수정 서비스 호출(userId: ${userId})`);
     try {
-        const res = await CommunityModel.updateCommunity(data, communityId, userId);
+        const res = await CommunityModel.updateCommunity(data, userId);
 
         if (res.affectedRows != 1) {
             logger.warn(`커뮤니티 글 update 실패 : ${res.affectedRows}`);

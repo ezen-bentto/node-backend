@@ -1,6 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { CommentModel } from '@/models/comment.model';
-import { RecruitmentDetailModel } from '@/models/recruitmentDetail.model';
 import { CommentUpdateRequest } from '@/schemas/comment.schema';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
@@ -23,13 +22,11 @@ import logger from '@/utils/common/logger';
  */
 export const updateComment = async (data: CommentUpdateRequest) => {
     // TODO : session에서 userId값 꺼내기
-    // 글번호는? 화면에서 넘겨준다
     const userId = 5;
-    const commentId = 20;
 
     logger.info(`댓글 수정 서비스 호출(userId: ${userId})`);
     try {
-        const res = await CommentModel.updateComment(data, commentId, userId);
+        const res = await CommentModel.updateComment(data, userId);
 
         if (res.affectedRows != 1) {
             logger.warn(`댓글 update 실패 : ${res.affectedRows}`);

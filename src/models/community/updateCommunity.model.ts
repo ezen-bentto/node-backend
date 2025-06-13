@@ -4,7 +4,6 @@ import { UpdateResult } from "@/types/db/response.type";
 
 export const updateCommunity = async (
     props: CommunityUpdateRequest,
-    communityId: number,
     userId: number
 ): Promise<UpdateResult> => {
     try {
@@ -32,7 +31,7 @@ export const updateCommunity = async (
             props.ageGroup,
             props.title,
             props.content,
-            communityId,
+            props.communityId,
             userId
         ];
 

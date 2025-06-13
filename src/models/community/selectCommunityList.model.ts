@@ -37,10 +37,12 @@ export const selectCommunityList = async (
     const offset = (page - 1) * size;
     let values: (string | number)[] = [];
     let whereClause = '';
+    let countWhereClause = '';
 
     // communityType 조건 추가
     if (communityType) {
         whereClause = 'AND c.community_type = ?';
+        countWhereClause = 'c.community_type = ?';
         values.push(communityType);
     }
 
@@ -95,7 +97,8 @@ export const selectCommunityList = async (
 
     // 전체 개수 조회 쿼리
     const countSql = `
-        SELECT COUNT(DISTINCT c.community_id) as totalCount
+        SELECT 
+            COUNT(DISTINCT c.community_id) as totalCount
         FROM community c
         LEFT JOIN scrap s 
             ON s.target_id = c.community_id 
@@ -104,8 +107,11 @@ export const selectCommunityList = async (
         LEFT JOIN comment cm
             ON c.community_id = cm.post_id 
             AND cm.del_yn = 'N'
-        ${whereClause}
+        WHERE 
+            ${countWhereClause}
     `;
+    logger.info("communityType:", communityType);
+
 
     try {
         const db = getDBConnection();
@@ -123,7 +129,10 @@ export const selectCommunityList = async (
             return converted;
         });
 
+
         const countResult = await db.query(countSql, values);
+        logger.info("countResult:", countResult);
+
         const countRows = Array.isArray(countResult) ? countResult : [];
         const totalCount = Number(countRows[0]?.totalCount || 0);
 
@@ -149,6 +158,7 @@ export const selectCommunityList = async (
         };
     }
 };
+
 
 export type { CommunityListResult };
 export default selectCommunityList;
