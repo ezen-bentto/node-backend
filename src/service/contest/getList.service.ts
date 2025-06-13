@@ -2,6 +2,8 @@ import { ContestModel } from '@/models/contest.model';
 import { getContestList as getContestLisParam } from '@/schemas/content.schema';
 import { handleDbError } from '@/utils/handleDbError';
 import { promises } from 'dns';
+import { optionResult } from "@/types/db/request.type";
+import { any } from 'zod';
 
 /**
  *
@@ -20,9 +22,15 @@ import { promises } from 'dns';
  *        2025/05/30           한유리             신규작성  
  * @param 없음
  */
-export const getContestList = async (): Promise<getContestLisParam> => {
+export const getContestList = async (options: optionResult = {}): Promise<getContestLisParam[]> => {
   try {
-    const contestData = await ContestModel.selectList();
+    const contestData = await ContestModel.selectList(options);
+
+    // const data = contestData[0];
+    // for (let key in data) {
+    //   const value = data[key as keyof typeof data];
+    //   console.log(key, typeof value);
+    // }
     return contestData;
   } catch (err: unknown) {
     handleDbError(err);

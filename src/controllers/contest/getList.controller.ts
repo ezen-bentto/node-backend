@@ -1,6 +1,7 @@
 import { ContestService } from '@/service/contest.service';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { optionResult } from "@/types/db/request.type";
 
 /**
  * 공모전 목록 조회 핸들러
@@ -24,8 +25,43 @@ import { StatusCodes } from 'http-status-codes';
 
 export const getContestList: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await ContestService.getContestList();
-    res.status(StatusCodes.OK).json({ data: data });
+    const {search, sortBy, sortOrder, page, limit} = req.query;
+    
+    const options: optionResult = {};
+    if (search && typeof search === 'string') {
+      options.search = search;
+    }
+    
+    if (sortBy && (sortBy === 'views' || sortBy === 'latest' || sortBy === 'deadline')) {
+      options.sortBy = sortBy;
+    }
+    
+    if (sortOrder && (sortOrder === 'ASC' || sortOrder === 'DESC')) {
+      options.sortOrder = sortOrder;
+    }
+
+    if (page && typeof page === 'string') {
+      const pageNum = parseInt(page, 10);
+      if (pageNum > 0) {
+        options.page = pageNum;
+      }
+    }
+
+    if (limit && typeof limit === 'string') {
+      const limitNum = parseInt(limit, 10);
+      if (limitNum > 0) {
+        options.limit = limitNum;
+      }
+    }
+
+    const data = await ContestService.getContestList(options);
+
+    for(let i=0; i<data.length; i++){
+      data[i].views = data[i].views.toString();
+      data[i].id = data[i].id.toString();
+    }
+    
+    res.status(StatusCodes.OK).json({ data: data, pagination: {currentPage: options.page, limit: options.limit }});
     return;
   } catch (err) {
     next(err);

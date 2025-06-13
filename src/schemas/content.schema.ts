@@ -17,6 +17,7 @@ import { z } from 'zod';
 
 // 공모전 create
 export const regContestSchema = z.object({
+  id: z.string(),
   writer_id: z.string(),
   title: z.string(),
   img: z.string(),
@@ -31,10 +32,13 @@ export const regContestSchema = z.object({
   benefits: z.string(),
   contest_tag: z.string(),
   article: z.string(),
+  reg_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+  message: "Invalid date format"}),
 });
 
 // 공모전 리스트
 export const getContestListSchema = z.object({
+  id: z.string(),
   title: z.string(),
   img: z.string(),
   organizer: z.string(),

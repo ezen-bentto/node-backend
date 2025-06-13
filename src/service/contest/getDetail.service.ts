@@ -5,6 +5,8 @@ import { handleDbError } from '@/utils/handleDbError';
 import { detailContest, getDetailParam } from '@/schemas/content.schema';
 import { ContestModel } from '@/models/contest.model';
 import trackViewByIp from '@/utils/common/trackViewByIp';
+import selectCommunityList, { CommunityList } from '@/models/community/selectCommunityByContestId.model';
+import { formatDateOnly } from '@/utils/common/dateFormat';
 
 /**
  *
@@ -27,19 +29,31 @@ import trackViewByIp from '@/utils/common/trackViewByIp';
  *        2025/06/09           이철욱             조회수 로직 공통 함수로 분리
  * @param data 조회할 공모전의 상세 정보 요청 데이터 (ID 등)
  */
-export const getContestDetail = async ({ ip, id }: getDetailParam): Promise<detailContest> => {
+
+export interface ContestDetailWithCommunity extends detailContest {
+  communityList: CommunityList[];
+}
+
+export const getContestDetail = async ({ ip, id,}: getDetailParam): Promise<ContestDetailWithCommunity> => {
   try {
-    // 실제 공모전 상세 조회 (DB)
+    // 공모전 상세 조회
     const contestData = await ContestModel.getContestDetail(id);
+    console.log(contestData);
 
     if (contestData === undefined) {
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
     }
 
     // 조회수 증가 (IP 기준)
-    await trackViewByIp('contest', id, ip);
+    await trackViewByIp('contest', id, ip, contestData.views);
 
-    return contestData;
+    // 팀원 모집 리스트 조회
+    const communityList = await selectCommunityList(id);
+
+    return { ...contestData,
+      start_date:formatDateOnly(contestData.start_date)||'',
+      end_date:formatDateOnly(contestData.end_date)||'',
+      communityList};
   } catch (err: unknown) {
     handleDbError(err);
     throw err;
