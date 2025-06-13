@@ -1,6 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
-import { getContestList } from "@/schemas/content.schema";
-import { optionResult } from "@/types/db/request.type";
+import { formatDateOnly } from "@/utils/common/dateFormat";
 
 /**
  * 
@@ -18,15 +17,15 @@ import { optionResult } from "@/types/db/request.type";
  */
 
 export interface CommunityList {
-  id: number;
-  author_id: number;
+  id: string;
+  author_id: string;
   title: string;
   content: string;
   recruit_end_date: string | null;
 }
 
 const selectCommunityList = async (contestId:number): Promise<CommunityList[]> => {
-  const sql = `SELECT id,
+  const sql = `SELECT community_id,
                       author_id,
                       title,
                       content,
@@ -37,7 +36,15 @@ const selectCommunityList = async (contestId:number): Promise<CommunityList[]> =
   const db = getDBConnection();
   const res = await db.query(sql, [contestId]);
 
-  return res;
+  const parsed = res.map((row: any) => ({
+    id: row.community_id.toString(),
+    author_id: row.author_id.toString(),
+    title: row.title,
+    content: row.content,
+    recruit_end_date: formatDateOnly(row.recruit_end_date),
+  }));
+
+  return parsed;
 };
 
 export default selectCommunityList;

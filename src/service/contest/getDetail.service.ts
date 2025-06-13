@@ -5,9 +5,8 @@ import { handleDbError } from '@/utils/handleDbError';
 import { detailContest, getDetailParam } from '@/schemas/content.schema';
 import { ContestModel } from '@/models/contest.model';
 import trackViewByIp from '@/utils/common/trackViewByIp';
-import selectCommunityList, {
-  CommunityList,
-} from '@/models/community/selectCommunityByContestId.model';
+import selectCommunityList, { CommunityList } from '@/models/community/selectCommunityByContestId.model';
+import { formatDateOnly } from '@/utils/common/dateFormat';
 
 /**
  *
@@ -35,13 +34,11 @@ export interface ContestDetailWithCommunity extends detailContest {
   communityList: CommunityList[];
 }
 
-export const getContestDetail = async ({
-  ip,
-  id,
-}: getDetailParam): Promise<ContestDetailWithCommunity> => {
+export const getContestDetail = async ({ ip, id,}: getDetailParam): Promise<ContestDetailWithCommunity> => {
   try {
     // 공모전 상세 조회
     const contestData = await ContestModel.getContestDetail(id);
+    console.log(contestData);
 
     if (contestData === undefined) {
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
@@ -53,7 +50,10 @@ export const getContestDetail = async ({
     // 팀원 모집 리스트 조회
     const communityList = await selectCommunityList(id);
 
-    return { ...contestData, communityList };
+    return { ...contestData,
+      start_date:formatDateOnly(contestData.start_date)||'',
+      end_date:formatDateOnly(contestData.end_date)||'',
+      communityList};
   } catch (err: unknown) {
     handleDbError(err);
     throw err;

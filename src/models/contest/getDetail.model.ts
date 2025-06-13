@@ -18,8 +18,23 @@ import { detailContest, regContest } from "@/schemas/content.schema";
  * @returns detailContest
  */
 const getContestDetail = async (id: number): Promise<detailContest> => {  
-  // TODO: 조회할 것만 불러오기
-  const sql = `SELECT * FROM contest WHERE id = ?`;
+  const sql = `SELECT id,
+                      writer_id,
+                      title,
+                      img,
+                      organizer,
+                      prize,
+                      start_date,
+                      end_date,
+                      homepage,
+                      participants,
+                      benefits,
+                      contest_tag,
+                      article,
+                      views,
+                      reg_date
+                 FROM contest
+                WHERE id = ?`;
 
   const db = getDBConnection();
   const res = await db.query(sql, id);
