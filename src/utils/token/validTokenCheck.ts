@@ -1,9 +1,10 @@
+//src\utils\token\validTokenCheck.ts
 import { getCurrentDate } from '../common/getCurrentDate';
-import { getDecodedData } from './getDecodedData';
+import { decodeToken } from './decodeToken';
 import { refreshExpiredCheck } from './refreshExpiredCheck';
 
 export const validTokenCheck = async (accessToken: string, refreshToken: string) => {
-  const accessDecoded = getDecodedData(accessToken);
+  const accessDecoded = decodeToken(accessToken);
   const currentDate = getCurrentDate(); // 요쳥날린 시간의 currentDate 반환 함수
   if (accessDecoded.exp && accessDecoded.exp < currentDate) {
     if (refreshExpiredCheck(refreshToken, currentDate)) {

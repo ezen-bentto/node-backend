@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\ezen501-18\\Desktop\\ezen\\node-backend\\logs\\.d6df5ba2347e58aeb2d0377e9cc6cb199a24d1c4-audit.json",
+    "files": [
+        {
+            "date": 1748996685621,
+            "name": "C:\\Users\\ezen501-18\\Desktop\\ezen\\node-backend\\logs\\error-2025-06-04.log",
+            "hash": "99e628f3cab54401c75339dbc25ce1bd5ae16563c2b24d95752a04fe9a07b5b4"
+        }
+    ],
+    "hashType": "sha256"
+}
