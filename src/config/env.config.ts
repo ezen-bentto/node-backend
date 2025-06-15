@@ -17,7 +17,9 @@ export const ENV = {
 
   jwt: {
     secret: process.env.JWT_SECRET as string,
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '1h') as string,
+    refreshSecret: process.env.REFRESH_SECRET as string,
+    refreshExpiresIn: (process.env.REFRESH_EXPIRES_IN || '7d') as string,
   },
 
   aws: {
@@ -27,11 +29,17 @@ export const ENV = {
     bucket: process.env.AWS_S3_BUCKET_NAME!,
   },
 
+  kakao: {
+    clientId: process.env.KAKAO_CLIENT_ID as string,
+    clientSecret: process.env.KAKAO_CLIENT_SECRET as string,
+    redirectUri: process.env.KAKAO_REDIRECT_URI as string,
+  },
+
   corsOrigin: process.env.CORS_ORIGIN || '*',
   logLevel: process.env.LOG_LEVEL || 'info',
 
   redis: {
     host: process.env.REDIS_HOST || 'localhost',
     port: Number(process.env.REDIS_PORT || 6379),
-  }
+  },
 };
