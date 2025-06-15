@@ -4,7 +4,6 @@ import { UpdateResult } from "@/types/db/response.type";
 
 export const updateComment = async (
     props: CommentUpdateRequest,
-    commentId: number,
     userId: number
 ): Promise<UpdateResult> => {
     try {
@@ -20,7 +19,7 @@ export const updateComment = async (
 
         const values = [
             props.content,
-            commentId,
+            props.commentId,
             userId
         ];
 
