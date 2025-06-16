@@ -7,6 +7,8 @@ import { verifyRefreshToken } from './token/verifyRefreshToken';
 import { AuthModel } from '../models/auth/auth.model';
 import { AuthUser } from '../types/auth.type';
 import { decodeToken } from './token/decodeToken';
+import type { AccessTokenPayload } from './token/verifyAccessToken';
+import type { RefreshTokenPayload } from './token/verifyRefreshToken';
 
 export const Token = {
   getNewAccessToken,

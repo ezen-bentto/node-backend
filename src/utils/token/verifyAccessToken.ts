@@ -3,7 +3,7 @@ import { ENV } from '../../config/env.config'; // 경로 수정
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken'; // Secret 임포트 추가
 
 // CustomJwtPayload 타입을 재사용하거나 AccessTokenPayload 정의
-interface AccessTokenPayload extends JwtPayload {
+export interface AccessTokenPayload extends JwtPayload {
   userId: number;
   loginId: string; // 추가
   nickname?: string;
@@ -14,7 +14,9 @@ interface AccessTokenPayload extends JwtPayload {
   type?: 'access' | 'refresh';
 }
 
-export const verifyAccessToken = (token: string): { ok: boolean; payload?: AccessTokenPayload; message?: string } => {
+export const verifyAccessToken = (
+  token: string
+): { ok: boolean; payload?: AccessTokenPayload; message?: string } => {
   try {
     // ENV.jwt.secret이 항상 string임을 확신할 수 있다면, Secret 타입 단언 사용
     const payload = jwt.verify(token, ENV.jwt.secret as Secret) as AccessTokenPayload;
