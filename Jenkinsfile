@@ -25,10 +25,8 @@ mkdir -p ~/node-backend
 cd ~/node-backend
 
 if [ ! -d ".git" ]; then
-  echo "Git repository not found. Cloning repository."
   git clone ${env.GITHUB_REPO} .
 else
-  echo "Git repository found. Pulling latest changes."
   git reset --hard
   git clean -fd
   git pull origin main
@@ -48,7 +46,8 @@ EOF
                         sh """
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
-npm install
+rm -rf dist
+npm ci
 npm run build
 EOF
 """
@@ -57,27 +56,25 @@ EOF
             }
         }
 
-        stage('Deploy') {
+        stage('PM2 Deploy') {
             steps {
                 script {
-                    echo "🚀 PM2를 사용해 서버 재시작"
+                    echo "🚀 PM2 clean start"
                     sshagent([env.SSH_KEY_ID]) {
                         sh """
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
+
+# .env 갱신
 echo "DB_HOST=${env.DB_HOST}" > .env
 echo "DB_PORT=${env.DB_PORT}" >> .env
 echo "DB_USER=${env.DB_USER}" >> .env
 echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
 echo "DB_DATABASE=${env.DB_DATABASE}" >> .env
 
-# PM2로 실행 중이면 reload, 아니면 start
-if pm2 list | grep -q "backend-api"; then
-    pm2 reload backend-api
-else
-    pm2 start dist/index.js --name backend-api
-fi
-
+# PM2 clean start
+pm2 delete backend-api || true
+pm2 start dist/index.js --name backend-api
 pm2 save
 EOF
 """
