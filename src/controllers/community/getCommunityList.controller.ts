@@ -21,15 +21,15 @@ export const getCommunityList = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        logger.info(`community_type: ${req.query.community_type}, type: ${typeof req.query.community_type}`);
+        logger.info(`communityType: ${req.query.community_type}, type: ${typeof req.query.community_type}`);
 
         logger.info(`커뮤니티 목록 요청 시작 : ${req.ip}`);
 
         // 쿼리 파라미터에서 값 추출
-        const { community_type, page = '1', size = '10' } = req.query;
+        const { communityType, page = '1', size = '10' } = req.query;
 
         // 기본 validation
-        if (community_type && typeof community_type !== 'string') {
+        if (communityType && typeof communityType !== 'string') {
             logger.warn(`커뮤니티 목록 요청 검증 실패 : community_type이 문자열이 아님`);
             next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
@@ -52,7 +52,7 @@ export const getCommunityList = async (
         }
 
         const data = await selectCommunityList(
-            community_type as string || '', // community_type이 없으면 빈 문자열
+            communityType as string || '', // community_type이 없으면 빈 문자열
             pageNum,
             sizeNum
         );
