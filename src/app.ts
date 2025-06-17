@@ -6,7 +6,7 @@ import DemoRouter from '@/routes/demo.routes';
 import ContestRouter from '@/routes/contest.routes';
 import CommunityRouter from '@/routes/community.routes';
 import { authRouter } from '@/routes/auth.routes';
-import "./jobs/index.ts";
+// import "./jobs/index.ts";
 import CommonRouter from '@/routes/common.routes';
 import CommentRouter from '@/routes/comment.routes';
 
