@@ -42,7 +42,6 @@ export const selectCommunityList = async (
     // communityType 조건 추가
     if (communityType) {
         whereClause = 'AND c.community_type = ?';
-        countWhereClause = 'c.community_type = ?';
         values.push(communityType);
     }
 
@@ -107,8 +106,9 @@ export const selectCommunityList = async (
         LEFT JOIN comment cm
             ON c.community_id = cm.post_id 
             AND cm.del_yn = 'N'
-        WHERE 
-            ${countWhereClause}
+        WHERE
+            c.del_yn = 'N'
+            ${whereClause}
     `;
     logger.info("communityType:", communityType);
 
