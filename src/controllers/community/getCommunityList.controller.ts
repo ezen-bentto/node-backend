@@ -21,7 +21,7 @@ export const getCommunityList = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        logger.info(`communityType: ${req.query.community_type}, type: ${typeof req.query.community_type}`);
+        logger.info(`communityType: ${req.query.communityType}, type: ${typeof req.query.communityType}`);
 
         logger.info(`커뮤니티 목록 요청 시작 : ${req.ip}`);
 
