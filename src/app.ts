@@ -5,7 +5,7 @@ import { syncViewsToDb } from './jobs/syncviews.job';
 import DemoRouter from '@/routes/demo.routes';
 import ContestRouter from '@/routes/contest.routes';
 import CommunityRouter from '@/routes/community.routes';
-import { authRouter } from '@/routes/auth.routes';
+import { authRouter } from './routes/auth.routes';
 // import "./jobs/index.ts";
 import CommonRouter from '@/routes/common.routes';
 import CommentRouter from '@/routes/comment.routes';
@@ -25,12 +25,15 @@ app.use('/api/comment', CommentRouter);
 app.use('/api/common', CommonRouter);
 
 // 레디스 값 DB에 삽입
-setInterval(() => {
-    console.log('조회수 동기화 시작')
-    syncViewsToDb("contest");
+setInterval(
+  () => {
+    console.log('조회수 동기화 시작');
+    syncViewsToDb('contest');
     // syncViewsToDb("community");
     // syncViewsToDb("policy");
-}, 1000 * 60 * 1);
+  },
+  1000 * 60 * 1
+);
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);
