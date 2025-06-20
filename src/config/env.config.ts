@@ -12,7 +12,8 @@ export const ENV = {
     user: process.env.DB_USER as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_DATABASE as string,
-    // timezone: 'Asia/Seoul',
+    connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+    acquireTimeout: Number(process.env.DB_ACQUIRE_TIMEOUT || 10000)
   },
 
   jwt: {
