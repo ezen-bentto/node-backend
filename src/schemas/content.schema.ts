@@ -20,8 +20,8 @@ export const regContestSchema = z.object({
   id: z.string(),
   writer_id: z.string(),
   title: z.string(),
-  img: z.string(),
   organizer: z.string(),
+  organizer_type: z.string(),
   prize: z.string(),
   start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
@@ -40,17 +40,13 @@ export const regContestSchema = z.object({
 export const getContestListSchema = z.object({
   id: z.string(),
   title: z.string(),
-  img: z.string(),
   organizer: z.string(),
-  prize: z.string(),
   start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
   end_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
-  participants: z.string(),
-  benefits: z.string(),
-  contest_tag: z.string(),
-  views: z.string()
+  views: z.string(),
+  categories: z.array(z.string())
 });
 
 // 공모전 상세 select
@@ -61,7 +57,6 @@ export const getContestDetailSchema = z.object({
 // 공모전 상세 UPDATE
 export const modContestSchema = z.object({
   title: z.string().optional(),
-  img: z.string().optional(),
   organizer: z.string().optional(),
   prize: z.string().optional(),
   start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
