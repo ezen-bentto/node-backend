@@ -40,7 +40,7 @@ export class AuthModel {
                     aps.approval_status
                  FROM user u
                  LEFT JOIN approval_status aps ON u.user_id = aps.user_id
-                 WHERE u.email = ? AND u.user_type = '2'`,
+                 WHERE u.email = ?`,
                 [email]
             );
             return rows[0];

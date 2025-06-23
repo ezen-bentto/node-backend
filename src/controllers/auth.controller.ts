@@ -165,12 +165,14 @@ export class AuthController {
         return;
       }
 
-      // 기업회원 승인 상태 확인 (DB 스키마의 approval_status 값 사용)
-      if (user.user_type !== '2' || user.approval_status !== '2') { // '기업' -> '2', '승인' -> '2' (스키마 확인 필요)
-        res.status(StatusCodes.FORBIDDEN).json({
-          success: false,
-          message: '승인되지 않았거나 기업 회원이 아닙니다.',
-        });
+      // 기업회원 승인 상태 확인 : 기업회원('2') 또는 관리자('3')인지 확인
+      if (user.user_type === '2') { // 기업회원일 경우
+        if (user.approval_status !== '2') {
+          res.status(StatusCodes.FORBIDDEN).json({ message: '아직 관리자의 승인이 필요한 계정입니다.' });
+          return;
+        }
+      } else if (user.user_type !== '3') { // 관리자도 아닐 경우
+        res.status(StatusCodes.FORBIDDEN).json({ message: '로그인 권한이 없습니다.' });
         return;
       }
 

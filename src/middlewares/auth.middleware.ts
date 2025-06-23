@@ -28,7 +28,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const { ok, payload, message } = Token.verifyAccessToken(accessToken);
 
     if (!ok || !payload) {
-      // [수정] return 키워드 삭제
       res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
         message: message || '유효하지 않은 Access Token입니다.',
