@@ -176,7 +176,7 @@ export class AuthController {
 
       // JWT 토큰 생성 (Token 유틸리티의 getNewAccessToken, getNewRefreshToken 사용)
       const authUser: AuthUser = {
-        id: user.user_id,
+        id: Number(user.user_id),
         loginId: user.login_id,
         email: user.email,
         nickname: user.nickname,
