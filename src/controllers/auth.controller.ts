@@ -121,7 +121,7 @@ export class AuthController {
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: '기업 회원가입이 완료되었습니다. 관리자 승인 대기 중입니다.',
-        data: { userId },
+        data: { userId: userId.toString() },
       });
     } catch (error) {
       console.error('기업 회원가입 실패:', error);
@@ -166,10 +166,10 @@ export class AuthController {
       }
 
       // 기업회원 승인 상태 확인 (DB 스키마의 approval_status 값 사용)
-      if (user.user_type !== '기업' || user.approval_status !== '승인') {
+      if (user.user_type !== '2' || user.approval_status !== '2') { // '기업' -> '2', '승인' -> '2' (스키마 확인 필요)
         res.status(StatusCodes.FORBIDDEN).json({
           success: false,
-          message: '아직 관리자의 승인이 필요한 계정입니다.',
+          message: '승인되지 않았거나 기업 회원이 아닙니다.',
         });
         return;
       }
@@ -177,13 +177,13 @@ export class AuthController {
       // JWT 토큰 생성 (Token 유틸리티의 getNewAccessToken, getNewRefreshToken 사용)
       const authUser: AuthUser = {
         id: user.user_id,
-        loginId: user.login_id, // login_id 추가
+        loginId: user.login_id,
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profile_image,
         provider: 'email', // 기업 회원은 'email' 프로바이더
-        userType: user.user_type,
-        approvalStatus: user.approval_status
+        userType: user.user_type, // '2'
+        approvalStatus: user.approval_status, // '2'
       };
 
       const accessToken = Token.getNewAccessToken(authUser); // AuthUser 객체 전달
