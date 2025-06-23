@@ -53,3 +53,6 @@ export const INTERNAL_SERVER_ERROR = '서버 오류입니다.';
 
 // 입력값
 export const BAD_REQUEST_VALUE = '올바르지 않은 입력입니다.';
+
+// 이미지 업로드
+export const OK_UPLOAD_IMAGE = '이미지 등록이 완료되었습니다.';
