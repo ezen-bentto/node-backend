@@ -19,6 +19,7 @@ const router = Router();
 router.get('/getDetail', ContestController.getContestDetail);
 router.get('/getList', ContestController.getContestList);
 router.post('/register', ContestController.regContest);
+router.get('/modify', ContestController.getContestById);
 router.post('/modify', ContestController.modContest);
 router.post('/delete', ContestController.delContest);
 

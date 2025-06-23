@@ -5,6 +5,7 @@ export const client = createClient({
   socket: {
     host: ENV.redis.host,
     port: ENV.redis.port,
+    connectTimeout: 0,
   },
   legacyMode: true,
 });

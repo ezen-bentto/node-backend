@@ -39,7 +39,7 @@ export const getContestDetail: RequestHandler = async (req: Request, res: Respon
       return;
     }
 
-    const data = await ContestService.getContestDetail({ id: parsed.data.id, ip:ip }); // or ...parsed.data
+    const data = await ContestService.getContestDetail({ id: contestId, ip:ip }); // or ...parsed.data
     data.writer_id = data.writer_id.toString();
     data.views = data.views.toString();
     

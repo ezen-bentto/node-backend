@@ -1,4 +1,7 @@
+import { ERROR_CODES } from '@/constants/error.constant';
+import { delContestSchema } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
+import { AppError } from '@/utils/AppError';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
@@ -23,7 +26,18 @@ import { StatusCodes } from 'http-status-codes';
  */
 export const delContest : RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = ContestService.delContest();
+    const { id } = req.query;
+    const contestId = parseInt(id as string, 10);
+    const parsed = delContestSchema.safeParse({id: contestId});
+
+    if(!parsed.success){
+      next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+      return;
+    }
+
+    // TODO: 로그인 id와 witerId 비교
+
+    const data = ContestService.delContest({id: contestId});
     res.status(StatusCodes.OK).json({ data: data });
     return;
   } catch (err) {

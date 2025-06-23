@@ -1,7 +1,7 @@
 import { env } from 'node:process';
 import app from './app';
 
-const PORT = env.port || 4000;
+const PORT = env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port : ${PORT}`);
