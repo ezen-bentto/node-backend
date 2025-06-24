@@ -18,7 +18,7 @@ import { detailContest, regContest } from "@/schemas/content.schema";
  * @returns detailContest
  */
 const getContestDetail = async (id: number): Promise<detailContest> => {  
-  const sql = `SELECT c.contest_id,
+  const sql = `SELECT c.contest_id id,
                       c.writer_id,
                       c.title,
                       c.article,
@@ -31,13 +31,13 @@ const getContestDetail = async (id: number): Promise<detailContest> => {
                       c.start_date,
                       c.end_date,
                       c.views,
-                      GROUP_CONCAT(cat.name) category
+                      GROUP_CONCAT(cat.name) contest_tag
                  FROM contest c
                  JOIN contest_category cc
                    ON c.contest_id = cc.contest_id
                  JOIN category cat
                    ON cc.category_id = cat.category_id
-                WHERE id = ?`;
+                WHERE c.contest_id = ?`;
 
   const db = getDBConnection();
   const res = await db.query(sql, id);

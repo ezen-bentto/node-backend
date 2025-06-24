@@ -38,7 +38,6 @@ export const getContestDetail = async ({ ip, id,}: getDetailParam): Promise<Cont
   try {
     // 공모전 상세 조회
     const contestData = await ContestModel.getContestDetail(id);
-    console.log(contestData);
 
     if (contestData === undefined) {
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
