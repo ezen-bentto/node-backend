@@ -1,10 +1,14 @@
 // src/controllers/auth.controller.ts
 import { Request, Response } from 'express';
 import { KakaoAuthService } from '../service/auth/kakao.service';
+import { NaverAuthService } from '../service/auth/naver.service';
+import { GoogleAuthService } from '../service/auth/google.service';
 import { AuthModel } from '../models/auth/auth.model';
-import { AuthUser, User } from '../types/auth.type'; // User 타입 임포트
+import { AuthUser, User, SocialUser  } from '../types/auth.type'; // User 타입 임포트
 import { ENV } from '../config/env.config';
 import { kakaoConfig } from '../config/kakao.config';
+import { naverConfig } from '../config/naver.config';
+import { googleConfig } from '../config/google.config';
 import { Token } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
@@ -13,97 +17,156 @@ import {
   mapDbUserTypeToService, 
   mapDbApprovalStatusToService 
 } from '../utils/mapper'; 
+import crypto from 'crypto';
 
 
 export class AuthController {
   private kakaoAuthService = new KakaoAuthService();
+  private naverAuthService = new NaverAuthService();
+  private googleAuthService = new GoogleAuthService();
   private authModel = new AuthModel();
 
-  // 카카오 콜백 처리 (개인 회원 소셜 로그인/회원가입)
+  private handleSocialLogin = async (
+    socialUser: SocialUser,
+    service: KakaoAuthService | NaverAuthService | GoogleAuthService
+  ): Promise<{ accessToken: string; refreshToken: string }> => {
+    let user: User | undefined = await this.authModel.findUserBySocialId(socialUser.socialId);
+    let authUser: AuthUser;
+
+    if (!user) {
+      // 새 사용자
+      const newUserId = await this.authModel.createSocialUser(socialUser);
+      user = await this.authModel.findUserById(Number(newUserId));
+    } else {
+      // 기존 사용자 정보 업데이트
+      await this.authModel.updateSocialUser(Number(user.user_id), {
+        nickname: socialUser.nickname,
+        profileImage: socialUser.profileImage,
+      });
+      user = await this.authModel.findUserById(Number(user.user_id));
+    }
+
+    if (!user) {
+      throw new Error('사용자 정보를 처리하는 데 실패했습니다.');
+    }
+
+    authUser = {
+      id: user.user_id.toString(),
+      loginId: user.login_id,
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profile_image,
+      provider: mapDbProviderToService(user.provider) || socialUser.provider,
+      userType: mapDbUserTypeToService(user.user_type) || '개인',
+      approvalStatus: mapDbApprovalStatusToService(user.approval_status),
+    };
+
+    return service.generateTokens(authUser);
+  };
+
+  // 카카오 콜백
   kakaoCallback = async (req: Request, res: Response): Promise<void> => {
     try {
       const { code } = req.query;
-
       if (!code || typeof code !== 'string') {
-        res.status(StatusCodes.BAD_REQUEST).json({
-          success: false,
-          message: '인증 코드가 없습니다.',
-        });
-        return;
+        throw new Error('인증 코드가 없습니다.');
       }
 
       const accessToken = await this.kakaoAuthService.getKakaoAccessToken(code);
       const socialUser = await this.kakaoAuthService.getKakaoUserInfo(accessToken);
 
-      // user 변수의 타입을 User | undefined로 명시 (DB에서 온 값)
-      let user: User | undefined = await this.authModel.findUserBySocialId(socialUser.socialId);
+      const { accessToken: jwtAccessToken, refreshToken } = await this.handleSocialLogin(
+        socialUser,
+        this.kakaoAuthService
+      );
 
-      let authUser: AuthUser;
-
-      if (!user) {
-        // 새 사용자인 경우 등록
-        // createSocialUser는 number 또는 bigint를 반환하지만, findUserById는 number를 기대.
-        // 현재 auth.model.ts에서 createSocialUser가 number를 반환한다고 가정.
-        const newUserId = await this.authModel.createSocialUser(socialUser);
-        user = await this.authModel.findUserById(Number(newUserId)); // findUserById는 number를 받도록 유지했으므로 Number() 변환
-        if (!user) {
-          throw new Error('새 사용자 정보를 불러오지 못했습니다.');
-        }
-        authUser = {
-          id: user.user_id.toString(), // AuthUser.id는 string이므로 .toString()
-          loginId: user.login_id,
-          email: user.email,
-          nickname: user.nickname,
-          profileImage: user.profile_image,
-          provider: mapDbProviderToService(user.provider) || 'kakao', // 매핑 함수 사용
-          userType: mapDbUserTypeToService(user.user_type) || '개인', // 매핑 함수 사용
-          approvalStatus: mapDbApprovalStatusToService(user.approval_status), // 매핑 함수 사용
-        };
-      } else {
-        // 기존 사용자인 경우 정보 업데이트
-        // updateSocialUser는 number를 받도록 유지했으므로 Number() 변환
-        await this.authModel.updateSocialUser(Number(user.user_id), { // user.user_id가 bigint일 수 있으므로 Number() 변환
-          nickname: socialUser.nickname,
-          profileImage: socialUser.profileImage,
-        });
-        user = await this.authModel.findUserById(Number(user.user_id)); // 업데이트된 정보 다시 조회, Number() 변환
-        if (!user) {
-          throw new Error('기존 사용자 정보를 불러오지 못했습니다.');
-        }
-        authUser = {
-          id: user.user_id.toString(), // AuthUser.id는 string이므로 .toString()
-          loginId: user.login_id,
-          email: user.email,
-          nickname: user.nickname,
-          profileImage: user.profile_image,
-          provider: mapDbProviderToService(user.provider) || 'kakao', // 매핑 함수 사용
-          userType: mapDbUserTypeToService(user.user_type) || '개인', // 매핑 함수 사용
-          approvalStatus: mapDbApprovalStatusToService(user.approval_status), // 매핑 함수 사용
-        };
-      }
-
-      // JWT 토큰 생성 (KakaoAuthService의 generateTokens 사용)
-      const { accessToken: jwtAccessToken, refreshToken } =
-        await this.kakaoAuthService.generateTokens(authUser);
-
-      const redirectUrl = `${ENV.corsOrigin}/login/callback?token=${jwtAccessToken}&refresh=${refreshToken}`;
+      const redirectUrl = `${ENV.corsOrigin}/login?token=${jwtAccessToken}&refresh=${refreshToken}`;
       res.redirect(redirectUrl);
     } catch (error) {
       console.error('카카오 로그인 실패:', error);
-      res.redirect(`${ENV.corsOrigin}/login?error=kakao_login_failed`);
+      res.redirect(`${ENV.corsOrigin}/login?error=social_login_failed`);
     }
   };
 
-  // 카카오 로그인 URL 반환 (변경 없음)
-  getKakaoLoginUrl = (req: Request, res: Response): void => {
-    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&response_type=code`;
+  // [추가] 네이버 콜백
+  naverCallback = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { code, state } = req.query;
+      if (!code || typeof code !== 'string' || !state || typeof state !== 'string') {
+        throw new Error('인증 코드가 없습니다.');
+      }
+      // 실제 프로덕션에서는 세션에 저장된 state와 비교하는 로직이 필요합니다.
+      // if (req.session.state !== state) { ... }
 
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: { loginUrl: kakaoAuthUrl },
-      message: '카카오 로그인 URL 생성',
-    });
+      const accessToken = await this.naverAuthService.getNaverAccessToken(code, state);
+      const socialUser = await this.naverAuthService.getNaverUserInfo(accessToken);
+
+      const { accessToken: jwtAccessToken, refreshToken } = await this.handleSocialLogin(
+        socialUser,
+        this.naverAuthService
+      );
+
+      const redirectUrl = `${ENV.corsOrigin}/login?token=${jwtAccessToken}&refresh=${refreshToken}`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('네이버 로그인 실패:', error);
+      res.redirect(`${ENV.corsOrigin}/login?error=social_login_failed`);
+    }
   };
+
+  // [추가] 구글 콜백
+  googleCallback = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { code } = req.query;
+      if (!code || typeof code !== 'string') {
+        throw new Error('인증 코드가 없습니다.');
+      }
+
+      const accessToken = await this.googleAuthService.getGoogleAccessToken(code);
+      const socialUser = await this.googleAuthService.getGoogleUserInfo(accessToken);
+
+      const { accessToken: jwtAccessToken, refreshToken } = await this.handleSocialLogin(
+        socialUser,
+        this.googleAuthService
+      );
+
+      const redirectUrl = `${ENV.corsOrigin}/login?token=${jwtAccessToken}&refresh=${refreshToken}`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('구글 로그인 실패:', error);
+      res.redirect(`${ENV.corsOrigin}/login?error=social_login_failed`);
+    }
+  };
+
+  // 카카오 로그인 URL 반환
+  getKakaoLoginUrl = (req: Request, res: Response): void => {
+    const url = `https://kauth.kakao.com/oauth/authorize?client_id=${
+      kakaoConfig.clientId
+    }&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&response_type=code`;
+    res.status(StatusCodes.OK).json({ success: true, data: { loginUrl: url } });
+  };
+
+  // [추가] 네이버 로그인 URL 반환
+  getNaverLoginUrl = (req: Request, res: Response): void => {
+    const state = crypto.randomBytes(16).toString('hex');
+    // 실제 프로덕션에서는 CSRF 공격 방지를 위해 이 state 값을 세션에 저장해야 합니다.
+    // req.session.state = state;
+    const url = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${
+      naverConfig.clientId
+    }&redirect_uri=${encodeURIComponent(naverConfig.redirectUri)}&state=${state}`;
+    res.status(StatusCodes.OK).json({ success: true, data: { loginUrl: url } });
+  };
+
+  // [추가] 구글 로그인 URL 반환
+  getGoogleLoginUrl = (req: Request, res: Response): void => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
+      googleConfig.clientId
+    }&redirect_uri=${encodeURIComponent(
+      googleConfig.redirectUri
+    )}&response_type=code&scope=email profile`;
+    res.status(StatusCodes.OK).json({ success: true, data: { loginUrl: url } });
+  };
+
 
   // 기업 회원 가입 (변경 없음, userId.toString() 이미 적용됨)
   signUpCompany = async (req: Request, res: Response): Promise<void> => {

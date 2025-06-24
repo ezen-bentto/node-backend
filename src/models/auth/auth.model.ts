@@ -5,6 +5,18 @@ import { SocialUser, User } from '../../types/auth.type'; // AuthUser는 여기�
 import bcrypt from 'bcrypt';
 import mariadb from 'mariadb';
 
+const mapProviderToDbCode = (provider: SocialUser['provider']): '1' | '2' | '3' => {
+  switch (provider) {
+    case 'naver':
+      return '2';
+    case 'google':
+      return '3';
+    case 'kakao':
+    default:
+      return '1';
+  }
+};
+
 export class AuthModel {
     async findUserBySocialId(socialId: string): Promise<User | undefined> {
         let conn: mariadb.PoolConnection | undefined;
@@ -79,22 +91,29 @@ export class AuthModel {
 
     // createSocialUser는 insertId가 number로 반환된다고 가정.
     async createSocialUser(socialUser: SocialUser): Promise<number> {
-        let conn: mariadb.PoolConnection | undefined;
-        try {
-            conn = await getDBConnection().getConnection();
-            const userResult = await conn.query(
-                `INSERT INTO user (login_id, nickname, email, profile_image, user_type, login_type)
-                 VALUES (?, ?, ?, ?, 1, 1)`, // user_type: 1(개인), login_type: 1(카카오)
-                [socialUser.socialId, socialUser.nickname, socialUser.email, socialUser.profileImage]
-            );
-            return userResult.insertId;
-        } catch (error) {
-            console.error('createSocialUser 사용자 생성 실패:', error);
-            throw error;
-        } finally {
-            if (conn) conn.release();
-        }
+    let conn: mariadb.PoolConnection | undefined;
+    try {
+      conn = await getDBConnection().getConnection();
+      const loginType = mapProviderToDbCode(socialUser.provider); // [수정] provider에 따라 login_type 결정
+      const userResult = await conn.query(
+        `INSERT INTO user (login_id, nickname, email, profile_image, user_type, login_type)
+         VALUES (?, ?, ?, ?, 1, ?)`, // user_type: 1(개인), login_type: 동적으로 할당
+        [
+          socialUser.socialId,
+          socialUser.nickname,
+          socialUser.email,
+          socialUser.profileImage,
+          loginType, // [수정]
+        ]
+      );
+      return userResult.insertId;
+    } catch (error) {
+      console.error('createSocialUser 사용자 생성 실패:', error);
+      throw error;
+    } finally {
+      if (conn) conn.release();
     }
+  }
 
     // createCompanyUser도 insertId가 number로 반환된다고 가정.
     async createCompanyUser(companyData: {

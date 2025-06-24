@@ -11,6 +11,28 @@ export interface KakaoUserInfo {
   };
 }
 
+export interface NaverUserInfo {
+  resultcode: string;
+  message: string;
+  response: {
+    id: string;
+    email: string;
+    nickname: string;
+    profile_image: string;
+  };
+}
+
+export interface GoogleUserInfo {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  picture: string;
+  locale: string;
+}
+
+
 export interface SocialUser {
   socialId: string;
   email: string;

@@ -7,8 +7,17 @@ export const authRouter = Router();
 const authController = new AuthController();
 
 // 소셜 로그인 관련
+// 카카오
 authRouter.get('/kakao/callback', authController.kakaoCallback);
-authRouter.get('/kakao/login-url', authController.getKakaoLoginUrl); // URL을 가져오는 엔드포인트 이름 변경
+authRouter.get('/kakao/login-url', authController.getKakaoLoginUrl);
+
+// 네이버
+authRouter.get('/naver/callback', authController.naverCallback);
+authRouter.get('/naver/login-url', authController.getNaverLoginUrl);
+
+// 구글
+authRouter.get('/google/callback', authController.googleCallback);
+authRouter.get('/google/login-url', authController.getGoogleLoginUrl);
 
 // 기업 회원 관련
 authRouter.post('/signup/company', authController.signUpCompany); // 기업 회원가입

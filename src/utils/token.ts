@@ -16,6 +16,7 @@ export const Token = {
   getNewRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
+  decodeToken,
 
   async refreshTokens(
     refreshToken: string
@@ -56,7 +57,6 @@ export const Token = {
       email: user.email,
       nickname: user.nickname,
       profileImage: user.profile_image,
-      // 매핑 함수를 사용하여 DB의 코드 값을 서비스용 문자열로 변환
       provider: mapDbProviderToService(user.provider) || 'email', // 기본값 지정
       userType: mapDbUserTypeToService(user.user_type) || '개인', // 기본값 지정
       approvalStatus: mapDbApprovalStatusToService(user.approval_status),
