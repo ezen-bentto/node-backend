@@ -4,7 +4,7 @@ import { getContestList } from './contest/getList.service';
 import { modContest } from './contest/modify.service';
 import { delContest } from './contest/delete.service';
 import { getContestById } from './contest/getContestById.service';
-
+import { regBookmark } from './contest/regBookmark.service';
 
 /**
  *
@@ -21,7 +21,15 @@ import { getContestById } from './contest/getContestById.service';
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/05/30           한유리              신규작성  
+ *        2025/05/30           한유리              신규작성
  * @param 없음
  */
-export const ContestService = { regContest, getContestDetail, getContestList, modContest, delContest, getContestById };
+export const ContestService = {
+  regContest,
+  getContestDetail,
+  getContestList,
+  modContest,
+  delContest,
+  getContestById,
+  regBookmark,
+};
