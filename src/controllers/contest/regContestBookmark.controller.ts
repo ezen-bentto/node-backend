@@ -49,12 +49,12 @@ export const regBookmark = async (req: Request, res: Response, next: NextFunctio
 
   try {
     // 4. 서비스 호출
-    const data = await ContestService.regBookmark({
+    await ContestService.regBookmark({
       target_id: target_id,
-      user_id: payload.user_id.toString(),
+      user_id: payload.userId.toString(),
     });
 
-    res.status(StatusCodes.OK).json({ data });
+    res.status(StatusCodes.OK).json({ message: 'true' });
   } catch (err) {
     next(err);
   }

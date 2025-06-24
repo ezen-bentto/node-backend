@@ -1,6 +1,7 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { ContestModel } from '@/models/contest.model';
 import { regBookmark as regBookmarkProps } from '@/schemas/content.schema';
+import { InsertResult } from '@/types/db/response.type';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
@@ -24,7 +25,10 @@ import { StatusCodes } from 'http-status-codes';
  *        2025/06/24           이철욱             신규작성
  * @param id - 공모전 id
  */
-export const regBookmark = async ({ target_id, user_id }: regBookmarkProps) => {
+export const regBookmark = async ({
+  target_id,
+  user_id,
+}: regBookmarkProps): Promise<InsertResult> => {
   try {
     const parsedTargetId = parseInt(target_id);
     const parsedUserId = parseInt(user_id);
@@ -41,7 +45,7 @@ export const regBookmark = async ({ target_id, user_id }: regBookmarkProps) => {
         throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.UPDATE_FAIL);
       }
 
-      return { ...updateRes, updated: true, del_yn: newDelYn };
+      return updateRes;
     }
 
     // 3. 없으면 새로 insert
@@ -50,7 +54,7 @@ export const regBookmark = async ({ target_id, user_id }: regBookmarkProps) => {
     if (insertRes.affectedRows !== 1) {
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
     }
-    return { ...insertRes, inserted: true };
+    return insertRes;
   } catch (err: unknown) {
     handleDbError(err);
     throw err;
