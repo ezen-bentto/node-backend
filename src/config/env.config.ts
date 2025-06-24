@@ -36,6 +36,18 @@ export const ENV = {
     redirectUri: process.env.KAKAO_REDIRECT_URI as string,
   },
 
+  naver: {
+    clientId: process.env.NAVER_CLIENT_ID as string,
+    clientSecret: process.env.NAVER_CLIENT_SECRET as string,
+    redirectUri: process.env.NAVER_REDIRECT_URI as string,
+  },
+
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID as string,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    redirectUri: process.env.GOOGLE_REDIRECT_URI as string,
+  },
+
   corsOrigin: process.env.CORS_ORIGIN || '*',
   logLevel: process.env.LOG_LEVEL || 'info',
 

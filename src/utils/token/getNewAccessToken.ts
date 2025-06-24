@@ -4,7 +4,7 @@ import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 import { AuthUser } from '../../types/auth.type';
 
 interface AccessTokenPayload extends JwtPayload {
-  userId: number;
+  userId: string;
   loginId: string;
   nickname: string;
   email?: string;
@@ -14,15 +14,29 @@ interface AccessTokenPayload extends JwtPayload {
   type: 'access';
 }
 
+// login_type (DB 숫자)을 provider (문자열)로 매핑하는 함수
+const mapLoginTypeToProvider = (loginType: string | number | undefined): AccessTokenPayload['provider'] | undefined => {
+  if (loginType === undefined) return undefined;
+  
+  const type = String(loginType); // 숫자를 문자열로 변환
+  switch (type) {
+    case '1': return 'kakao';
+    case '2': return 'naver';
+    case '3': return 'google';
+    case '4': return 'email'; // 기업회원은 이메일로 매핑
+    default: return undefined; // 또는 에러 처리
+  }
+};
+
 export const getNewAccessToken = (user: AuthUser): string => {
   const payload: AccessTokenPayload = {
-    userId: user.id,
+    userId: String(user.id), // user.id를 string으로 변환
     loginId: user.loginId,
     nickname: user.nickname,
     email: user.email,
     profileImage: user.profileImage,
-    provider: user.provider,
-    userType: user.userType,
+    provider: mapLoginTypeToProvider(user.provider) as AccessTokenPayload['provider'], // 매핑 함수 사용
+    userType: user.userType as AccessTokenPayload['userType'], // 필요시 타입 단언 또는 매핑 로직 추가
     type: 'access',
   };
 

@@ -11,6 +11,28 @@ export interface KakaoUserInfo {
   };
 }
 
+export interface NaverUserInfo {
+  resultcode: string;
+  message: string;
+  response: {
+    id: string;
+    email: string;
+    nickname: string;
+    profile_image: string;
+  };
+}
+
+export interface GoogleUserInfo {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  picture: string;
+  locale: string;
+}
+
+
 export interface SocialUser {
   socialId: string;
   email: string;
@@ -27,22 +49,21 @@ export interface User {
   password?: string;
   nickname: string;
   profile_image?: string;
-  user_type: '개인' | '기업' | '관리자'; // DB의 user_types 테이블과 조인된 값
-  approval_status?: '대기' | '승인' | '반려' | '취소'; // DB의 approval_statuses 테이블과 조인된 값
-  provider?: 'kakao' | 'naver' | 'google' | 'email';
-  // created_at, updated_at 등 다른 DB 컬럼이 있다면 여기에 추가
+  user_type: '1' | '2' | '3'; // '1' 개인, '2' 기업, '3' 관리자
+  approval_status?: '1' | '2' | '3' | null; // '1' 대기, '2' 승인, '3' 거절
+  provider?: '1' | '2' | '3' | '4' | null;  //'1' 카카오, '2' 네이버, '3' 구글, '4' 이메일
 }
 
 // JWT payload 및 req.user에 사용될 사용자 정보 (DB의 User 테이블과 매핑)
 export interface AuthUser {
-  id: number; // user_id (PK)
+  id: string; // user_id (PK)
   loginId: string; // login_id (필수: 소셜ID 또는 이메일)
   email?: string; // user.email 필드 (소셜로그인 이메일 또는 별도 저장 이메일)
   nickname: string;
   profileImage?: string; // user.profile_image 필드
-  provider: 'kakao' | 'naver' | 'google' | 'email'; // 로그인 방식 (필수)
-  userType?: '개인' | '기업' | '관리자'; // user_type.type 값
-  approvalStatus?: '대기' | '승인' | '반려' | '취소'; // approval_status.status 값 (기업회원용)
+  provider: 'kakao' | 'naver' | 'google' | 'email';
+  userType?: '개인' | '기업' | '관리자';
+  approvalStatus?: '대기' | '승인' | '거절';
 }
 
 export interface AuthResponse {

@@ -1,158 +1,113 @@
 // src/models/auth/auth.model.ts
-import mariadb from 'mariadb';
-import { ENV } from '../../config/env.config';
-import { SocialUser } from '../../types/auth.type';
-import { User } from '../../types/auth.type';
+
+import { getDBConnection } from '../../config/db.config';
+import { SocialUser, User } from '../../types/auth.type'; // AuthUser는 여기서 직접 사용되지 않으므로 제거 가능
 import bcrypt from 'bcrypt';
+import mariadb from 'mariadb';
+
+const mapProviderToDbCode = (provider: SocialUser['provider']): '1' | '2' | '3' => {
+  switch (provider) {
+    case 'naver':
+      return '2';
+    case 'google':
+      return '3';
+    case 'kakao':
+    default:
+      return '1';
+  }
+};
 
 export class AuthModel {
-  private pool: mariadb.Pool;
-
-  constructor() {
-    this.pool = mariadb.createPool(ENV.db);
-  }
-
-  // user_type.type 값으로 user_type_id를 가져오는 헬퍼 함수
-  private async getUserTypeId(type: '개인' | '기업' | '관리자'): Promise<number> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const rows = await conn.query(`SELECT user_id FROM user_type WHERE type = ?`, [type]);
-      if (rows.length === 0) {
-        throw new Error(`User type '${type}' not found.`);
-      }
-      return rows[0].user_id; // user_type 테이블의 PK가 user_id로 되어있어 이렇게 매핑
-    } finally {
-      if (conn) conn.release();
+    async findUserBySocialId(socialId: string): Promise<User | undefined> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const rows = await conn.query(
+                `SELECT 
+                    u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
+                    u.user_type,
+                    aps.approval_status
+                   FROM user u
+                   LEFT JOIN approval_status aps ON u.user_id = aps.user_id
+                   WHERE u.login_id = ?`,
+                [socialId]
+            );
+            return rows[0];
+        } catch (error) {
+            console.error('findUserBySocialId 사용자 조회 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // approval_status.status 값으로 approval_status_id를 가져오는 헬퍼 함수
-  private async getApprovalStatusId(status: '대기' | '승인' | '반려' | '취소'): Promise<number> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const rows = await conn.query(`SELECT user_id FROM approval_status WHERE approval_status = ?`, [status]);
-      if (rows.length === 0) {
-        throw new Error(`Approval status '${status}' not found.`);
-      }
-      return rows[0].user_id; // approval_status 테이블의 PK가 user_id로 되어있어 이렇게 매핑
-    } finally {
-      if (conn) conn.release();
+    async findUserByEmail(email: string): Promise<User | undefined> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const rows = await conn.query(
+                `SELECT 
+                    u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
+                    u.user_type,
+                    aps.approval_status
+                   FROM user u
+                   LEFT JOIN approval_status aps ON u.user_id = aps.user_id
+                   WHERE u.email = ?`,
+                [email]
+            );
+            return rows[0];
+        } catch (error) {
+            console.error('findUserByEmail 사용자 조회 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-
-  // 소셜 ID (login_id)로 사용자 찾기
-  async findUserBySocialId(socialId: string): Promise<User | undefined> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      // user_type과 approval_status 정보를 함께 가져오도록 JOIN 쿼리 사용
-      const rows = await conn.query(
-        `SELECT
-           u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
-           ut.type AS user_type,
-           aps.approval_status AS approval_status
-         FROM user u
-         JOIN user_type ut ON u.user_id = ut.user_id -- user_id로 조인 (user_type 테이블 PK가 user_id라고 가정)
-         LEFT JOIN approval_status aps ON u.user_id = aps.user_id -- user_id로 조인
-         WHERE u.login_id = ?`,
-        [socialId]
-      );
-      return rows[0];
-    } catch (error) {
-      console.error('findUserBySocialId 사용자 조회 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+    // userId는 현재 Number(payload.userId)로 들어오므로 number로 유지.
+    // mariadb 드라이버가 bigint 컬럼에 number를 잘 매핑한다고 가정.
+    async findUserById(userId: number): Promise<User | undefined> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const rows = await conn.query(
+                `SELECT 
+                    u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
+                    u.user_type,
+                    aps.approval_status
+                   FROM user u
+                   LEFT JOIN approval_status aps ON u.user_id = aps.user_id
+                   WHERE u.user_id = ?`,
+                [userId] // number를 그대로 전달
+            );
+            return rows[0];
+        } catch (error) {
+            console.error('findUserById 사용자 조회 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // 이메일 (login_id)로 사용자 찾기 (기업회원용)
-  async findUserByEmail(email: string): Promise<User | undefined> {
+    // createSocialUser는 insertId가 number로 반환된다고 가정.
+    async createSocialUser(socialUser: SocialUser): Promise<number> {
     let conn: mariadb.PoolConnection | undefined;
     try {
-      conn = await this.pool.getConnection();
-      const rows = await conn.query(
-        `SELECT
-           u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
-           ut.type AS user_type,
-           aps.approval_status AS approval_status
-         FROM user u
-         JOIN user_type ut ON u.user_id = ut.user_id
-         LEFT JOIN approval_status aps ON u.user_id = aps.user_id
-         WHERE u.login_id = ? AND ut.type = '기업'`, // login_id가 이메일이고, user_type이 '기업'인 경우
-        [email]
-      );
-      return rows[0];
-    } catch (error) {
-      console.error('findUserByEmail 사용자 조회 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
-    }
-  }
-
-  // user_id로 사용자 찾기
-  async findUserById(userId: number): Promise<User | undefined> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const rows = await conn.query(
-        `SELECT
-           u.user_id, u.login_id, u.nickname, u.password, u.phone, u.reg_date, u.mod_date, u.del_yn, u.email, u.profile_image,
-           ut.type AS user_type,
-           aps.approval_status AS approval_status
-         FROM user u
-         JOIN user_type ut ON u.user_id = ut.user_id
-         LEFT JOIN approval_status aps ON u.user_id = aps.user_id
-         WHERE u.user_id = ?`,
-        [userId]
-      );
-      return rows[0];
-    } catch (error) {
-      console.error('findUserById 사용자 조회 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
-    }
-  }
-
-  // 새 소셜 사용자 생성 (user_type: 개인, approval_status: 해당 없음)
-  async createSocialUser(socialUser: SocialUser): Promise<number> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      await conn.beginTransaction(); // 트랜잭션 시작
-
-      // 1. user 테이블에 삽입
+      conn = await getDBConnection().getConnection();
+      const loginType = mapProviderToDbCode(socialUser.provider); // [수정] provider에 따라 login_type 결정
       const userResult = await conn.query(
-        `INSERT INTO user (login_id, nickname, email, profile_image, reg_date, mod_date, del_yn)
-         VALUES (?, ?, ?, ?, NOW(), NOW(), 'N')`,
+        `INSERT INTO user (login_id, nickname, email, profile_image, user_type, login_type)
+         VALUES (?, ?, ?, ?, 1, ?)`, // user_type: 1(개인), login_type: 동적으로 할당
         [
-          socialUser.socialId, // login_id는 socialId
+          socialUser.socialId,
           socialUser.nickname,
           socialUser.email,
           socialUser.profileImage,
+          loginType, // [수정]
         ]
       );
-      const newUserId: number = userResult.insertId;
-
-      // 2. user_type 테이블에 '개인' 타입 연결
-      const personalUserTypeId = await this.getUserTypeId('개인'); // '개인'은 DB에 1로 매핑되어있다고 가정.
-      await conn.query(
-        `INSERT INTO user_type (user_id, type, reg_date, mod_date, del_yn) VALUES (?, ?, NOW(), NOW(), 'N')`,
-        [newUserId, personalUserTypeId] // user_type 테이블의 'type' 컬럼은 텍스트 값, 'user_id'는 FK를 가정.
-      );
-
-      // 소셜 로그인은 approval_status 테이블과 관련 없다고 가정하고 삽입하지 않음.
-      // 만약 소셜 로그인도 승인 상태가 필요하다면 여기에 추가
-
-      await conn.commit(); // 트랜잭션 커밋
-      return newUserId;
+      return userResult.insertId;
     } catch (error) {
-      await conn?.rollback(); // 오류 발생 시 롤백
       console.error('createSocialUser 사용자 생성 실패:', error);
       throw error;
     } finally {
@@ -160,137 +115,143 @@ export class AuthModel {
     }
   }
 
-  // 기업 사용자 생성 (user_type: 기업, approval_status: 대기)
-  async createCompanyUser(companyData: { email: string; password: string; companyName: string; phoneNumber: string }): Promise<number> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      await conn.beginTransaction(); // 트랜잭션 시작
+    // createCompanyUser도 insertId가 number로 반환된다고 가정.
+    async createCompanyUser(companyData: {
+        email: string;
+        password: string;
+        companyName: string;
+        phoneNumber: string;
+    }): Promise<number> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            await conn.beginTransaction();
 
-      const hashedPassword = await bcrypt.hash(companyData.password, 10);
+            const hashedPassword = await bcrypt.hash(companyData.password, 10);
+            
+            const userResult = await conn.query(
+                `INSERT INTO user (login_id, nickname, password, phone, email, user_type, login_type)
+                 VALUES (?, ?, ?, ?, ?, 2, 4)`, // user_type: 2(기업), login_type: 4(이메일)
+                [
+                    companyData.email,
+                    companyData.companyName,
+                    hashedPassword,
+                    companyData.phoneNumber,
+                    companyData.email,
+                ]
+            );
+            const newUserId: number = userResult.insertId;
 
-      // 1. user 테이블에 삽입
-      const userResult = await conn.query(
-        `INSERT INTO user (login_id, nickname, password, phone, email, reg_date, mod_date, del_yn)
-         VALUES (?, ?, ?, ?, ?, NOW(), NOW(), 'N')`,
-        [
-          companyData.email, // login_id는 기업회원의 이메일
-          companyData.companyName, // nickname은 회사명
-          hashedPassword,
-          companyData.phoneNumber,
-          companyData.email, // email도 동일하게 이메일
-        ]
-      );
-      const newUserId: number = userResult.insertId;
+            await conn.query(
+                `INSERT INTO approval_status (user_id, approval_status) VALUES (?, '2')`,
+                [newUserId]
+            );
 
-      // 2. user_type 테이블에 '기업' 타입 연결
-      const companyUserTypeId = await this.getUserTypeId('기업');
-      await conn.query(
-        `INSERT INTO user_type (user_id, type, reg_date, mod_date, del_yn) VALUES (?, ?, NOW(), NOW(), 'N')`,
-        [newUserId, companyUserTypeId]
-      );
-
-      // 3. approval_status 테이블에 '대기' 상태 연결
-      const pendingApprovalStatusId = await this.getApprovalStatusId('대기');
-      await conn.query(
-        `INSERT INTO approval_status (user_id, approval_status, reg_date, mod_date, del_yn) VALUES (?, ?, NOW(), NOW(), 'N')`,
-        [newUserId, pendingApprovalStatusId]
-      );
-
-      await conn.commit(); // 트랜잭션 커밋
-      return newUserId;
-    } catch (error) {
-      await conn?.rollback(); // 오류 발생 시 롤백
-      console.error('createCompanyUser 기업 사용자 생성 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+            await conn.commit();
+            return newUserId;
+        } catch (error) {
+            await conn?.rollback();
+            console.error('createCompanyUser 기업 사용자 생성 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // 소셜 사용자 정보 업데이트 (nickname, profileImage만)
-  async updateSocialUser(userId: number, socialUser: Partial<SocialUser>): Promise<boolean> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const result = await conn.query(
-        `UPDATE user SET nickname = ?, profile_image = ?, mod_date = NOW() WHERE user_id = ?`,
-        [socialUser.nickname, socialUser.profileImage, userId]
-      );
-      return result.affectedRows > 0;
-    } catch (error) {
-      console.error('updateSocialUser 사용자 정보 업데이트 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+    // updateSocialUser의 userId 파라미터를 number로 유지
+    async updateSocialUser(userId: number, socialUser: Partial<SocialUser>): Promise<boolean> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const result = await conn.query(
+                `UPDATE user SET nickname = ?, profile_image = ?, mod_date = NOW() WHERE user_id = ?`,
+                [socialUser.nickname, socialUser.profileImage, userId]
+            );
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error('updateSocialUser 사용자 정보 업데이트 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // Refresh Token 저장 또는 업데이트 (refresh_tokens 테이블 사용)
-  async saveRefreshToken(userId: number, token: string, expDate: Date): Promise<void> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      // user_id에 해당하는 기존 Refresh Token이 있는지 확인
-      const existingToken = await conn.query(
-        `SELECT refresh_id FROM refresh_tokens WHERE user_id = ? AND del_yn = 'N'`,
-        [userId]
-      );
+    // saveRefreshToken 메서드 수정:
+    // 1. userId 파라미터 타입을 string으로 변경 (authUser.id가 string이므로)
+    // 2. refresh_id를 number로 생성
+    // 3. user_id 파라미터를 DB에 전달할 때 Number()로 변환 (타입 에러 방지)
+    async saveRefreshToken(userId: string, token: string, expDate: Date): Promise<void> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            
+            // `refresh_id`는 `bigint(20)`이지만, Number()로 생성한 값을 넣습니다.
+            // 이로 인해 발생할 수 있는 잠재적인 문제(정밀도 손실, 고유성 충돌)는 개발자가 인지해야 합니다.
+            const refreshId = Date.now() + Math.floor(Math.random() * 1000); // number 타입 유지
+            
+            // `user_id`는 `bigint(20)`이지만, `AuthUser.id`가 `string`이므로 Number()로 변환하여 전달
+            // mariadb 드라이버가 이 number 값을 bigint 컬럼에 잘 매핑한다고 가정
+            const userIdAsNumber = Number(userId);
 
-      if (existingToken.length > 0) {
-        // 기존 토큰이 있으면 업데이트
-        await conn.query(
-          `UPDATE refresh_tokens SET token = ?, exp_date = ?, mod_date = NOW() WHERE user_id = ?`,
-          [token, expDate, userId]
-        );
-      } else {
-        // 없으면 삽입
-        await conn.query(
-          `INSERT INTO refresh_tokens (user_id, token, exp_date, reg_date, mod_date, del_yn) VALUES (?, ?, ?, NOW(), NOW(), 'N')`,
-          [userId, token, expDate]
-        );
-      }
-    } catch (error) {
-      console.error('saveRefreshToken Refresh Token 저장/업데이트 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+            await conn.query(
+                `INSERT INTO refresh_tokens (refresh_id, user_id, token, exp_date, reg_date, del_yn) 
+                 VALUES (?, ?, ?, ?, NOW(), 'N')
+                 ON DUPLICATE KEY UPDATE 
+                 token = VALUES(token), 
+                 exp_date = VALUES(exp_date), 
+                 del_yn = 'N', 
+                 mod_date = NOW()`,
+                [refreshId, userIdAsNumber, token, expDate]
+            );
+        } catch (error) {
+            console.error('saveRefreshToken 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // Refresh Token 조회
-  async findRefreshTokenByToken(token: string): Promise<{ refresh_id: number; user_id: number; token: string; exp_date: Date } | undefined> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const rows = await conn.query(
-        `SELECT refresh_id, user_id, token, exp_date FROM refresh_tokens WHERE token = ? AND del_yn = 'N'`,
-        [token]
-      );
-      return rows[0];
-    } catch (error) {
-      console.error('findRefreshTokenByToken Refresh Token 조회 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+    // findRefreshTokenByToken 메서드의 반환 타입 수정:
+    // refresh_id와 user_id는 DB에서 bigint로 오지만, number로 받는다고 가정.
+    async findRefreshTokenByToken(
+        token: string
+    ): Promise<{ refresh_id: number; user_id: number; token: string; exp_date: Date } | undefined> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const rows = await conn.query(
+                `SELECT refresh_id, user_id, token, exp_date FROM refresh_tokens WHERE token = ? AND del_yn = 'N'`,
+                [token]
+            );
+            // mariadb 드라이버가 bigint를 number로 반환할 때의 잠재적 정밀도 손실 감수
+            return rows[0] ? {
+                refresh_id: rows[0].refresh_id, // number로 간주
+                user_id: rows[0].user_id,     // number로 간주
+                token: rows[0].token,
+                exp_date: rows[0].exp_date
+            } : undefined;
+        } catch (error) {
+            console.error('findRefreshTokenByToken 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 
-  // Refresh Token 삭제 (del_yn을 'Y'로 업데이트)
-  async deleteRefreshToken(token: string): Promise<boolean> {
-    let conn: mariadb.PoolConnection | undefined;
-    try {
-      conn = await this.pool.getConnection();
-      const result = await conn.query(
-        `UPDATE refresh_tokens SET del_yn = 'Y', mod_date = NOW() WHERE token = ?`,
-        [token]
-      );
-      return result.affectedRows > 0;
-    } catch (error) {
-      console.error('deleteRefreshToken Refresh Token 삭제 실패:', error);
-      throw error;
-    } finally {
-      if (conn) conn.release();
+    async deleteRefreshToken(token: string): Promise<boolean> {
+        let conn: mariadb.PoolConnection | undefined;
+        try {
+            conn = await getDBConnection().getConnection();
+            const result = await conn.query(
+                `UPDATE refresh_tokens SET del_yn = 'Y', mod_date = NOW() WHERE token = ?`,
+                [token]
+            );
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error('deleteRefreshToken 실패:', error);
+            throw error;
+        } finally {
+            if (conn) conn.release();
+        }
     }
-  }
 }
