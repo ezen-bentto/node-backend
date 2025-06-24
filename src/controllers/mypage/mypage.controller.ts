@@ -14,7 +14,7 @@ export class MypageController {
   public getMyPosts = async (req: Request, res: Response) => {
     const userId = req.user!.id; // authMiddleware가 보장
     try {
-      const posts = await this.mypageModel.findPostsByUserId(userId);
+      const posts = await this.mypageModel.findPostsByUserId(parseInt(userId));
       res.status(StatusCodes.OK).json({ success: true, data: posts });
     } catch (error) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: '서버 오류' });
