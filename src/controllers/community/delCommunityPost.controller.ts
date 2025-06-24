@@ -14,7 +14,12 @@ import logger from '@/utils/common/logger';
  * ```
  *
  * @date 2025/06/02
- * @author 김혜미
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/06/24           김혜미               userId 파라미터 추가
  */
 export const delCommunityPost: RequestHandler = async (
     req: Request,
@@ -31,12 +36,23 @@ export const delCommunityPost: RequestHandler = async (
     }
 
     try {
-        const result = await CommunityService.deleteCommunityPost(parsed.data);
+        if (!req.user) {
+            logger.warn(`인증 정보 누락: ${req.ip}`);
+            next(new AppError(StatusCodes.UNAUTHORIZED, ERROR_CODES.UNAUTHORIZED));
+            return;
+        }
+
+        // userId와 communityId를 서비스에 전달
+        const result = await CommunityService.deleteCommunityPost(
+            parsed.data,
+            Number(req.user.id)
+        );
+
         logger.info(`커뮤니티 글 삭제 성공 : ${JSON.stringify(result.affectedRows)}`);
 
         const data = serializeBigInt(result);
 
-        res.status(StatusCodes.OK).json({ data: data });
+        res.status(StatusCodes.OK).json({ data });
         return;
     } catch (err) {
         logger.error('커뮤니티 글 삭제 중 오류 발생', err);

@@ -18,12 +18,11 @@ import logger from '@/utils/common/logger';
  * -------------------------------------------------------
  *
  *        2025/06/03           김혜미               신규작성  
+ *        2025/06/24           김혜미               userId 파라미터화
  * @param data(CommunityRegisterRequest)
+ * @param userId 작성자 ID
  */
-export const createCommunityPost = async (data: CommunityRegisterRequest) => {
-    // TODO : session에서 userId값 꺼내기
-    const userId = 5;
-
+export const createCommunityPost = async (data: CommunityRegisterRequest, userId: number) => {
     logger.info(`커뮤니티 글 등록 서비스 호출(userId: ${userId})`);
     try {
         const res = await CommunityModel.insertCommunity(data, userId);

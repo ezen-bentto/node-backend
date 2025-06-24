@@ -5,6 +5,7 @@ import { modContest } from './contest/modify.service';
 import { delContest } from './contest/delete.service';
 import { getContestById } from './contest/getContestById.service';
 import { regBookmark } from './contest/regBookmark.service';
+import { selectActiveContests } from './contest/selectActiveContests.service';
 
 /**
  *
@@ -22,14 +23,16 @@ import { regBookmark } from './contest/regBookmark.service';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리              신규작성
+ *        2025/06/24           김혜미              추가작성  
  * @param 없음
  */
 export const ContestService = {
-  regContest,
-  getContestDetail,
-  getContestList,
-  modContest,
-  delContest,
-  getContestById,
-  regBookmark,
+    regContest,
+    getContestDetail,
+    getContestList,
+    modContest,
+    delContest,
+    getContestById,
+    regBookmark,
+    selectActiveContests
 };

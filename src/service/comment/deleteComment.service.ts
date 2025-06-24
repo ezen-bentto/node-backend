@@ -8,7 +8,6 @@ import logger from '@/utils/common/logger';
 
 /**
  *
- *
  * @function deleteComment
  * @date 2025/06/10
  * @history
@@ -17,25 +16,29 @@ import logger from '@/utils/common/logger';
  * -------------------------------------------------------
  *
  *        2025/06/03           김혜미              신규작성  
- * @param data(CommentDeleteRequest)
+ *        2025/06/24           김혜미              userId 파라미터화
+ * 
+ * @param commentId 댓글 ID
+ * @param userId 작성자 ID
  */
-export const deleteComment = async (data: CommentDeleteRequest) => {
-    // TODO : session에서 userId 값 꺼내기
-    // index값은? 화면에서 넘겨받기
-    const userId = 5;
+export const deleteComment = async (
+    data: CommentDeleteRequest,
+    userId: number
+) => {
 
-    logger.info(`커뮤니티 글 삭제 서비스 호출(userId: ${userId})`);
+    const { commentId } = data;
+    logger.info(`댓글 삭제 서비스 호출(userId: ${userId}, commentId: ${commentId})`);
 
     try {
         const res = await CommentModel.deleteComment(data, userId);
 
-        if (res.affectedRows != 1) {
-            logger.warn(`댓글 delete 실패 : ${res.affectedRows}`);
-            throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
+        if (res.affectedRows !== 1) {
+            logger.warn(`댓글 delete 실패 또는 권한 없음 : ${res.affectedRows}`);
+            throw new AppError(StatusCodes.FORBIDDEN, ERROR_CODES.FORBIDDEN);
         }
         logger.debug(`댓글 delete 성공 : ${res.affectedRows}`);
 
-        logger.info(`댓글 삭제 서비스 종료(userId: ${userId})`);
+        logger.info(`댓글 삭제 서비스 종료(userId: ${userId}, commentId: ${commentId})`);
         return res;
     } catch (err) {
         logger.error('댓글 삭제 서비스 오류 발생', err);

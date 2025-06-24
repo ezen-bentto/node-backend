@@ -8,6 +8,7 @@ import modContest from './contest/modify.model';
 import regBookmark from './contest/regBookmark.model';
 import regContest from './contest/register.model';
 import selectList from './contest/selectList.mode';
+import selectContestsByCategory from "./contest/selectContestsByCategory.model";
 
 /**
  *
@@ -22,6 +23,7 @@ import selectList from './contest/selectList.mode';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리             신규작성
+ *        2025/06/24           김혜미             추가작성 
  * @param 없음
  */
 export const ContestModel = {
@@ -35,4 +37,5 @@ export const ContestModel = {
   regBookmark,
   getBookmark,
   modBookmark,
+  selectContestsByCategory
 };

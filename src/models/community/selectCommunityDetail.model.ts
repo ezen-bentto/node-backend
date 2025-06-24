@@ -24,7 +24,6 @@ export interface CommunityDetail {
 }
 
 // BigInt → Number 변환 함수
-// TODO Check
 const convertBigIntToNumber = (obj: any): any => {
     if (Array.isArray(obj)) {
         return obj.map(convertBigIntToNumber);

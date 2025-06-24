@@ -13,6 +13,7 @@ import { Router } from 'express';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리             신규작성
+ *        2025/06/24           김혜미             추가작성 
  */
 const router = Router();
 
@@ -23,5 +24,7 @@ router.get('/modify', ContestController.getContestById);
 router.post('/modify', ContestController.modContest);
 router.post('/delete', ContestController.delContest);
 router.post('/bookmark', ContestController.regBookmark);
+router.get('/category', ContestController.getContestsByCategory);
+
 
 export default router;

@@ -12,6 +12,7 @@ import { z } from 'zod';
  * -------------------------------------------------------
  *
  *        2025/06/09           한유리
+ *        2025/06/24           김혜미             추가작성 
  * @param 없음
  */
 
@@ -99,6 +100,19 @@ export const delContestSchema = z.object({
   id: z.number(),
 });
 
+// 커뮤니티 연관 스키마
+// 카테고리별 공모전 조회 파라미터
+export const getContestByCategorySchema = z.object({
+  categoryId: z.number().int().positive({
+    message: "유효한 카테고리 ID를 선택해주세요."
+  }),
+});
+// 카테고리별 공모전 목록 응답 스키마
+export const contestListItemSchema = z.object({
+  contest_id: z.number(),
+  title: z.string(),
+});
+
 export type regContest = z.infer<typeof regContestSchema>;
 export type getContestList = z.infer<typeof getContestListSchema>;
 export type detailContest = z.infer<typeof regContestSchema> & {
@@ -115,3 +129,6 @@ export type delContest = z.infer<typeof delContestSchema>;
 export type regBookmark = z.infer<typeof regBookSchema> & {
   user_id: string;
 };
+
+export type getContestByCategoryParam = z.infer<typeof getContestByCategorySchema>;
+export type contestListItem = z.infer<typeof contestListItemSchema>;

@@ -13,8 +13,13 @@ import logger from '@/utils/common/logger';
  * 상세설명: 댓글 삭제 컨트롤러
  * ```
  *
- * @date 2025/06/010
- * @author 김혜미
+ * @date 2025/06/10
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/06/24           김혜미             userId 파라미터 추가
  */
 export const delComment: RequestHandler = async (
     req: Request,
@@ -31,12 +36,22 @@ export const delComment: RequestHandler = async (
     }
 
     try {
-        const result = await CommentService.deleteComment(parsed.data);
+        if (!req.user) {
+            logger.warn(`인증 정보 누락: ${req.ip}`);
+            next(new AppError(StatusCodes.UNAUTHORIZED, ERROR_CODES.UNAUTHORIZED));
+            return;
+        }
+
+        const result = await CommentService.deleteComment(
+            parsed.data,
+            Number(req.user.id)
+        );
+
         logger.info(`댓글 삭제 성공 : ${JSON.stringify(result.affectedRows)}`);
 
         const data = serializeBigInt(result);
 
-        res.status(StatusCodes.OK).json({ data: data });
+        res.status(StatusCodes.OK).json({ data });
         return;
     } catch (err) {
         logger.error('댓글 삭제 중 오류 발생', err);

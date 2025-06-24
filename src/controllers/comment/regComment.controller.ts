@@ -14,7 +14,12 @@ import logger from '@/utils/common/logger';
  * ```
  *
  * @date 2025/06/09
- * @author 김혜미
+ * @history
+ * -------------------------------------------------------
+ *           변경일             작성자             변경내용
+ * -------------------------------------------------------
+ *
+ *        2025/06/24           김혜미             userId 파라미터 추가
  */
 export const regComment: RequestHandler = async (
     req: Request,
@@ -34,13 +39,19 @@ export const regComment: RequestHandler = async (
     }
 
     try {
-        // XSS 필터링 제거, 원본 데이터 그대로 사용
-        const result = await CommentService.createComment(parsed.data);
+        if (!req.user) {
+            logger.warn(`인증 정보 누락: ${req.ip}`);
+            next(new AppError(StatusCodes.UNAUTHORIZED, ERROR_CODES.UNAUTHORIZED));
+            return;
+        }
+
+        const result = await CommentService.createComment(parsed.data, Number(req.user.id));
+
         logger.info(`댓글 등록 성공 : ${JSON.stringify(serializeBigInt(result.insertId))}`);
 
         const data = serializeBigInt(result);
 
-        res.status(StatusCodes.OK).json({ data: data });
+        res.status(StatusCodes.OK).json({ data });
         return;
     } catch (err) {
         logger.error('댓글 등록 중 오류 발생', err);
