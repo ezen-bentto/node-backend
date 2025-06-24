@@ -49,7 +49,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       });
       return;
     }
-    
+
     // AuthUser 객체 생성 시 DB 값들을 매핑 함수를 통해 변환
     const user: AuthUser = {
       id: String(userFromDb.user_id), // DB에서 온 BigInt/Number를 String으로 변환
@@ -69,7 +69,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '서버 오류로 인해 인증에 실패했습니다.',
-    
+
     });
   }
 };

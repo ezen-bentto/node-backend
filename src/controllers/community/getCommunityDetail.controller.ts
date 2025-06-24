@@ -13,6 +13,7 @@ import { ERROR_CODES } from '@/constants/error.constant';
  *
  * @date 2025/06/03
  * @author 김혜미
+ * @update 2025/06/25 스크랩 여부 로그인 사용자만 확인
  */
 
 export const getCommunityDetail = async (
@@ -31,12 +32,16 @@ export const getCommunityDetail = async (
             return;
         }
 
-        const result = await CommunityService.selectCommunityDetail(communityId);
+        // 로그인 했다면 req.user.id 가 있을 것
+        const userId = (req as any).user?.id;
+
+        const result = await CommunityService.selectCommunityDetail(communityId, userId);
 
         if (!result) {
             next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
             return;
         }
+
         logger.info(`커뮤니티 글 상세 조회 성공 : ${JSON.stringify(result)}`);
 
         res.status(StatusCodes.OK).json({ data: result });
