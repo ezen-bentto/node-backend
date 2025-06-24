@@ -46,7 +46,7 @@ export const getContestListSchema = z.object({
   end_date: z.string().refine(val => !isNaN(Date.parse(val)), {
   message: "Invalid date format"}),
   views: z.string(),
-  categories: z.array(z.string())
+  contest_tag: z.string()
 });
 
 // 공모전 상세 select

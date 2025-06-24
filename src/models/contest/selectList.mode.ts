@@ -42,7 +42,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
                     c.start_date,
                     c.end_date,
                     c.views,
-                    GROUP_CONCAT(cat.name) categories
+                    GROUP_CONCAT(cat.name) contest_tag
                FROM contest c
                JOIN contest_category cc
                  ON c.contest_id = cc.contest_id
@@ -77,10 +77,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
   const db = getDBConnection();
   const res = await db.query(sql, values);
 
-  return res.map((row: any) => ({
-    ...row,
-    categories: row.categories ? row.categories.split(',') : []
-  }));
+  return res;
 };
 
 export default selectList;
