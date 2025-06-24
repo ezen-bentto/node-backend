@@ -17,7 +17,7 @@ authRouter.post('/login/company', authController.loginCompany); // 기업 회원
 // 토큰 재발급 (로그인 미들웨어보다 먼저 처리)
 authRouter.post('/token/refresh', authController.refreshToken);
 
-// 로그인 미들웨어 적용 (이 이후의 라우트들은 req.user를 사용할 수 있습니다.)
+// 로그인 미들웨어 적용 (이 이후의 라우트들은 req.user를 사용할 수 있다.)
 // authRouter.use(authenticateUser); // 특정 라우트에만 적용하거나 전역 적용 가능
 
 // 로그아웃 (토큰을 만료시켜야 하므로 토큰 정보가 필요할 수 있음)

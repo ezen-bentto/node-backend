@@ -2,12 +2,18 @@
 import { Request, Response } from 'express';
 import { KakaoAuthService } from '../service/auth/kakao.service';
 import { AuthModel } from '../models/auth/auth.model';
-import { AuthUser } from '../types/auth.type';
+import { AuthUser, User } from '../types/auth.type'; // User 타입 임포트
 import { ENV } from '../config/env.config';
 import { kakaoConfig } from '../config/kakao.config';
-import { Token } from '../utils/token'; // 통합된 Token 유틸리티 클래스 임포트
+import { Token } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
+import { 
+  mapDbProviderToService, 
+  mapDbUserTypeToService, 
+  mapDbApprovalStatusToService 
+} from '../utils/mapper'; 
+
 
 export class AuthController {
   private kakaoAuthService = new KakaoAuthService();
@@ -29,44 +35,50 @@ export class AuthController {
       const accessToken = await this.kakaoAuthService.getKakaoAccessToken(code);
       const socialUser = await this.kakaoAuthService.getKakaoUserInfo(accessToken);
 
-      let user = await this.authModel.findUserBySocialId(socialUser.socialId);
+      // user 변수의 타입을 User | undefined로 명시 (DB에서 온 값)
+      let user: User | undefined = await this.authModel.findUserBySocialId(socialUser.socialId);
 
       let authUser: AuthUser;
 
       if (!user) {
         // 새 사용자인 경우 등록
+        // createSocialUser는 number 또는 bigint를 반환하지만, findUserById는 number를 기대.
+        // 현재 auth.model.ts에서 createSocialUser가 number를 반환한다고 가정.
         const newUserId = await this.authModel.createSocialUser(socialUser);
-        user = await this.authModel.findUserById(newUserId);
+        user = await this.authModel.findUserById(Number(newUserId)); // findUserById는 number를 받도록 유지했으므로 Number() 변환
         if (!user) {
           throw new Error('새 사용자 정보를 불러오지 못했습니다.');
         }
         authUser = {
-          id: user.user_id.toString(),
-          loginId: user.login_id, // login_id 추가
+          id: user.user_id.toString(), // AuthUser.id는 string이므로 .toString()
+          loginId: user.login_id,
           email: user.email,
           nickname: user.nickname,
           profileImage: user.profile_image,
-          provider: 'kakao', // 소셜 로그인 프로바이더 명시
-          userType: '개인', // 소셜 로그인은 개인 회원으로 가정
+          provider: mapDbProviderToService(user.provider) || 'kakao', // 매핑 함수 사용
+          userType: mapDbUserTypeToService(user.user_type) || '개인', // 매핑 함수 사용
+          approvalStatus: mapDbApprovalStatusToService(user.approval_status), // 매핑 함수 사용
         };
       } else {
         // 기존 사용자인 경우 정보 업데이트
-        await this.authModel.updateSocialUser(user.user_id, {
+        // updateSocialUser는 number를 받도록 유지했으므로 Number() 변환
+        await this.authModel.updateSocialUser(Number(user.user_id), { // user.user_id가 bigint일 수 있으므로 Number() 변환
           nickname: socialUser.nickname,
           profileImage: socialUser.profileImage,
         });
-        user = await this.authModel.findUserById(user.user_id); // 업데이트된 정보 다시 조회
+        user = await this.authModel.findUserById(Number(user.user_id)); // 업데이트된 정보 다시 조회, Number() 변환
         if (!user) {
           throw new Error('기존 사용자 정보를 불러오지 못했습니다.');
         }
         authUser = {
-          id: user.user_id.toString(),
-          loginId: user.login_id, // login_id 추가
+          id: user.user_id.toString(), // AuthUser.id는 string이므로 .toString()
+          loginId: user.login_id,
           email: user.email,
           nickname: user.nickname,
           profileImage: user.profile_image,
-          provider: 'kakao', // 소셜 로그인 프로바이더 명시
-          userType: '개인',
+          provider: mapDbProviderToService(user.provider) || 'kakao', // 매핑 함수 사용
+          userType: mapDbUserTypeToService(user.user_type) || '개인', // 매핑 함수 사용
+          approvalStatus: mapDbApprovalStatusToService(user.approval_status), // 매핑 함수 사용
         };
       }
 
@@ -82,7 +94,7 @@ export class AuthController {
     }
   };
 
-  // 카카오 로그인 URL 반환
+  // 카카오 로그인 URL 반환 (변경 없음)
   getKakaoLoginUrl = (req: Request, res: Response): void => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&response_type=code`;
 
@@ -93,7 +105,7 @@ export class AuthController {
     });
   };
 
-  // 기업 회원 가입
+  // 기업 회원 가입 (변경 없음, userId.toString() 이미 적용됨)
   signUpCompany = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, password, companyName, phoneNumber } = req.body;
@@ -125,7 +137,7 @@ export class AuthController {
       res.status(StatusCodes.CREATED).json({
         success: true,
         message: '기업 회원가입이 완료되었습니다. 관리자 승인 대기 중입니다.',
-        data: { userId: userId.toString() },
+        data: { userId: userId.toString() }, // userId가 number | bigint일 수 있으므로 .toString()
       });
     } catch (error) {
       console.error('기업 회원가입 실패:', error);
@@ -170,34 +182,33 @@ export class AuthController {
       }
 
       // 기업회원 승인 상태 확인 : 기업회원('2') 또는 관리자('3')인지 확인
-      if (user.user_type === '2') {
-        // 기업회원일 경우
-        if (user.approval_status !== '2') {
+      // user.user_type은 User 타입에 따라 '1' | '2' | '3' 이므로 직접 비교 가능
+      if (user.user_type === '2') { // 기업회원일 경우
+        if (user.approval_status !== '2') { // '2'는 승인 상태 (DB 기준)
           res
             .status(StatusCodes.FORBIDDEN)
             .json({ message: '아직 관리자의 승인이 필요한 계정입니다.' });
           return;
         }
-      } else if (user.user_type !== '3') {
-        // 관리자도 아닐 경우
+      } else if (user.user_type !== '3') { // 관리자도 아닐 경우
         res.status(StatusCodes.FORBIDDEN).json({ message: '로그인 권한이 없습니다.' });
         return;
       }
 
       // JWT 토큰 생성 (Token 유틸리티의 getNewAccessToken, getNewRefreshToken 사용)
       const authUser: AuthUser = {
-        id: user.user_id.toString(),
+        id: user.user_id.toString(), // AuthUser.id는 string이므로 .toString()
         loginId: user.login_id,
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profile_image,
-        provider: 'email', // 기업 회원은 'email' 프로바이더
-        userType: user.user_type, // '2'
-        approvalStatus: user.approval_status, // '2'
+        provider: mapDbProviderToService(user.provider) || 'email', // 매핑 함수 사용
+        userType: mapDbUserTypeToService(user.user_type), // 매핑 함수 사용
+        approvalStatus: mapDbApprovalStatusToService(user.approval_status), // 매핑 함수 사용
       };
 
-      const accessToken = Token.getNewAccessToken(authUser); // AuthUser 객체 전달
-      const refreshToken = Token.getNewRefreshToken(authUser); // AuthUser 객체 전달
+      const accessToken = Token.getNewAccessToken(authUser);
+      const refreshToken = Token.getNewRefreshToken(authUser);
 
       res.status(StatusCodes.OK).json({
         success: true,
@@ -217,7 +228,7 @@ export class AuthController {
     }
   };
 
-  // 토큰 재발급
+  // 토큰 재발급 (변경 없음)
   refreshToken = async (req: Request, res: Response): Promise<void> => {
     try {
       const refreshToken = req.body.refreshToken as string;
@@ -230,7 +241,6 @@ export class AuthController {
         return;
       }
 
-      // Token.refreshTokens 사용
       const refreshResult = await Token.refreshTokens(refreshToken);
 
       if (
@@ -263,10 +273,10 @@ export class AuthController {
     }
   };
 
-  // 로그아웃
+  // 로그아웃 (변경 없음)
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
-      const refreshToken = req.body.refreshToken as string; // 또는 헤더에서 받기
+      const refreshToken = req.body.refreshToken as string;
 
       if (refreshToken) {
         await this.authModel.deleteRefreshToken(refreshToken);

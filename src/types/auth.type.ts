@@ -27,10 +27,9 @@ export interface User {
   password?: string;
   nickname: string;
   profile_image?: string;
-  user_type: '1' | '2' | '3';
-  approval_status?: string;
-  provider?: '1' | '2' | '3' | '4' | null;
-  // created_at, updated_at 등 다른 DB 컬럼이 있다면 여기에 추가
+  user_type: '1' | '2' | '3'; // '1' 개인, '2' 기업, '3' 관리자
+  approval_status?: '1' | '2' | '3' | null; // '1' 대기, '2' 승인, '3' 거절
+  provider?: '1' | '2' | '3' | '4' | null;  //'1' 카카오, '2' 네이버, '3' 구글, '4' 이메일
 }
 
 // JWT payload 및 req.user에 사용될 사용자 정보 (DB의 User 테이블과 매핑)
@@ -40,9 +39,9 @@ export interface AuthUser {
   email?: string; // user.email 필드 (소셜로그인 이메일 또는 별도 저장 이메일)
   nickname: string;
   profileImage?: string; // user.profile_image 필드
-  provider: string;
-  userType?: string;
-  approvalStatus?: string;
+  provider: 'kakao' | 'naver' | 'google' | 'email';
+  userType?: '개인' | '기업' | '관리자';
+  approvalStatus?: '대기' | '승인' | '거절';
 }
 
 export interface AuthResponse {
