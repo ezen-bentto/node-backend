@@ -41,7 +41,7 @@ export class AuthController {
           throw new Error('새 사용자 정보를 불러오지 못했습니다.');
         }
         authUser = {
-          id: user.user_id,
+          id: user.user_id.toString(),
           loginId: user.login_id, // login_id 추가
           email: user.email,
           nickname: user.nickname,
@@ -60,7 +60,7 @@ export class AuthController {
           throw new Error('기존 사용자 정보를 불러오지 못했습니다.');
         }
         authUser = {
-          id: user.user_id,
+          id: user.user_id.toString(),
           loginId: user.login_id, // login_id 추가
           email: user.email,
           nickname: user.nickname,
@@ -76,7 +76,6 @@ export class AuthController {
 
       const redirectUrl = `${ENV.corsOrigin}/login/callback?token=${jwtAccessToken}&refresh=${refreshToken}`;
       res.redirect(redirectUrl);
-
     } catch (error) {
       console.error('카카오 로그인 실패:', error);
       res.redirect(`${ENV.corsOrigin}/login?error=kakao_login_failed`);
@@ -116,7 +115,12 @@ export class AuthController {
         return;
       }
 
-      const userId = await this.authModel.createCompanyUser({ email, password, companyName, phoneNumber });
+      const userId = await this.authModel.createCompanyUser({
+        email,
+        password,
+        companyName,
+        phoneNumber,
+      });
 
       res.status(StatusCodes.CREATED).json({
         success: true,
@@ -166,19 +170,23 @@ export class AuthController {
       }
 
       // 기업회원 승인 상태 확인 : 기업회원('2') 또는 관리자('3')인지 확인
-      if (user.user_type === '2') { // 기업회원일 경우
+      if (user.user_type === '2') {
+        // 기업회원일 경우
         if (user.approval_status !== '2') {
-          res.status(StatusCodes.FORBIDDEN).json({ message: '아직 관리자의 승인이 필요한 계정입니다.' });
+          res
+            .status(StatusCodes.FORBIDDEN)
+            .json({ message: '아직 관리자의 승인이 필요한 계정입니다.' });
           return;
         }
-      } else if (user.user_type !== '3') { // 관리자도 아닐 경우
+      } else if (user.user_type !== '3') {
+        // 관리자도 아닐 경우
         res.status(StatusCodes.FORBIDDEN).json({ message: '로그인 권한이 없습니다.' });
         return;
       }
 
       // JWT 토큰 생성 (Token 유틸리티의 getNewAccessToken, getNewRefreshToken 사용)
       const authUser: AuthUser = {
-        id: Number(user.user_id),
+        id: user.user_id.toString(),
         loginId: user.login_id,
         email: user.email,
         nickname: user.nickname,
@@ -225,7 +233,12 @@ export class AuthController {
       // Token.refreshTokens 사용
       const refreshResult = await Token.refreshTokens(refreshToken);
 
-      if (refreshResult.ok && refreshResult.accessToken && refreshResult.refreshToken && refreshResult.user) {
+      if (
+        refreshResult.ok &&
+        refreshResult.accessToken &&
+        refreshResult.refreshToken &&
+        refreshResult.user
+      ) {
         res.status(StatusCodes.OK).json({
           success: true,
           message: '새로운 Access Token과 Refresh Token이 발급되었습니다.',

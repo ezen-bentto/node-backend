@@ -1,7 +1,7 @@
 // src/types/auth.type.ts
 
 export interface KakaoUserInfo {
-  id: number | bigint;
+  id: number;
   kakao_account: {
     email?: string;
     profile?: {
@@ -21,13 +21,13 @@ export interface SocialUser {
 
 // --- DB에서 조회되는 사용자 정보의 실제 형태 ---
 export interface User {
-  user_id: number | bigint;
+  user_id: number;
   login_id: string;
   email?: string;
   password?: string;
   nickname: string;
   profile_image?: string;
-  user_type: '개인' | '기업' | '관리자';
+  user_type: '1' | '2' | '3';
   approval_status?: string;
   provider?: '1' | '2' | '3' | '4' | null;
   // created_at, updated_at 등 다른 DB 컬럼이 있다면 여기에 추가
