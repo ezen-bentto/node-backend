@@ -18,7 +18,7 @@ import { InsertResult } from '@/types/db/response.type';
  * @returns InsertResult - 삽입 결과
  */
 
-interface regCategoryProps {
+export interface regCategoryProps {
   contest_id: string;
   category_id: string;
 }
