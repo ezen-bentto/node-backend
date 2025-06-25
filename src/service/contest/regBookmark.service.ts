@@ -25,16 +25,13 @@ import { StatusCodes } from 'http-status-codes';
  *        2025/06/24           이철욱             신규작성
  * @param id - 공모전 id
  */
-export const regBookmark = async ({
-  target_id,
-  user_id,
-}: regBookmarkProps): Promise<InsertResult> => {
+const regBookmark = async ({ target_id, user_id }: regBookmarkProps): Promise<InsertResult> => {
   try {
     const parsedTargetId = parseInt(target_id);
     const parsedUserId = parseInt(user_id);
 
     // 1. scrap 존재 여부 조회
-    const existing = await ContestModel.getBookmark(parsedTargetId, parsedUserId);
+    const existing = await ContestModel.isBookmark(parsedTargetId, parsedUserId);
 
     // 2. 있으면 del_yn 토글 업데이트
     if (existing) {
@@ -60,3 +57,5 @@ export const regBookmark = async ({
     throw err;
   }
 };
+
+export default regBookmark;
