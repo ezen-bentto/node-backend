@@ -19,14 +19,14 @@ import { StatusCodes } from 'http-status-codes';
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/05/30           한유리             신규작성  
+ *        2025/05/30           한유리             신규작성
  * @param data - 공모전 등록에 필요한 데이터 객체
  */
-export const regContest = async (data: regContestParams) => {
+const regContest = async (data: regContestParams) => {
   try {
     const res = await ContestModel.regContest(data);
 
-    if(res.affectedRows != 1){
+    if (res.affectedRows != 1) {
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
     }
     return res;
@@ -35,3 +35,5 @@ export const regContest = async (data: regContestParams) => {
     throw err;
   }
 };
+
+export default regContest;

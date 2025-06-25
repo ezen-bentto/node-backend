@@ -21,7 +21,7 @@ import { ContestModel } from '@/models/contest.model';
  *        2025/06/09           한유리             신규작성
  * @param data 조회할 공모전의 상세 정보 요청 데이터 (ID 등)
  */
-export const getContestById = async ({ id }: delContest): Promise<detailContest> => {
+const getContestById = async ({ id }: delContest): Promise<detailContest> => {
   try {
     const contestData = await ContestModel.getContestById(id);
 
@@ -35,3 +35,5 @@ export const getContestById = async ({ id }: delContest): Promise<detailContest>
     throw err;
   }
 };
+
+export default getContestById;

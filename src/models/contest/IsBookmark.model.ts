@@ -1,6 +1,6 @@
 import { getDBConnection } from '@/config/db.config';
 
-export const getBookmark = async (target_id: number, user_id: number) => {
+const isBookmark = async (target_id: number, user_id: number) => {
   const sql = `
     SELECT del_yn 
     FROM scrap 
@@ -11,3 +11,5 @@ export const getBookmark = async (target_id: number, user_id: number) => {
   const res = await db.query(sql, [target_id, user_id]);
   return res[0]; // 없으면 undefined 반환
 };
+
+export default isBookmark;
