@@ -55,7 +55,12 @@ const getBookmark = async (req: Request, res: Response, next: NextFunction) => {
       user_id: payload.userId.toString(),
     });
 
-    res.status(StatusCodes.OK).json({ data: data });
+    const result = {
+      isBookmarked: data.isBookmarked,
+      bookmarkCount: data.bookmarkCount.toString(),
+    };
+
+    res.status(StatusCodes.OK).json({ data: result });
   } catch (err) {
     next(err);
   }
