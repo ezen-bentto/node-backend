@@ -25,19 +25,20 @@ const regContest = async (props: regSchema): Promise<InsertResult> => {
     "title",
     "organizer",
     "organizer_type",
+    "participants",
     "prize",
+    "benefits",
     "start_date",
     "end_date",
     "homepage",
-    "participants",
-    "benefits",
-    "contest_tag",
     "article"
   ];
 
   const values = keys.map((key) => (props as any)[key]);
 
   const sql = `INSERT INTO contest (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`;
+
+  console.log(sql)
 
   const db = getDBConnection();
   const res = await db.query(sql, values);

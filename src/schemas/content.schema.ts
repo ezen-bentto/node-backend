@@ -18,12 +18,15 @@ import { z } from 'zod';
 
 // 공모전 create
 export const regContestSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   writer_id: z.string(),
   title: z.string(),
   organizer: z.string(),
   organizer_type: z.string(),
+  participants: z.string(),
   prize: z.string(),
+  benefits: z.string(),
+  contest_tag: z.array(z.string()),
   start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
     message: 'Invalid date format',
   }),
@@ -31,13 +34,10 @@ export const regContestSchema = z.object({
     message: 'Invalid date format',
   }),
   homepage: z.string(),
-  participants: z.string(),
-  benefits: z.string(),
-  contest_tag: z.string(),
   article: z.string(),
   reg_date: z.string().refine(val => !isNaN(Date.parse(val)), {
     message: 'Invalid date format',
-  }),
+  }).optional(),
 });
 
 // 북마크
