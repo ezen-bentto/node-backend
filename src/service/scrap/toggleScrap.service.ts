@@ -1,3 +1,4 @@
+//node-backend\src\service\scrap\toggleScrap.service.ts
 import { ScrapModel } from '@/models/scrap.model';
 import logger from '@/utils/common/logger';
 
