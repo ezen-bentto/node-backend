@@ -20,23 +20,15 @@ import { handleDbError } from '@/utils/handleDbError';
  *        2025/06/25           이철욱             신규작성
  * @param id - 공모전 id
  */
-const getBookmark = async ({ target_id, user_id }: regBookmarkProps) => {
+const getBookmark = async ({ target_id }: { target_id: string }) => {
   try {
     const parsedTargetId = parseInt(target_id);
-    const parsedUserId = parseInt(user_id);
-
-    // 1. 내가 북마크 했는지?
-    const isBookmarkResponse = await ContestModel.isBookmark(parsedTargetId, parsedUserId);
-    const isBookmarked = isBookmarkResponse?.del_yn === 'Y';
 
     // 2. 해당 공모전 북마크 수
     const countResponse = await ContestModel.getBookmark(parsedTargetId);
     const bookmarkCount: number = countResponse?.cnt ?? 0;
 
-    return {
-      isBookmarked,
-      bookmarkCount,
-    };
+    return bookmarkCount;
   } catch (err: unknown) {
     handleDbError(err);
     throw err;

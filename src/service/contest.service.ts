@@ -7,6 +7,7 @@ import getContestById from './contest/getContestById.service';
 import regBookmark from './contest/regBookmark.service';
 import selectActiveContests from './contest/selectActiveContests.service';
 import getBookmark from './contest/getBookmark.service';
+import getIsBookmarked from './contest/getIsBookmarked.service';
 
 /**
  *
@@ -37,4 +38,5 @@ export const ContestService = {
   regBookmark,
   getBookmark,
   selectActiveContests,
+  getIsBookmarked,
 };

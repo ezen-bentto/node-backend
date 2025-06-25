@@ -7,6 +7,7 @@ import { getContestById } from './contest/getContestById.controller';
 import { regBookmark } from './contest/regBookmark.controller';
 import { getContestsByCategory } from './contest/getContestsByCategory.controller';
 import getBookmark from './contest/getBookmark.controller';
+import getIsBookmarked from './contest/getIsBookmarked.controller';
 
 /**
  *
@@ -36,6 +37,7 @@ const ContestController = {
   regBookmark,
   getContestsByCategory,
   getBookmark,
+  getIsBookmarked,
 };
 
 export default ContestController;
