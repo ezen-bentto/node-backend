@@ -19,7 +19,7 @@ import { InsertResult } from "@/types/db/response.type";
  * @returns InsertResult - 삽입 결과
  */
 const addCntViews = async (views: number, id: number): Promise<InsertResult> => {  
-  const sql = `UPDATE contest SET views = ? where id = ?`;
+  const sql = `UPDATE contest SET views = ? where contest_id = ?`;
   const values = [views, id];
   const db = getDBConnection();
   const res = await db.query(sql, values);

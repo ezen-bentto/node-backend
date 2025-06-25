@@ -23,8 +23,8 @@ const regContest = async (props: regSchema): Promise<InsertResult> => {
   const keys = [
     "writer_id",
     "title",
-    "img",
     "organizer",
+    "organizer_type",
     "prize",
     "start_date",
     "end_date",
@@ -35,21 +35,7 @@ const regContest = async (props: regSchema): Promise<InsertResult> => {
     "article"
   ];
 
-  // props (camelCase) → DB 컬럼 순서에 맞춰 값 추출
-  const values = [
-    props.writer_id,
-    props.title,
-    props.img,
-    props.organizer,
-    props.prize,
-    props.start_date,
-    props.end_date,
-    props.homepage,
-    props.participants,
-    props.benefits,
-    props.contest_tag,
-    props.article,
-  ];
+  const values = keys.map((key) => (props as any)[key]);
 
   const sql = `INSERT INTO contest (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`;
 

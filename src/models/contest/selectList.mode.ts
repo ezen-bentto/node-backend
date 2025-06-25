@@ -36,18 +36,18 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
   
   const sortColumn = sortOptions[sortBy];
 
-  let sql = `SELECT id,
-                    title,
-                    img,
-                    organizer,
-                    prize,
-                    start_date,
-                    end_date,
-                    participants,
-                    benefits,
-                    contest_tag,
-                    views
-               FROM contest`;
+  let sql = `SELECT c.contest_id id,
+                    c.title,
+                    c.organizer,
+                    c.start_date,
+                    c.end_date,
+                    c.views,
+                    GROUP_CONCAT(cat.name) contest_tag
+               FROM contest c
+               JOIN contest_category cc
+                 ON c.contest_id = cc.contest_id
+               JOIN category cat
+                 ON cc.category_id = cat.category_id`;
 
   const conditions: string[] = [];
   const values: any[] = [];
@@ -63,8 +63,11 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
     sql += ` WHERE ${conditions.join(' AND ')}`;
   }
 
+  // GROUP BY
+  sql += ` GROUP BY c.contest_id`;
+
   // ORDER BY
-  sql += ` ORDER BY ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`
+  sql += ` ORDER BY ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`;
 
   // 페이징
   const offset = (page-1) * limit;

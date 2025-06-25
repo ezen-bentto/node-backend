@@ -25,12 +25,6 @@ import { any } from 'zod';
 export const getContestList = async (options: optionResult = {}): Promise<getContestLisParam[]> => {
   try {
     const contestData = await ContestModel.selectList(options);
-
-    // const data = contestData[0];
-    // for (let key in data) {
-    //   const value = data[key as keyof typeof data];
-    //   console.log(key, typeof value);
-    // }
     return contestData;
   } catch (err: unknown) {
     handleDbError(err);
