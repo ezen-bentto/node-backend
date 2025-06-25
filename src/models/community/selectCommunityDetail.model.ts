@@ -1,4 +1,5 @@
 import { getDBConnection } from "@/config/db.config";
+import logger from "@/utils/common/logger";
 
 export interface RecruitmentDetail {
     recruitment_detail_id: number;
@@ -11,20 +12,20 @@ export interface CommunityDetail {
     community_type: string;
     category_type: number;
     contest_id: number;
-    start_date: string;
-    end_date: string;
-    recruit_end_date: string;
+    start_date: string | null;
+    end_date: string | null;
+    recruit_end_date: string | null;
     age_group: string;
     title: string;
     content: string;
     author_id: number;
     nickname: string;
-    reg_date: string;
+    reg_date: string | null;
     recruitment_detail_list: RecruitmentDetail[];
+    scrap_yn: boolean;
 }
 
 // BigInt → Number 변환 함수
-// TODO Check
 const convertBigIntToNumber = (obj: any): any => {
     if (Array.isArray(obj)) {
         return obj.map(convertBigIntToNumber);
@@ -46,9 +47,11 @@ const convertBigIntToNumber = (obj: any): any => {
 };
 
 export const selectCommunityDetail = async (
-    communityId: number
+    communityId: number,
+    userId?: number
 ): Promise<CommunityDetail | null> => {
     const db = getDBConnection();
+    console.log("userId", userId);
 
     const [communityRows] = await db.query(
         `SELECT 
@@ -112,9 +115,34 @@ export const selectCommunityDetail = async (
         ? detailRows
         : [];
 
+    let scrap_yn = false; // 기본값
+
+    if (userId) {
+        const scrapRows = await db.query(
+            `SELECT scrap_id FROM scrap
+             WHERE target_id = ? AND user_id = ? AND target_type = '2' AND del_yn = 'N'`,
+            [communityId, userId]
+        );
+
+        if (Array.isArray(scrapRows) && scrapRows.length > 0) {
+            logger.info("communityId", communityId);
+            logger.info("userId", userId);
+            logger.info("scrapRows", scrapRows);
+
+
+            console.log(communityId);
+            console.log(userId);
+            console.log(scrapRows);
+
+
+            scrap_yn = true;
+        }
+    }
+
     const result = {
         ...communityWithStringDates,
         recruitment_detail_list,
+        scrap_yn,
     };
 
     const resultWithConverted = convertBigIntToNumber(result);

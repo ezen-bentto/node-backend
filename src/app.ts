@@ -9,6 +9,8 @@ import { authRouter } from './routes/auth.routes';
 // import "./jobs/index.ts";
 import CommonRouter from '@/routes/common.routes';
 import CommentRouter from '@/routes/comment.routes';
+import ScrapRouter from '@/routes/scrap.routes';
+
 
 const app = express();
 
@@ -16,13 +18,13 @@ const app = express();
 registerMiddlewares(app);
 
 // ✅ 2. 라우터 연결
-
 app.use('/api/demo', DemoRouter);
 app.use('/api/contest', ContestRouter);
 app.use('/api/community', CommunityRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/comment', CommentRouter);
 app.use('/api/common', CommonRouter);
+app.use('/api/scrap', ScrapRouter);
 
 // // 레디스 값 DB에 삽입
 // setInterval(

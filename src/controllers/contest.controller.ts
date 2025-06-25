@@ -5,6 +5,7 @@ import { modContest } from './contest/modify.controller';
 import { delContest } from './contest/delete.controller';
 import { getContestById } from './contest/getContestById.controller';
 import { regBookmark } from './contest/regContestBookmark.controller';
+import { getContestsByCategory } from './contest/getContestsByCategory.controller';
 
 /**
  *
@@ -20,6 +21,7 @@ import { regBookmark } from './contest/regContestBookmark.controller';
  * -------------------------------------------------------
  *
  *        2025/05/30           한유리              신규작성
+ *        2025/06/24           김혜미              추가작성  
  * @param 없음
  */
 
@@ -31,6 +33,7 @@ const ContestController = {
   delContest,
   getContestById,
   regBookmark,
+  getContestsByCategory
 };
 
 export default ContestController;

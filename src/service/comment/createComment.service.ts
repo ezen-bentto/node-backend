@@ -8,7 +8,6 @@ import logger from '@/utils/common/logger';
 
 /**
  *
- *
  * @function createComment
  * @date 2025/06/09
  * @history
@@ -17,12 +16,16 @@ import logger from '@/utils/common/logger';
  * -------------------------------------------------------
  *
  *        2025/06/09           김혜미               신규작성  
- *        2025/06/11           수정자               postId 처리 추가
+ *        2025/06/11           김혜미               postId 처리 추가
+ *        2025/06/24           김혜미               userId 파라미터화
+ * 
  * @param data(CommentRegisterRequest) - content, postId 포함
+ * @param userId(로그인 사용자 ID)
  */
-export const createComment = async (data: CommentRegisterRequest) => {
-    // TODO : session에서 userId값 꺼내기 (임시로 5 사용)
-    const userId = 5;
+export const createComment = async (
+    data: CommentRegisterRequest,
+    userId: number
+) => {
     const postId = data.postId; // 프론트엔드에서 받은 postId 사용
 
     logger.info(`댓글 등록 서비스 호출(userId: ${userId}, postId: ${postId})`);
@@ -36,7 +39,7 @@ export const createComment = async (data: CommentRegisterRequest) => {
     try {
         const res = await CommentModel.insertComment(data, postId, userId);
 
-        if (res.affectedRows != 1) {
+        if (res.affectedRows !== 1) {
             logger.warn(`댓글 insert 실패 : ${res.affectedRows}`);
             throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
         }
