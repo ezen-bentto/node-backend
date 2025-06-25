@@ -60,8 +60,6 @@ const getBookmark = async (req: Request, res: Response, next: NextFunction) => {
       bookmarkCount: data.bookmarkCount.toString(),
     };
 
-    console.log(result, '@@@@@@@@@@');
-
     res.status(StatusCodes.OK).json({ data: result });
   } catch (err) {
     next(err);
