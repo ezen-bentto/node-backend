@@ -35,18 +35,14 @@ const regContest = async (data: regContestParams) => {
 
     // ✅ contest_tag를 ','로 나눠서 각각 처리
     const categoryNames = data.contest_tag.split(',');
-    console.log(categoryNames, '@@@@@@@');
 
     for (const categoryName of categoryNames) {
-      console.log(categoryName);
       const category_id = mapCategoryStringToId(categoryName);
-      console.log('카테!~', category_id);
       if (!category_id) {
         throw new AppError(StatusCodes.BAD_REQUEST, `유효하지 않은 카테고리: ${categoryName}`);
       }
 
       const categoryRes = await ContestModel.regCategory({ contest_id, category_id });
-      console.log('결과!~', categoryRes);
       if (categoryRes.affectedRows !== 1) {
         throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
       }

@@ -31,12 +31,8 @@ const regCategory = async ({
   const values = [contest_id, category_id];
 
   const sql = `INSERT INTO contest_category (contest_id, category_id) VALUES (?, ?)`;
-
-  console.log(sql, values);
-
   const db = getDBConnection();
   const res = await db.query(sql, values);
-  console.log(res, '#########');
   return res;
 };
 
