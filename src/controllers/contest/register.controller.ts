@@ -35,7 +35,8 @@ export const regContest: RequestHandler = async (req: Request, res: Response, ne
   
   try {
     const data = ContestService.regContest(parsed.data);
-    res.status(StatusCodes.OK).json({ data: data });
+    const id = (await data).insertId.toString();
+    res.status(StatusCodes.OK).json({ data: id });
     return;
   } catch (err) {
     next(err);

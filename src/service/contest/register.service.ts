@@ -2,6 +2,7 @@ import { ERROR_CODES } from '@/constants/error.constant';
 import { ContestModel } from '@/models/contest.model';
 import { regContest as regContestParams } from '@/schemas/content.schema';
 import { AppError } from '@/utils/AppError';
+import { mapCategoryStringToId } from '@/utils/common/categoryMapper';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
 
@@ -26,9 +27,27 @@ const regContest = async (data: regContestParams) => {
   try {
     const res = await ContestModel.regContest(data);
 
-    if (res.affectedRows != 1) {
+    if (res.affectedRows !== 1) {
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
     }
+
+    const contest_id = res.insertId.toString();
+
+    // ✅ contest_tag를 ','로 나눠서 각각 처리
+    const categoryNames = data.contest_tag.split(',');
+
+    for (const categoryName of categoryNames) {
+      const category_id = mapCategoryStringToId(categoryName);
+      if (!category_id) {
+        throw new AppError(StatusCodes.BAD_REQUEST, `유효하지 않은 카테고리: ${categoryName}`);
+      }
+
+      const categoryRes = await ContestModel.regCategory({ contest_id, category_id });
+      if (categoryRes.affectedRows !== 1) {
+        throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
+      }
+    }
+
     return res;
   } catch (err: unknown) {
     handleDbError(err);

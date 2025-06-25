@@ -23,8 +23,9 @@ router.post('/register', ContestController.regContest);
 router.get('/modify', ContestController.getContestById);
 router.post('/modify', ContestController.modContest);
 router.post('/delete', ContestController.delContest);
-router.post('/bookmark', ContestController.regBookmark);
-router.get('/bookmark', ContestController.getBookmark);
+router.post('/:target_id/bookmark', ContestController.regBookmark);
+router.get('/:target_id/bookmark', ContestController.getIsBookmarked);
+router.get('/:target_id/bookmark/counter', ContestController.getBookmark);
 router.get('/category', ContestController.getContestsByCategory);
 
 export default router;
