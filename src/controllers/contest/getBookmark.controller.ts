@@ -25,42 +25,18 @@ import { StatusCodes } from 'http-status-codes';
 
 const getBookmark = async (req: Request, res: Response, next: NextFunction) => {
   // 1. zod 스키마 검증
-  const parsed = regBookSchema.safeParse({ target_id: req.query.id });
+  const parsed = regBookSchema.safeParse({ target_id: req.params.target_id });
 
   if (!parsed.success) {
     next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
     return;
   }
 
-  const { target_id } = parsed.data;
-
-  // 2. 토큰 꺼내기
-  const accessToken = req.headers.authorization?.split(' ')[1];
-  if (!accessToken) {
-    next(new AppError(StatusCodes.UNAUTHORIZED, ERROR_CODES.VALIDATION_FAIL));
-    return;
-  }
-
-  // 3. 토큰 검증 및 user_id 추출
-  const { ok, payload } = Token.verifyAccessToken(accessToken);
-  if (!ok || !payload) {
-    next(new AppError(StatusCodes.UNAUTHORIZED, ERROR_CODES.VALIDATION_FAIL));
-    return;
-  }
-
   try {
-    // 4. 서비스 호출
-    const data = await ContestService.getBookmark({
-      target_id: target_id,
-      user_id: payload.userId.toString(),
-    });
-
-    const result = {
-      isBookmarked: data.isBookmarked,
-      bookmarkCount: data.bookmarkCount.toString(),
-    };
-
-    res.status(StatusCodes.OK).json({ data: result });
+    // 서비스 호출
+    const data = await ContestService.getBookmark({ target_id: parsed.data.target_id });
+    const bookmarkCounter = data.toString();
+    res.status(StatusCodes.OK).json({ data: bookmarkCounter });
   } catch (err) {
     next(err);
   }
