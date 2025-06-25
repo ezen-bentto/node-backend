@@ -11,9 +11,6 @@ router.post('/register', authMiddleware, CommunityController.regCommunityPost);
 router.post('/modify', authMiddleware, CommunityController.modCommunityPost);
 router.post('/delete', authMiddleware, CommunityController.delCommunityPost);
 router.get('/getDetail', optionalAuthMiddleware, CommunityController.getCommunityDetail);
-
-
-// 인증 필요 없는 API (목록은 공개)
-router.get('/getList', CommunityController.getCommunityList);
+router.get('/getList', optionalAuthMiddleware, CommunityController.getCommunityList);
 
 export default router;
