@@ -65,12 +65,14 @@ EOF
 ssh -o StrictHostKeyChecking=no ubuntu@${env.BACKEND_EC2_IP} <<EOF
 cd ~/node-backend
 
-# .env 갱신
-echo "DB_HOST=${env.DB_HOST}" > .env
-echo "DB_PORT=${env.DB_PORT}" >> .env
-echo "DB_USER=${env.DB_USER}" >> .env
-echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
-echo "DB_DATABASE=${env.DB_DATABASE}" >> .env
+# .env 파일이 없을 경우에만 생성
+if [ ! -f .env ]; then
+  echo "DB_HOST=${env.DB_HOST}" > .env
+  echo "DB_PORT=${env.DB_PORT}" >> .env
+  echo "DB_USER=${env.DB_USER}" >> .env
+  echo "DB_PASSWORD=${env.DB_PASSWORD}" >> .env
+  echo "DB_DATABASE=${env.DB_DATABASE}" >> .env
+fi
 
 # PM2 clean start
 pm2 delete backend-api || true
