@@ -18,23 +18,26 @@ import { detailContest, regContest } from "@/schemas/content.schema";
  * @returns detailContest
  */
 const getContestDetail = async (id: number): Promise<detailContest> => {  
-  const sql = `SELECT id,
-                      writer_id,
-                      title,
-                      img,
-                      organizer,
-                      prize,
-                      start_date,
-                      end_date,
-                      homepage,
-                      participants,
-                      benefits,
-                      contest_tag,
-                      article,
-                      views,
-                      reg_date
-                 FROM contest
-                WHERE id = ?`;
+  const sql = `SELECT c.contest_id id,
+                      c.writer_id,
+                      c.title,
+                      c.article,
+                      c.benefits,
+                      c.homepage,
+                      c.organizer,
+                      c.organizer_type,
+                      c.participants,
+                      c.prize,
+                      c.start_date,
+                      c.end_date,
+                      c.views,
+                      GROUP_CONCAT(cat.name) contest_tag
+                 FROM contest c
+                 JOIN contest_category cc
+                   ON c.contest_id = cc.contest_id
+                 JOIN category cat
+                   ON cc.category_id = cat.category_id
+                WHERE c.contest_id = ?`;
 
   const db = getDBConnection();
   const res = await db.query(sql, id);
