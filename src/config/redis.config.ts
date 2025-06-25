@@ -31,4 +31,4 @@ export const connectRedis = async () => {
   }
 };
 
-// connectRedis();
+connectRedis();
