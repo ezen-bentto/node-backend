@@ -74,6 +74,7 @@ export const getContestDetailSchema = z.object({
 export const modContestSchema = z.object({
   title: z.string().optional(),
   organizer: z.string().optional(),
+  organizer_type: z.string().optional(),
   prize: z.string().optional(),
   start_date: z
     .string()
@@ -90,9 +91,7 @@ export const modContestSchema = z.object({
   homepage: z.string().optional(),
   participants: z.string().optional(),
   benefits: z.string().optional(),
-  contest_tag: z.string().optional(),
   article: z.string().optional(),
-  views: z.string().optional(),
 });
 
 // 공모전 상세 삭제 UPDATE
@@ -132,3 +131,7 @@ export type regBookmark = z.infer<typeof regBookSchema> & {
 
 export type getContestByCategoryParam = z.infer<typeof getContestByCategorySchema>;
 export type contestListItem = z.infer<typeof contestListItemSchema>;
+
+export type ResponseContestDetail = Omit<regContest, 'contest_tag'> & {
+  contest_tag: string[];
+};

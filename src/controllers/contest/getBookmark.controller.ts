@@ -2,7 +2,6 @@ import { ERROR_CODES } from '@/constants/error.constant';
 import { regBookSchema } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
-import { Token } from '@/utils/token';
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
@@ -36,6 +35,13 @@ const getBookmark = async (req: Request, res: Response, next: NextFunction) => {
     // 서비스 호출
     const data = await ContestService.getBookmark({ target_id: parsed.data.target_id });
     const bookmarkCounter = data.toString();
+    // 캐시 무효화 헤더 추가
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
+    });
+
     res.status(StatusCodes.OK).json({ data: bookmarkCounter });
   } catch (err) {
     next(err);

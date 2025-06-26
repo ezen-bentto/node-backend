@@ -55,6 +55,13 @@ const getIsBookmarked = async (req: Request, res: Response, next: NextFunction) 
       user_id: payload.userId.toString(),
     });
 
+    // 캐시 무효화 헤더 추가
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
+    });
+
     res.status(StatusCodes.OK).json({ data: data });
   } catch (err) {
     next(err);

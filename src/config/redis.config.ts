@@ -10,7 +10,7 @@ export const client = createClient({
   legacyMode: true,
 });
 
-client.on('error', (error) => {
+client.on('error', error => {
   console.error('Redis error:', error);
   // err 던지기
 });

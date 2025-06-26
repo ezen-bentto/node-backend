@@ -7,7 +7,7 @@ import { ContestModel } from '@/models/contest.model';
 /**
  *
  * 조회수 레디스 캐싱
- * 
+ *
  * Redis에 임시 저장된 조회수 데이터를 데이터베이스에 동기화
  * Redis 키: `${target}:${id}:views` 형태로 저장됨 (예: contest:123:views)
  * 특정 대상(target)의 모든 조회수 데이터를 불러와 DB에 적용 후 Redis 키 삭제
@@ -19,7 +19,7 @@ import { ContestModel } from '@/models/contest.model';
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/06/04           한유리             신규작성  
+ *        2025/06/04           한유리             신규작성
  * @param target ('contest' | 'community' | 'policy')
  */
 export const syncViewsToDb = async (target: 'contest' | 'community' | 'policy') => {
@@ -45,10 +45,10 @@ export const syncViewsToDb = async (target: 'contest' | 'community' | 'policy') 
           await ContestModel.addCntViews(viewsCount, id);
           break;
         case 'community':
-        //   await CommunityModel.incrementViews(id, viewsCount);
+          //   await CommunityModel.incrementViews(id, viewsCount);
           break;
         case 'policy':
-        //   await PolicyModel.incrementViews(id, viewsCount);
+          //   await PolicyModel.incrementViews(id, viewsCount);
           break;
         default:
           console.warn(`[syncViewsToDb] 알 수 없는 매개변수: ${target}`);
@@ -57,8 +57,6 @@ export const syncViewsToDb = async (target: 'contest' | 'community' | 'policy') 
 
       await client.v4.del(key); // Redis 키 삭제
     }
-
-    console.log(`[syncViewsToDb] ${keys.length}건 (${target}) 동기화 완료`);
   } catch (err) {
     console.error(`[syncViewsToDb] ${target} 조회수 동기화 실패:`, err);
   }
