@@ -26,24 +26,28 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 에러 처리용 next 함수
  */
 
-export const getContestDetail: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const getContestDetail: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     // id 쿼리 파라미터 추출
     const { id } = req.query;
     const ip = req.ip; //string
     const contestId = parseInt(id as string, 10);
-    const parsed = getContestDetailSchema.safeParse({id: contestId});
+    const parsed = getContestDetailSchema.safeParse({ id: contestId });
 
     if (!parsed.success || ip === undefined) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }
 
-    const data = await ContestService.getContestDetail({ id: contestId, ip:ip }); // or ...parsed.data
-    data.id = data.id.toString();
-    data.writer_id = data.writer_id.toString();
-    data.views = data.views.toString();
-    
+    const data = await ContestService.getContestDetail({ id: contestId, ip: ip }); // or ...parsed.data
+    data.id = data.id!.toString();
+    data.writer_id = data.writer_id!.toString();
+    data.views = data.views!.toString();
+
     res.status(StatusCodes.OK).json({ data: data });
     return;
   } catch (err) {

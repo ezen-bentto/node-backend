@@ -12,18 +12,21 @@ import { z } from 'zod';
  * -------------------------------------------------------
  *
  *        2025/06/09           한유리
- *        2025/06/24           김혜미             추가작성 
+ *        2025/06/24           김혜미             추가작성
  * @param 없음
  */
 
 // 공모전 create
 export const regContestSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   writer_id: z.string(),
   title: z.string(),
   organizer: z.string(),
   organizer_type: z.string(),
+  participants: z.string(),
   prize: z.string(),
+  benefits: z.string(),
+  contest_tag: z.string(),
   start_date: z.string().refine(val => !isNaN(Date.parse(val)), {
     message: 'Invalid date format',
   }),
@@ -31,13 +34,13 @@ export const regContestSchema = z.object({
     message: 'Invalid date format',
   }),
   homepage: z.string(),
-  participants: z.string(),
-  benefits: z.string(),
-  contest_tag: z.string(),
   article: z.string(),
-  reg_date: z.string().refine(val => !isNaN(Date.parse(val)), {
-    message: 'Invalid date format',
-  }),
+  reg_date: z
+    .string()
+    .refine(val => !isNaN(Date.parse(val)), {
+      message: 'Invalid date format',
+    })
+    .optional(),
 });
 
 // 북마크
@@ -60,7 +63,6 @@ export const getContestListSchema = z.object({
   benefits: z.string(),
   contest_tag: z.string(),
   views: z.string(),
-
 });
 
 // 공모전 상세 select
@@ -102,7 +104,7 @@ export const delContestSchema = z.object({
 // 카테고리별 공모전 조회 파라미터
 export const getContestByCategorySchema = z.object({
   categoryId: z.number().int().positive({
-    message: "유효한 카테고리 ID를 선택해주세요."
+    message: '유효한 카테고리 ID를 선택해주세요.',
   }),
 });
 // 카테고리별 공모전 목록 응답 스키마

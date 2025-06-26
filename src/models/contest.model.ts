@@ -10,6 +10,7 @@ import regContest from './contest/register.model';
 import selectList from './contest/selectList.mode';
 import selectContestsByCategory from './contest/selectContestsByCategory.model';
 import getBookmark from './contest/getBookmarks.model';
+import regCategory from './contest/regCategory.model';
 
 /**
  *
@@ -40,4 +41,5 @@ export const ContestModel = {
   getBookmark,
   modBookmark,
   selectContestsByCategory,
+  regCategory,
 };
