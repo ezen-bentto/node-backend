@@ -34,7 +34,6 @@ const regBookmark = async (target_id: number, user_id: number): Promise<InsertRe
     const res = await conn.query(sql, values);
 
     await conn.commit();
-    console.log('북마크 INSERT 커밋 완료:', res.insertId); // 로그 추가
     return res;
   } catch (error) {
     console.error('regBookmark 에러:', error); // 로그 추가

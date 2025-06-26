@@ -31,14 +31,10 @@ const getBookmark = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  console.log('문제없는지 확인', parsed);
-
   try {
     // 서비스 호출
     const data = await ContestService.getBookmark({ target_id: parsed.data.target_id });
     const bookmarkCounter = data.toString();
-    console.log('bookmarkCounter', bookmarkCounter);
-
     // 캐시 무효화 헤더 추가
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',

@@ -56,7 +56,6 @@ export const modContest: RequestHandler = async (
     // TODO: 로그인 id와 existing.witerId 비교
 
     await ContestService.modContest(contestId, parsed.data);
-    console.log('여기는 컨트롤러입니다. 나온 값 나와주세요');
 
     res.status(StatusCodes.OK).json({ message: OK_UPDATE_COMMENT });
     return;

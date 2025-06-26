@@ -1,5 +1,5 @@
-import { getDBConnection } from "@/config/db.config";
-import logger from "@/utils/common/logger";
+import { getDBConnection } from '@/config/db.config';
+import logger from '@/utils/common/logger';
 
 interface CategoryRow {
   category_id: number;
@@ -33,17 +33,13 @@ export const selectCategory = async (): Promise<CategoryResult> => {
     const result = await db.query(listSql);
     const list = Array.isArray(result) ? result : [];
 
-    console.log("query로 가져온 result:", result);
-    console.log("list 배열 여부:", Array.isArray(list));
-    console.log("list 길이:", list.length);
-
-    logger.info("카테고리 목록 조회 완료");
+    logger.info('카테고리 목록 조회 완료');
 
     return {
       list: list as CategoryRow[],
     };
   } catch (error) {
-    logger.error("selectCategory 에러 발생", error);
+    logger.error('selectCategory 에러 발생', error);
     return { list: [] };
   }
 };

@@ -29,7 +29,6 @@ const modContest = async (contestId: number, data: Partial<modContestParam>) => 
   try {
     const res = await ContestModel.modContest(contestId, data);
 
-    console.log('DB 에서 제대로 나왔는가?', res);
     if (res.affectedRows != 1) {
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.UPDATE_FAIL);
     }
