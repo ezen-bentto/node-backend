@@ -36,6 +36,7 @@ const regBookmark = async ({ target_id, user_id }: regBookmarkProps): Promise<In
     // 2. 있으면 del_yn 토글 업데이트
     if (existing) {
       const newDelYn = existing.del_yn === 'N' ? 'Y' : 'N';
+
       const updateRes = await ContestModel.modBookmark(parsedTargetId, parsedUserId, newDelYn);
 
       if (updateRes.affectedRows !== 1) {

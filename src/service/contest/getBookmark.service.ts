@@ -28,6 +28,8 @@ const getBookmark = async ({ target_id }: { target_id: string }) => {
     const countResponse = await ContestModel.getBookmark(parsedTargetId);
     const bookmarkCount: number = countResponse?.cnt ?? 0;
 
+    console.log('서비스', bookmarkCount);
+
     return bookmarkCount;
   } catch (err: unknown) {
     handleDbError(err);

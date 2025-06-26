@@ -24,10 +24,29 @@ const regBookmark = async (target_id: number, user_id: number): Promise<InsertRe
     VALUES (?, ?, '1', NOW(), NOW(), 'N')
   `;
   const values = [target_id, user_id];
-  const db = getDBConnection();
-  const res = await db.query(sql, values);
+  const pool = getDBConnection();
+  let conn;
 
-  return res;
+  try {
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    const res = await conn.query(sql, values);
+
+    await conn.commit();
+    console.log('북마크 INSERT 커밋 완료:', res.insertId); // 로그 추가
+    return res;
+  } catch (error) {
+    console.error('regBookmark 에러:', error); // 로그 추가
+    if (conn) {
+      await conn.rollback();
+    }
+    throw error;
+  } finally {
+    if (conn) {
+      conn.release();
+    }
+  }
 };
 
 export default regBookmark;
