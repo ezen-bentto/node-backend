@@ -51,6 +51,7 @@ const regBookmark = async ({ target_id, user_id }: regBookmarkProps): Promise<In
     if (insertRes.affectedRows !== 1) {
       throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, ERROR_CODES.INSERT_FAIL);
     }
+
     return insertRes;
   } catch (err: unknown) {
     handleDbError(err);

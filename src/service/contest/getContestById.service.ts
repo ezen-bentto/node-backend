@@ -24,6 +24,7 @@ import { ContestModel } from '@/models/contest.model';
 const getContestById = async ({ id }: delContest): Promise<detailContest> => {
   try {
     const contestData = await ContestModel.getContestById(id);
+    console.log(contestData, '###########');
 
     if (contestData === undefined) {
       new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND);
