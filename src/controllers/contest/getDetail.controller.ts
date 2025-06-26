@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { getContestDetailSchema } from '@/schemas/content.schema';
+import { getContestDetailSchema, ResponseContestDetail } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
@@ -20,6 +20,7 @@ import { StatusCodes } from 'http-status-codes';
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *        2025/05/30           한유리             신규작성
+ *        2025/06/26           이철욱             반환 구조 변경
  *
  * @param {Request} req - 요청 객체 (쿼리로 공모전 ID 전달)
  * @param {Response} res - 응답 객체 (공모전 상세 정보 반환)

@@ -20,22 +20,26 @@ import { parse } from 'path';
  * -------------------------------------------------------
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
- *        2025/06/09           한유리             신규작성  
+ *        2025/06/09           한유리             신규작성
  *
  * @param {Request} req - 요청 객체 (수정할 공모전 정보 포함)
  * @param {Response} res - 응답 객체 (수정 결과 반환)
  * @param {NextFunction} next - 오류 처리 미들웨어로 넘기는 함수
  */
-export const modContest: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const modContest: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const parsed = modContestSchema.safeParse(req.body);
 
-    if(!parsed.success){
+    if (!parsed.success) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }
 
-    const { id } = req.query;
+    const { id } = req.params;
     const contestId = parseInt(id as string, 10);
 
     if (isNaN(contestId)) {
@@ -43,16 +47,16 @@ export const modContest: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
-    const existing = await ContestService.getContestById({id: contestId});
+    const existing = await ContestService.getContestById({ id: contestId });
     if (!existing) {
       next(new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND));
       return;
     }
 
     // TODO: 로그인 id와 existing.witerId 비교
-    
+
     await ContestService.modContest(contestId, parsed.data);
-    
+
     res.status(StatusCodes.OK).json({ message: OK_UPDATE_COMMENT });
     return;
   } catch (err) {

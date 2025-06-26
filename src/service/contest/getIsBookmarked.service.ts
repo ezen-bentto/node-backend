@@ -27,7 +27,7 @@ const getIsBookmarked = async ({ target_id, user_id }: regBookmarkProps) => {
 
     // 1. 내가 북마크 했는지?
     const isBookmarkResponse = await ContestModel.isBookmark(parsedTargetId, parsedUserId);
-    const isBookmarked = isBookmarkResponse?.del_yn === 'Y';
+    const isBookmarked = isBookmarkResponse?.del_yn === 'N';
 
     return isBookmarked;
   } catch (err: unknown) {
