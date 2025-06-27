@@ -1,5 +1,9 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { getContestDetailSchema, ResponseContestDetail } from '@/schemas/content.schema';
+import {
+  getContestDetailSchema,
+  ResponseContestDetail,
+  ResponseDetailContest,
+} from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
@@ -46,10 +50,11 @@ export const getContestDetail: RequestHandler = async (
 
     const data = await ContestService.getContestDetail({ id: contestId, ip: ip }); // or ...parsed.data
     data.id = data.id!.toString();
-    data.writer_id = data.writer_id!.toString();
     data.views = data.views!.toString();
 
-    res.status(StatusCodes.OK).json({ data: data });
+    const response: ResponseDetailContest = { ...data, writer_id: data.writer_id.toString() };
+
+    res.status(StatusCodes.OK).json({ data: response });
     return;
   } catch (err) {
     next(err);
