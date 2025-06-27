@@ -18,21 +18,25 @@ import { StatusCodes } from 'http-status-codes';
  * -------------------------------------------------------
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
- *        2025/05/30           한유리             신규작성  
+ *        2025/05/30           한유리             신규작성
  *
  * @param {Request} req - 요청 객체 (등록할 공모전 정보가 포함된 body)
  * @param {Response} res - 응답 객체 (등록된 공모전 데이터 반환)
  * @param {NextFunction} next - 오류 처리 미들웨어로 넘기는 함수
  */
 
-export const regContest: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const regContest: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const parsed = regContestSchema.safeParse(req.body);
 
-  if(!parsed.success){
+  if (!parsed.success) {
     next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
     return;
   }
-  
+
   try {
     const data = ContestService.regContest(parsed.data);
     const id = (await data).insertId.toString();
