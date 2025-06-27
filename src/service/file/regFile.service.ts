@@ -1,7 +1,8 @@
-import { ContestModel } from '@/models/contest.model';
+import { FileModel } from '@/models/file.model';
+import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
-import fs from 'fs';
-import { buffer } from 'stream/consumers';
+import { StatusCodes } from 'http-status-codes';
+import path from 'path';
 
 /**
  *
@@ -21,24 +22,32 @@ import { buffer } from 'stream/consumers';
  * @param data - 공모전 등록에 필요한 데이터 객체
  */
 
-// zod 만들거니까 필요 없음
 export interface FileParams {
   reference_id: number;
   reference_type: number;
   original_name: string;
   file_path: Buffer;
+  mime_type?: string;
 }
 
 export const regFile = async (data: FileParams) => {
     try{
-        // 버퍼 검증
+        // buffer 검증
         if(!data.file_path || data.file_path.length === 0){
-            throw new Error('빈 파일입니다');
+            throw new AppError(StatusCodes.BAD_REQUEST, '빈 파일입니다');
         }
 
-        const res = await ContestModel.regFile(data);
+        // mimeType 검증
+        const mimeType = data.mime_type ?? 'application/octet-stream';
+        const allowedTypes = ['image/png', 'image/jpeg', 'application/octet-stream'];
+        if (!allowedTypes.includes(mimeType)) {
+            throw new AppError(StatusCodes.BAD_REQUEST,`허용되지 않은 MIME 타입: ${mimeType}`);
+        }
+
+        const res = await FileModel.regFile(data);
         return res;
     }catch (err: unknown) {
+        console.error(err)
         handleDbError(err);
         throw err;
     }

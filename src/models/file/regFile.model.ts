@@ -19,20 +19,23 @@ import { InsertResult } from '@/types/db/response.type';
  * @returns InsertResult - 삽입 결과
  */
 
-// zod 만들거니까 필요 없음
-export interface FileDTO {
+export interface FileParams {
   reference_id: number;
   reference_type: number;
   original_name: string;
   file_path: Buffer;
+  mime_type?: string;
 }
 
-const regFile = async (fileData:FileDTO ) => {
-  const sql = `INSERT INTO file (reference_id, reference_type, original_name, file_path) VALUES (?, ?, ?, ?);`;
+const regFile = async (data:FileParams ) => {
+  console.log("data",data);
+  const sql = `INSERT INTO file (reference_id, reference_type, original_name, file_path, mime_type) VALUES (?, ?, ?, ?, ?);`;
 
+  console.log(sql);
   const conn = getDBConnection();
-  const [result] = await conn.query(sql, [fileData.reference_id, fileData.reference_type, fileData.original_name, fileData.file_path]);
+  const result = await conn.query(sql, [data.reference_id, data.reference_type, data.original_name, data.file_path, data.mime_type || null]);
 
+  console.log("result", result)
   return result;
 };
 

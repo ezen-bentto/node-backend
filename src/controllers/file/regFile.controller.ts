@@ -1,6 +1,6 @@
 import { ERROR_CODES } from '@/constants/error.constant';
 import { regContestSchema } from '@/schemas/content.schema';
-import { ContestService } from '@/service/contest.service';
+import { FileService } from '@/service/file.service';
 import { AppError } from '@/utils/AppError';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -38,16 +38,14 @@ export const regFile: RequestHandler = async (
         return;
     }
 
-    // 이름이나 id, type(하드코딩?), filename은 body로 받고
-    const parsed = regFileSchema.safeParse(req.body); // zod 검사하기
-    if (!parsed.success) {
-      next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
-      return;
-    }
-
-    // 서비스 호출
-    const data = await ContestService.regFile(parsed.data);
-    res.status(StatusCodes.OK).json({ message: "업로드 성공", data: data });
+    const data = await FileService.regFile({
+      reference_id: Number(req.body.contest_id),
+      reference_type: 1,
+      original_name: req.body.article,
+      file_path: file.buffer,
+      mime_type: file.mimetype,
+    });
+    res.status(StatusCodes.OK).json({ message: "업로드 성공" });
     return;
   } catch (err) {
     next(err);

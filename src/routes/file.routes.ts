@@ -4,7 +4,6 @@ import multer from "multer";
 
 const router = Router();
 
-
 // 메모리에 버퍼 저장 -> 파일을 메모리 버퍼로 즉시 가져와 DB로 넘기기 위해
 const upload = multer({storage: multer.memoryStorage()});
 
