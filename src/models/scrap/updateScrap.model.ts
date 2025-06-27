@@ -1,3 +1,4 @@
+////src\models\scrap\updateScrap.model.ts
 import { getDBConnection } from "@/config/db.config";
 
 export const updateScrap = async (scrapId: number, yn: 'Y' | 'N', userId: number) => {

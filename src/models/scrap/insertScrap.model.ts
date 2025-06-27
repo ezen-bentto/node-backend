@@ -1,3 +1,4 @@
+//src\models\scrap\insertScrap.model.ts
 import { getDBConnection } from "@/config/db.config";
 
 export const insertScrap = async (

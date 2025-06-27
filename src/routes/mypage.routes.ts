@@ -6,9 +6,9 @@ import { MypageController } from '../controllers/mypage/mypage.controller';
 export const mypageRouter = Router();
 const mypageController = new MypageController();
 
-// 내 프로필 정보 조회
+// 모든 마이페이지 API는 로그인이 필요하므로 authMiddleware를 사용
 mypageRouter.get('/profile', authMiddleware, mypageController.getProfile);
-// 내가 쓴 글 목록 조회
 mypageRouter.get('/posts', authMiddleware, mypageController.getMyPosts);
-// 프로필 수정
+mypageRouter.get('/bookmarked-contests', authMiddleware, mypageController.getBookmarkedContests);
+mypageRouter.get('/bookmarked-communities', authMiddleware, mypageController.getBookmarkedCommunities);
 mypageRouter.patch('/profile', authMiddleware, mypageController.updateProfile);

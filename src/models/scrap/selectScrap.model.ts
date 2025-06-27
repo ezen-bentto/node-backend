@@ -1,3 +1,4 @@
+//src\models\scrap\selectScrap.model.ts
 import { getDBConnection } from "@/config/db.config";
 
 export const selectScrap = async (
