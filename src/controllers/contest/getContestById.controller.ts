@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@/constants/error.constant';
-import { getContestDetailSchema } from '@/schemas/content.schema';
+import { getContestDetailSchema, ResponseDetailContest } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
@@ -26,11 +26,15 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 에러 처리용 next 함수
  */
 
-export const getContestById: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const getContestById: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.query;
     const contestId = parseInt(id as string, 10);
-    const parsed = getContestDetailSchema.safeParse({id: contestId});
+    const parsed = getContestDetailSchema.safeParse({ id: contestId });
 
     if (!parsed.success) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
@@ -38,9 +42,11 @@ export const getContestById: RequestHandler = async (req: Request, res: Response
     }
 
     const data = await ContestService.getContestById({ id: contestId });
-    data.writer_id = data.writer_id.toString();
-    
-    res.status(StatusCodes.OK).json({ data: data });
+    // 빅인트 오류때문에 string 바꾸고 response 에 쏴준건데
+
+    const response: ResponseDetailContest = { ...data, writer_id: data.writer_id.toString() };
+
+    res.status(StatusCodes.OK).json({ data: response });
     return;
   } catch (err) {
     next(err);

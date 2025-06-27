@@ -135,3 +135,7 @@ export type contestListItem = z.infer<typeof contestListItemSchema>;
 export type ResponseContestDetail = Omit<regContest, 'contest_tag'> & {
   contest_tag: string[];
 };
+
+export type ResponseDetailContest = Omit<detailContest, 'writer_id'> & {
+  writer_id: string;
+};
