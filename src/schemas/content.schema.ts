@@ -19,7 +19,7 @@ import { z } from 'zod';
 // 공모전 create
 export const regContestSchema = z.object({
   id: z.string().optional(),
-  writer_id: z.string(),
+  writer_id: z.number(),
   title: z.string(),
   organizer: z.string(),
   organizer_type: z.string(),
