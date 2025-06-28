@@ -25,27 +25,23 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 오류 처리 미들웨어로 넘기는 함수
  */
 
-export const regFile: RequestHandler = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const regFile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // multer로 파일 추출
     const file = req.file;
     if (!file) {
-        next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
-        return;
+      next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+      return;
     }
 
     const data = await FileService.regFile({
-      reference_id: Number(req.body.contest_id),
+      reference_id: Number(req.body.id),
       reference_type: 1,
       original_name: req.body.article,
       file_path: file.buffer,
       mime_type: file.mimetype,
     });
-    res.status(StatusCodes.OK).json({ message: "업로드 성공" });
+    res.status(StatusCodes.OK).json({ message: '업로드 성공' });
     return;
   } catch (err) {
     next(err);
