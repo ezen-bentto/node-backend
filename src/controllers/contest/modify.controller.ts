@@ -3,6 +3,7 @@ import { OK_UPDATE_COMMENT } from '@/constants/message.constant';
 import { modContestSchema } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
+import { Token } from '@/utils/token';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { parse } from 'path';
@@ -52,8 +53,18 @@ export const modContest: RequestHandler = async (
       next(new AppError(StatusCodes.NOT_FOUND, ERROR_CODES.NOT_FOUND));
       return;
     }
-
-    // TODO: 로그인 id와 existing.witerId 비교
+    
+    const accessToken = req.headers.authorization?.split(' ')[1];
+    if(!accessToken){
+      next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+      return;
+    }
+  
+    const { ok, payload } = Token.verifyAccessToken(accessToken);
+    if(!ok || !payload){
+      next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+      return;
+    }
 
     await ContestService.modContest(contestId, parsed.data);
 

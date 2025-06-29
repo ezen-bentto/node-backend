@@ -33,7 +33,7 @@ const regContest = async (data: regContestParams) => {
 
     const contest_id = res.insertId.toString();
 
-    // ✅ contest_tag를 ','로 나눠서 각각 처리
+    // contest_tag를 ','로 나눠서 각각 처리
     const categoryNames = data.contest_tag.split(',');
 
     for (const categoryName of categoryNames) {

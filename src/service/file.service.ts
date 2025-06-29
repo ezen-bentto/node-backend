@@ -1,4 +1,5 @@
-import { regFile } from './file/regContestFile.service';
+import { modContestFile } from './file/modContestFile.service';
+import { regContestFile } from './file/regContestFile.service';
 import updateReferenceId from './file/updateReferenceId.service';
 
 
@@ -17,6 +18,7 @@ import updateReferenceId from './file/updateReferenceId.service';
  * @param 없음
  */
 export const FileService = {
-  regFile,
+  regContestFile,
+  modContestFile,
   updateReferenceId
 };

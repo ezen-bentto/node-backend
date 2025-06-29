@@ -1,6 +1,6 @@
-import { regFile } from "./file/regContestFile.controller";
+import { modContestFile } from "./file/modContestFile.controller";
+import { regContestFile } from "./file/regContestFile.controller";
 import { updateImageReferences } from "./file/updateReferences.controller";
-
 
 /**
  *
@@ -18,6 +18,7 @@ import { updateImageReferences } from "./file/updateReferences.controller";
  */
 
 export const fileController = {
-  regFile,
+  regContestFile,
+  modContestFile,
   updateImageReferences
 };
