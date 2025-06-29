@@ -27,11 +27,9 @@ export interface FileParams {
   mime_type?: string;
 }
 
-const regFile = async (data:FileParams ) => {
-  console.log("data",data);
+const regContestFile = async (data:FileParams ) => {
   const sql = `INSERT INTO file (reference_id, reference_type, original_name, file_path, mime_type) VALUES (?, ?, ?, ?, ?);`;
 
-  console.log(sql);
   const conn = getDBConnection();
   const result = await conn.query(sql, [data.reference_id, data.reference_type, data.original_name, data.file_path, data.mime_type || null]);
 
@@ -39,4 +37,4 @@ const regFile = async (data:FileParams ) => {
   return result;
 };
 
-export default regFile;
+export default regContestFile;

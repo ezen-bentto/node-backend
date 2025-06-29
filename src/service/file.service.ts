@@ -1,4 +1,5 @@
-import { regFile } from './file/regContestFile.service';
+import { modContestFile } from './file/modContestFile.service';
+import { regContestFile } from './file/regContestFile.service';
 
 /**
  *
@@ -15,5 +16,6 @@ import { regFile } from './file/regContestFile.service';
  * @param 없음
  */
 export const FileService = {
-  regFile
+  regContestFile,
+  modContestFile
 };

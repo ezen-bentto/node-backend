@@ -2,16 +2,14 @@ import { FileModel } from '@/models/file.model';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
-import path from 'path';
 
 /**
  *
- * 파일 등록 서비스
+ * 파일 수정 서비스
  *
- * 클라이언트로부터 전달받은 파일 정보를
- * 데이터베이스에 저장하고, 저장 결과를 반환합니다.
+ * 클라이언트로부터 전달받은 파일 정보를 데이터베이스에 반영합니다.
  *
- * @function regContestFile
+ * @function modContestFile
  * @date 2025/06/27
  * @history
  * -------------------------------------------------------
@@ -23,14 +21,14 @@ import path from 'path';
  */
 
 export interface FileParams {
+  id: number;
   reference_id: number;
-  reference_type: number;
   original_name: string;
   file_path: Buffer;
   mime_type?: string;
 }
 
-export const regContestFile = async (data: FileParams) => {
+export const modContestFile = async (data: FileParams) => {
     try{
         // buffer 검증
         if(!data.file_path || data.file_path.length === 0){
@@ -44,7 +42,7 @@ export const regContestFile = async (data: FileParams) => {
             throw new AppError(StatusCodes.BAD_REQUEST,`허용되지 않은 MIME 타입: ${mimeType}`);
         }
 
-        const res = await FileModel.regContestFile(data);
+        const res = await FileModel.modContestFile(data);
         return res;
     }catch (err: unknown) {
         console.error(err)
