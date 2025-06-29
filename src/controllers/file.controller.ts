@@ -1,4 +1,4 @@
-import { regFile } from "./file/regFile.controller";
+import { regFile } from "./file/regContestFile.controller";
 import { updateImageReferences } from "./file/updateReferences.controller";
 
 

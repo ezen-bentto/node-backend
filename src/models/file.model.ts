@@ -1,6 +1,5 @@
-import regFile from './file/regFile.model';
+import regFile from './file/regContestFile.model';
 import updateReferenceId from './file/updateReferenceId.model';
-
 
 /**
  *
