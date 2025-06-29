@@ -1,3 +1,4 @@
+import { modContestFile } from "./file/modContestFile.controller";
 import { regContestFile } from "./file/regContestFile.controller";
 
 /**
@@ -16,5 +17,6 @@ import { regContestFile } from "./file/regContestFile.controller";
  */
 
 export const fileController = {
-  regContestFile
+  regContestFile,
+  modContestFile
 };
