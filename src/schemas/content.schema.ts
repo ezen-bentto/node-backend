@@ -41,6 +41,10 @@ export const regContestSchema = z.object({
       message: 'Invalid date format',
     })
     .optional(),
+  file_id: z.number().optional(),
+  file_name: z.string().optional(),
+  file_path: z.string().optional(),
+  mime_type: z.string().optional(),
 });
 
 // 북마크

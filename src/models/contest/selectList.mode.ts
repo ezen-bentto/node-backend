@@ -42,12 +42,17 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
                     c.start_date,
                     c.end_date,
                     c.views,
+                    f.id file_id,
+                    f.file_path,
+                    f.mime_type,
                     GROUP_CONCAT(cat.name) contest_tag
-               FROM contest c
-               JOIN contest_category cc
-                 ON c.contest_id = cc.contest_id
-               JOIN category cat
-                 ON cc.category_id = cat.category_id`;
+                FROM contest c
+                JOIN contest_category cc
+                  ON c.contest_id = cc.contest_id
+                JOIN category cat
+                  ON cc.category_id = cat.category_id
+                LEFT JOIN file f
+                  ON f.reference_id = c.contest_id`;
 
   const conditions: string[] = [];
   const values: any[] = [];

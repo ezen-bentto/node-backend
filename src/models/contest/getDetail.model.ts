@@ -31,12 +31,18 @@ const getContestDetail = async (id: number): Promise<detailContest> => {
                       c.start_date,
                       c.end_date,
                       c.views,
+                      f.id file_id,
+                      f.original_name file_name,
+                      f.file_path,
+                      f.mime_type,
                       GROUP_CONCAT(cat.name) contest_tag
                  FROM contest c
                  JOIN contest_category cc
                    ON c.contest_id = cc.contest_id
                  JOIN category cat
                    ON cc.category_id = cat.category_id
+                 LEFT JOIN file f
+                   ON f.reference_id = c.contest_id
                 WHERE c.contest_id = ?`;
 
   const db = getDBConnection();
