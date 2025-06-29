@@ -20,7 +20,11 @@ const app = express();
 registerMiddlewares(app);
 
 // 정적 파일 서빙 설정
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+const staticUploadPath = process.env.UPLOAD_PATH
+  ? process.env.UPLOAD_PATH
+  : path.join(process.cwd(), 'uploads');
+
+app.use('/uploads', express.static(staticUploadPath));
 
 // ✅ 2. 라우터 연결
 app.use('/api/demo', DemoRouter);
