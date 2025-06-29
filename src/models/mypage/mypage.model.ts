@@ -34,7 +34,7 @@ export class MypageModel {
     try {
       conn = await getDBConnection().getConnection();
 
-      // 1. 먼저 사용자가 북마크한 모든 공모전의 target_id를 가져옵니다.
+      // 1. 북마크한 모든 공모전 ID 가져오기 (변경 없음)
       const allScrappedQuery = `
         SELECT target_id FROM scrap
         WHERE user_id = ? AND target_type = '1' AND del_yn = 'N'
@@ -44,11 +44,10 @@ export class MypageModel {
       const allTargetIds = scrappedItems.map(item => item.target_id);
 
       if (allTargetIds.length === 0) {
-        // 북마크한 공모전이 없으면 빈 배열 반환
         return { crawledContestIds: [], dbContests: [] };
       }
 
-      // 2. target_id를 크롤링 ID와 DB ID로 분리합니다.
+      // 2. 크롤링 ID와 DB ID 분리 (변경 없음)
       const crawledContestIds: number[] = [];
       const dbContestIds: number[] = [];
 
@@ -60,24 +59,33 @@ export class MypageModel {
         }
       });
 
-      // 3. DB ID에 해당하는 공모전 정보만 조회합니다.
+      // 3. DB ID에 해당하는 공모전 정보 조회
       let dbContests = [];
       if (dbContestIds.length > 0) {
+        
+        // [수정된 부분] SQL 쿼리 수정
         const dbQuery = `
           SELECT 
-            c.contest_id as id, c.title, c.organizer, c.end_date as endDate, 
-            c.participants, c.prize, c.benefits, 'Y' as scrapYn 
+            c.contest_id as id, 
+            c.title, 
+            c.organizer, 
+            c.end_date as endDate,
+            c.organizer_type,
+            c.participants,
+            cc.category_id
           FROM contest c
+          LEFT JOIN contest_category cc ON c.contest_id = cc.contest_id
           WHERE c.contest_id IN (?)
+          GROUP BY c.contest_id;
         `;
-        // 필요하다면 프론트에서 reg_date 기준으로 다시 정렬해야 합니다.
+        
         const results = await conn.query(dbQuery, [dbContestIds]);
         
-        // DB에서 가져온 결과를 원래의 ID 순서(최신순)에 맞게 정렬
+        // DB에서 가져온 결과를 원래의 ID 순서(최신순)에 맞게 정렬 (변경 없음)
         dbContests = dbContestIds.map(id => results.find((contest: any) => contest.id === id)).filter(Boolean);
       }
       
-      // 4. 크롤링 ID 목록과 DB 공모전 데이터를 객체 형태로 반환합니다.
+      // 4. 최종 데이터 반환 (변경 없음)
       return { crawledContestIds, dbContests };
 
     } catch (error) {
