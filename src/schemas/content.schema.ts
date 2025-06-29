@@ -68,7 +68,7 @@ export const getContestListSchema = z.object({
   contest_tag: z.string(),
   views: z.string(),
   file_id: z.number().optional(),
-  file_name: z.string().optional(),
+  save_name: z.string().optional(),
   file_path: z.string().optional(),
   mime_type: z.string().optional(),
 });

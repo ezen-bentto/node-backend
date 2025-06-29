@@ -32,7 +32,7 @@ const getContestDetail = async (id: number): Promise<detailContest> => {
                       c.end_date,
                       c.views,
                       f.id file_id,
-                      f.original_name file_name,
+                      f.original_name save_name,
                       f.file_path,
                       f.mime_type,
                       GROUP_CONCAT(cat.name) contest_tag

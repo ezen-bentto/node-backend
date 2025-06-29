@@ -72,7 +72,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
   sql += ` GROUP BY c.contest_id`;
 
   // ORDER BY
-  sql += ` ORDER BY ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`;
+  sql += ` ORDER BY c.contest_id DESC, ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`;
 
   // 페이징
   const offset = (page-1) * limit;
