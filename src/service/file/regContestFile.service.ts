@@ -23,30 +23,37 @@ import path from 'path';
  */
 
 export interface FileParams {
-  reference_id: number;
-  reference_type: number;
-  original_name: string;
-  file_path: Buffer;
-  mime_type?: string;
+    reference_id: number;
+    reference_type: number;
+    original_name: string;
+    file_path: Buffer;
+    mime_type?: string;
 }
 
 export const regFile = async (data: FileParams) => {
-    try{
+    try {
         // buffer 검증
-        if(!data.file_path || data.file_path.length === 0){
+        if (!data.file_path || data.file_path.length === 0) {
             throw new AppError(StatusCodes.BAD_REQUEST, '빈 파일입니다');
         }
 
         // mimeType 검증
         const mimeType = data.mime_type ?? 'application/octet-stream';
-        const allowedTypes = ['image/png', 'image/jpeg', 'application/octet-stream'];
+        const allowedTypes = [
+            'image/png',
+            'image/jpeg',
+            'image/jpg',
+            'image/gif',
+            'image/webp',
+            'application/octet-stream'
+        ];
         if (!allowedTypes.includes(mimeType)) {
-            throw new AppError(StatusCodes.BAD_REQUEST,`허용되지 않은 MIME 타입: ${mimeType}`);
+            throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
         }
 
         const res = await FileModel.regFile(data);
         return res;
-    }catch (err: unknown) {
+    } catch (err: unknown) {
         console.error(err)
         handleDbError(err);
         throw err;
