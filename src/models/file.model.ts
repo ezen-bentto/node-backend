@@ -1,4 +1,4 @@
-import regFile from './file/regFile.model';
+import regFile from './file/regContestFile.model';
 
 /**
  *

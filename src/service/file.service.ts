@@ -1,4 +1,4 @@
-import { regFile } from './file/regFile.service';
+import { regFile } from './file/regContestFile.service';
 
 /**
  *

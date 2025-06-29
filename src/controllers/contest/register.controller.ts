@@ -2,6 +2,7 @@ import { ERROR_CODES } from '@/constants/error.constant';
 import { regContestSchema } from '@/schemas/content.schema';
 import { ContestService } from '@/service/contest.service';
 import { AppError } from '@/utils/AppError';
+import { Token } from '@/utils/token';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
@@ -33,6 +34,20 @@ export const regContest: RequestHandler = async (
   const parsed = regContestSchema.safeParse(req.body);
 
   if (!parsed.success) {
+    next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+    return;
+  }
+
+  // header에서 토큰 추출
+  const accessToken = req.headers.authorization?.split(' ')[1];
+  if(!accessToken){
+    next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
+    return;
+  }
+
+  // 토큰 검증 및 id 추출
+  const { ok, payload } = Token.verifyAccessToken(accessToken);
+  if(!ok || !payload){
     next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
     return;
   }
