@@ -11,6 +11,7 @@ import CommonRouter from '@/routes/common.routes';
 import CommentRouter from '@/routes/comment.routes';
 import ScrapRouter from '@/routes/scrap.routes';
 import { mypageRouter } from '@/routes/mypage.routes';
+import fileRouter from '@/routes/file.routes';
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api/comment', CommentRouter);
 app.use('/api/common', CommonRouter);
 app.use('/api/scrap', ScrapRouter);
 app.use('/api/mypage', mypageRouter);
+app.use('/api/file', fileRouter);
 
 // 레디스 값 DB에 삽입
 setInterval(
