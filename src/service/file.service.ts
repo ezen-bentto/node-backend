@@ -1,5 +1,7 @@
 import { modContestFile } from './file/modContestFile.service';
 import { regContestFile } from './file/regContestFile.service';
+import updateReferenceId from './file/updateReferenceId.service';
+
 
 /**
  *
@@ -17,5 +19,6 @@ import { regContestFile } from './file/regContestFile.service';
  */
 export const FileService = {
   regContestFile,
-  modContestFile
+  modContestFile,
+  updateReferenceId
 };

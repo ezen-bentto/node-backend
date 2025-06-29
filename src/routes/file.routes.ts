@@ -1,4 +1,6 @@
+import { uploadImageController } from '@/controllers/community/uploadCommunityImage.controller';
 import { fileController } from '@/controllers/file.controller';
+
 import { Router } from 'express';
 import multer from 'multer';
 
@@ -10,5 +12,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // 인증이 필요한 API
 router.post('/contest/image', upload.single('file'), fileController.regContestFile);
 router.post('/contest/image/:id', upload.single('file'), fileController.modContestFile);
+router.post('/community/image', upload.single('file'), uploadImageController);
+router.post('/update-reference', fileController.updateImageReferences);
 
 export default router;

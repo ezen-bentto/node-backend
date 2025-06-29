@@ -1,5 +1,6 @@
 import modContestFile from './file/modContestFile.model';
 import regContestFile from './file/regContestFile.model';
+import updateReferenceId from './file/updateReferenceId.model';
 
 /**
  *
@@ -18,4 +19,5 @@ import regContestFile from './file/regContestFile.model';
 export const FileModel = {
   regContestFile,
   modContestFile,
+  updateReferenceId
 };
