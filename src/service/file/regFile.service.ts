@@ -11,7 +11,7 @@ import path from 'path';
  * 클라이언트로부터 전달받은 파일 정보를
  * 데이터베이스에 저장하고, 저장 결과를 반환합니다.
  *
- * @function regContestFile
+ * @function regFile
  * @date 2025/06/27
  * @history
  * -------------------------------------------------------
@@ -30,7 +30,7 @@ export interface FileParams {
     mime_type?: string;
 }
 
-export const regContestFile = async (data: FileParams) => {
+export const regFile = async (data: FileParams) => {
     try{
         // buffer 검증
         if (!data.file_path || data.file_path.length === 0) {
@@ -51,7 +51,7 @@ export const regContestFile = async (data: FileParams) => {
             throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
         }
 
-        const res = await FileModel.regContestFile(data);
+        const res = await FileModel.regFile(data);
         return res;
     } catch (err: unknown) {
         console.error(err)

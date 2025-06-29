@@ -9,7 +9,7 @@ import { StatusCodes } from 'http-status-codes';
  *
  * 클라이언트로부터 전달받은 파일 정보를 데이터베이스에 반영합니다.
  *
- * @function modContestFile
+ * @function modFile
  * @date 2025/06/27
  * @history
  * -------------------------------------------------------
@@ -28,7 +28,7 @@ export interface FileParams {
   mime_type?: string;
 }
 
-export const modContestFile = async (data: FileParams) => {
+export const modFile = async (data: FileParams) => {
     try{
         if(data.file_path !== undefined){
             // buffer 검증
@@ -45,7 +45,7 @@ export const modContestFile = async (data: FileParams) => {
             }
         }
 
-        const res = await FileModel.modContestFile(data);
+        const res = await FileModel.modFile(data);
         return res;
     }catch (err: unknown) {
         console.error(err)

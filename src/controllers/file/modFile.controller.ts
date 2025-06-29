@@ -10,7 +10,7 @@ import { StatusCodes } from 'http-status-codes';
  * 클라이언트로부터 전달받은 파일 정보를 검증하고, 유효한 경우 DB에 등록합니다.
  * 수정 성공 시 해당 파일 데이터를 응답합니다.
  *
- * @function modContestFile
+ * @function modFile
  * @date 2025/06/29
  * @author 한유리
  * @history
@@ -24,10 +24,9 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 오류 처리 미들웨어로 넘기는 함수
  */
 
-export const modContestFile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const modFile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    console.log("@@@@@@@@@@@");
     const id = parseInt(req.params.id);
 
     // multer로 파일 추출
@@ -37,7 +36,7 @@ export const modContestFile: RequestHandler = async (req: Request, res: Response
       return;
     }
 
-    const data = await FileService.modContestFile({
+    const data = await FileService.modFile({
       id: id,
       reference_id: Number(req.body.id),
       original_name: req.body.article,
