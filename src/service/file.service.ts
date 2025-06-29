@@ -1,4 +1,6 @@
 import { regFile } from './file/regFile.service';
+import updateReferenceId from './file/updateReferenceId.service';
+
 
 /**
  *
@@ -15,5 +17,6 @@ import { regFile } from './file/regFile.service';
  * @param 없음
  */
 export const FileService = {
-  regFile
+  regFile,
+  updateReferenceId
 };

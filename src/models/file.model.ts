@@ -1,4 +1,6 @@
 import regFile from './file/regFile.model';
+import updateReferenceId from './file/updateReferenceId.model';
+
 
 /**
  *
@@ -15,5 +17,6 @@ import regFile from './file/regFile.model';
  * @param 없음
  */
 export const FileModel = {
-  regFile
+  regFile,
+  updateReferenceId
 };
