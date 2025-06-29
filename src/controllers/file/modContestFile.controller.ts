@@ -26,6 +26,8 @@ import { StatusCodes } from 'http-status-codes';
 
 export const modContestFile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
+
+    console.log("@@@@@@@@@@@");
     const id = parseInt(req.params.id);
 
     // multer로 파일 추출

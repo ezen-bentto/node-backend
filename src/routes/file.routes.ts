@@ -9,6 +9,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // 인증이 필요한 API
 router.post('/contest/image', upload.single('file'), fileController.regContestFile);
-router.post('/contset/image/:id', upload.single('file'), fileController.modContestFile);
+router.post('/contest/image/:id', upload.single('file'), fileController.modContestFile);
 
 export default router;
