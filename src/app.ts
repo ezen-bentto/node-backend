@@ -11,6 +11,7 @@ import CommentRouter from '@/routes/comment.routes';
 import ScrapRouter from '@/routes/scrap.routes';
 import { mypageRouter } from '@/routes/mypage.routes';
 import fileRouter from '@/routes/file.routes';
+import userRouter from '@/routes/user.route';
 import path from 'path';
 
 
@@ -36,17 +37,18 @@ app.use('/api/common', CommonRouter);
 app.use('/api/scrap', ScrapRouter);
 app.use('/api/mypage', mypageRouter);
 app.use('/api/file', fileRouter);
+app.use('/api/user', userRouter);
 
 // 레디스 값 DB에 삽입
-setInterval(
-  () => {
-    console.log('조회수 동기화 시작');
-    syncViewsToDb('contest');
-    // syncViewsToDb("community");
-    // syncViewsToDb("policy");
-  },
-  1000 * 60 * 1
-);
+// setInterval(
+//   () => {
+//     console.log('조회수 동기화 시작');
+//     syncViewsToDb('contest');
+//     // syncViewsToDb("community");
+//     // syncViewsToDb("policy");
+//   },
+//   1000 * 60 * 1
+// );
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);

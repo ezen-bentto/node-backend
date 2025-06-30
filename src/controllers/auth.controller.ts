@@ -38,12 +38,12 @@ export class AuthController {
       const newUserId = await this.authModel.createSocialUser(socialUser);
       user = await this.authModel.findUserById(Number(newUserId));
     } else {
-      // 기존 사용자 정보 업데이트
-      await this.authModel.updateSocialUser(Number(user.user_id), {
-        nickname: socialUser.nickname,
-        profileImage: socialUser.profileImage,
-      });
-      user = await this.authModel.findUserById(Number(user.user_id));
+      // 기존 사용자 정보 업데이트 : 최초 가입 이후는 사이트 DB에서 다루기 위해 주석처리
+      // await this.authModel.updateSocialUser(Number(user.user_id), {
+      //   nickname: socialUser.nickname,
+      //   profileImage: socialUser.profileImage,
+      // });
+      // user = await this.authModel.findUserById(Number(user.user_id));
     }
 
     if (!user) {
