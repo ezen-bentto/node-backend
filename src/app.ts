@@ -39,7 +39,7 @@ app.use('/api/file', fileRouter);
 // 레디스 값 DB에 삽입
 setInterval(
   () => {
-    console.log('조회수 동기화 시작');
+    // console.log('조회수 동기화 시작');
     syncViewsToDb('contest');
     // syncViewsToDb("community");
     // syncViewsToDb("policy");

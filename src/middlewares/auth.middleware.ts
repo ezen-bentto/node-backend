@@ -5,7 +5,11 @@ import { Token } from '../utils/token';
 import { AuthModel } from '../models/auth/auth.model';
 import { AuthUser, User } from '../types/auth.type';
 import { StatusCodes } from 'http-status-codes';
-import { mapDbProviderToService, mapDbUserTypeToService, mapDbApprovalStatusToService } from '../utils/mapper'; // 매핑 함수 임포트
+import {
+  mapDbProviderToService,
+  mapDbUserTypeToService,
+  mapDbApprovalStatusToService,
+} from '../utils/mapper'; // 매핑 함수 임포트
 
 // Express의 Request 객체에 user 속성 추가를 위한 타입 확장
 declare module 'express-serve-static-core' {
@@ -69,7 +73,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '서버 오류로 인해 인증에 실패했습니다.',
-
     });
   }
 };
