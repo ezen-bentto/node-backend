@@ -1,6 +1,6 @@
 //node-backend\src\models\file.model.ts
-import modFile from './file/modFile.model';
-import regFile from './file/regFile.model';
+import modFile from './file/modContestFile.model';
+import regFile from './file/regContestFile.model';
 import updateReferenceId from './file/updateReferenceId.model';
 import { getDBConnection } from '@/config/db.config';
 

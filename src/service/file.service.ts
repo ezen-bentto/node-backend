@@ -3,10 +3,9 @@ import { handleDbError } from '@/utils/handleDbError';
 import { AppError } from '@/utils/AppError';
 import { StatusCodes } from 'http-status-codes';
 // 개별 서비스 파일들 import
-import { regFile } from './file/regFile.service';
-import { modFile } from './file/modFile.service';
 import updateReferenceId from './file/updateReferenceId.service';
-
+import { regFile } from './file/regContestFile.service';
+import { modFile } from './file/modContestFile.service';
 
 /**
  *
@@ -23,25 +22,24 @@ import updateReferenceId from './file/updateReferenceId.service';
  * @param 없음
  */
 
-
 //reference 정보로 파일을 조회하는 서비스
 const getFileByReference = async (reference_id: number, reference_type: number) => {
-    try {
-        const fileData = await FileModel.findByReference(reference_id, reference_type);
-        if (!fileData) {
-            // 파일이 없을 경우 404 에러
-            throw new AppError(StatusCodes.NOT_FOUND, "파일을 찾을 수 없습니다.");
-        }
-        return fileData;
-    } catch(err) {
-        handleDbError(err);
-        throw err;
+  try {
+    const fileData = await FileModel.findByReference(reference_id, reference_type);
+    if (!fileData) {
+      // 파일이 없을 경우 404 에러
+      throw new AppError(StatusCodes.NOT_FOUND, '파일을 찾을 수 없습니다.');
     }
+    return fileData;
+  } catch (err) {
+    handleDbError(err);
+    throw err;
+  }
 };
 
 export const FileService = {
   regFile,
   updateReferenceId,
   modFile,
-  getFileByReference, 
+  getFileByReference,
 };
