@@ -10,7 +10,7 @@ import sharp from 'sharp';
  *
  * 클라이언트로부터 전달받은 파일 정보를 데이터베이스에 반영합니다.
  *
- * @function modContestFile
+ * @function modFile
  * @date 2025/06/27
  * @history
  * -------------------------------------------------------
@@ -29,15 +29,13 @@ export interface FileParams {
   mime_type?: string;
 }
 
-export const modContestFile = async (data: FileParams) => {
+export const modFile = async (data: FileParams) => {
   try {
     if (data.file_path !== undefined) {
-      let fileData: FileParams = data;
       // buffer 검증
       if (!data.file_path || data.file_path.length === 0) {
         throw new AppError(StatusCodes.BAD_REQUEST, '빈 파일입니다');
       }
-
       // mimeType 검증
       const mimeType = data.mime_type ?? 'application/octet-stream';
       const allowedTypes = ['image/png', 'image/jpeg', 'application/octet-stream'];
@@ -53,12 +51,12 @@ export const modContestFile = async (data: FileParams) => {
         .toBuffer();
 
       // optimizedBuffer를 넣어서 새로운 FileParams 객체 생성
-      fileData = {
+      const fileData = {
         ...data,
         file_path: optimizedBuffer,
         mime_type: 'image/webp', // sharp으로 webp로 변환했으므로
       };
-      const res = await FileModel.modContestFile(fileData);
+      const res = await FileModel.modFile(fileData);
       return res;
     }
     return;

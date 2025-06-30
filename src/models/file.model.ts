@@ -1,5 +1,5 @@
-import modContestFile from './file/modContestFile.model';
-import regContestFile from './file/regContestFile.model';
+import modFile from './file/modFile.model';
+import regFile from './file/regFile.model';
 import updateReferenceId from './file/updateReferenceId.model';
 
 /**
@@ -17,7 +17,7 @@ import updateReferenceId from './file/updateReferenceId.model';
  * @param 없음
  */
 export const FileModel = {
-  regContestFile,
-  modContestFile,
-  updateReferenceId
+  regFile,
+  updateReferenceId,
+  modFile,
 };

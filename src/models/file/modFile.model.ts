@@ -26,7 +26,7 @@ export interface FileParams {
   mime_type?: string;
 }
 
-const modContestFile = async ( data:FileParams ) => {
+const modFile = async ( data:FileParams ) => {
   const sql = `UPDATE file SET reference_id = ?, original_name = ?, file_path = ? , mime_type = ?, mod_date = NOW() WHERE id = ?`;
 
   const conn = getDBConnection();
@@ -36,4 +36,4 @@ const modContestFile = async ( data:FileParams ) => {
   return result;
 };
 
-export default modContestFile;
+export default modFile;

@@ -27,7 +27,7 @@ export interface FileParams {
   mime_type?: string;
 }
 
-const regContestFile = async (data:FileParams ) => {
+const regFile = async (data:FileParams ) => {
   const sql = `INSERT INTO file (reference_id, reference_type, original_name, file_path, mime_type) VALUES (?, ?, ?, ?, ?);`;
 
   const conn = getDBConnection();
@@ -37,4 +37,4 @@ const regContestFile = async (data:FileParams ) => {
   return result;
 };
 
-export default regContestFile;
+export default regFile;
