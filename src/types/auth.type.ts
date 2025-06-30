@@ -32,7 +32,6 @@ export interface GoogleUserInfo {
   locale: string;
 }
 
-
 export interface SocialUser {
   socialId: string;
   email: string;
@@ -51,7 +50,7 @@ export interface User {
   profile_image?: string;
   user_type: '1' | '2' | '3'; // '1' 개인, '2' 기업, '3' 관리자
   approval_status?: '1' | '2' | '3' | null; // '1' 대기, '2' 승인, '3' 거절
-  provider?: '1' | '2' | '3' | '4' | null;  //'1' 카카오, '2' 네이버, '3' 구글, '4' 이메일
+  provider?: '1' | '2' | '3' | '4' | null; //'1' 카카오, '2' 네이버, '3' 구글, '4' 이메일
 }
 
 // JWT payload 및 req.user에 사용될 사용자 정보 (DB의 User 테이블과 매핑)
@@ -74,4 +73,10 @@ export interface AuthResponse {
     refreshToken: string;
   };
   message: string;
+}
+
+export interface UpdateProfileData {
+  nickname?: string;
+  email?: string;
+  profileImage?: string;
 }

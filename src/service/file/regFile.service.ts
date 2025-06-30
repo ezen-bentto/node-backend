@@ -23,39 +23,45 @@ import path from 'path';
  */
 
 export interface FileParams {
-    reference_id: number;
-    reference_type: number;
-    original_name: string;
-    file_path: Buffer;
-    mime_type?: string;
+  reference_id: number;
+  reference_type: number;
+  original_name: string;
+  file_path: Buffer;
+  mime_type?: string;
 }
 
 export const regFile = async (data: FileParams) => {
-    try{
-        // buffer 검증
-        if (!data.file_path || data.file_path.length === 0) {
-            throw new AppError(StatusCodes.BAD_REQUEST, '빈 파일입니다');
-        }
-
-        // mimeType 검증
-        const mimeType = data.mime_type ?? 'application/octet-stream';
-        const allowedTypes = [
-            'image/png',
-            'image/jpeg',
-            'image/jpg',
-            'image/gif',
-            'image/webp',
-            'application/octet-stream'
-        ];
-        if (!allowedTypes.includes(mimeType)) {
-            throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
-        }
-
-        const res = await FileModel.regFile(data);
-        return res;
-    } catch (err: unknown) {
-        console.error(err)
-        handleDbError(err);
-        throw err;
+  try {
+    // buffer 검증
+    if (!data.file_path || data.file_path.length === 0) {
+      throw new AppError(StatusCodes.BAD_REQUEST, '빈 파일입니다');
     }
-}
+
+    // mimeType 검증
+    const mimeType = data.mime_type ?? 'application/octet-stream';
+    const allowedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+      'application/octet-stream',
+    ];
+    if (!allowedTypes.includes(mimeType)) {
+      throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
+    }
+
+    const dbResult = await FileModel.regFile(data);
+
+    // 파일이 웹에서 접근 가능한 URL 생성
+    // 실제 정적 파일 제공 설정과 일치해야 합니다. (예: /uploads/이미지파일명)
+    const fileUrl = `/uploads/${data.original_name}`;
+
+    // DB 저장 결과와 함께 생성된 fileUrl을 반환
+    return { dbResult, fileUrl };
+  } catch (err: unknown) {
+    console.error(err);
+    handleDbError(err);
+    throw err;
+  }
+};
