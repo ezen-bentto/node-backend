@@ -62,7 +62,6 @@ export class MypageModel {
       // 3. DB ID에 해당하는 공모전 정보 조회
       let dbContests = [];
       if (dbContestIds.length > 0) {
-        
         // [수정된 부분] SQL 쿼리 수정
         const dbQuery = `
           SELECT 
@@ -78,16 +77,17 @@ export class MypageModel {
           WHERE c.contest_id IN (?)
           GROUP BY c.contest_id;
         `;
-        
+
         const results = await conn.query(dbQuery, [dbContestIds]);
-        
+
         // DB에서 가져온 결과를 원래의 ID 순서(최신순)에 맞게 정렬 (변경 없음)
-        dbContests = dbContestIds.map(id => results.find((contest: any) => contest.id === id)).filter(Boolean);
+        dbContests = dbContestIds
+          .map(id => results.find((contest: any) => contest.id === id))
+          .filter(Boolean);
       }
-      
+
       // 4. 최종 데이터 반환 (변경 없음)
       return { crawledContestIds, dbContests };
-
     } catch (error) {
       console.error('findBookmarkedContestsByUserId 실패:', error);
       throw error;
@@ -95,7 +95,6 @@ export class MypageModel {
       if (conn) conn.release();
     }
   }
-
 
   // 내가 북마크한 커뮤니티 글 조회
   async findBookmarkedCommunitiesByUserId(userId: number) {
@@ -111,7 +110,7 @@ export class MypageModel {
       FROM scrap s
       JOIN community co ON s.target_id = co.community_id
       JOIN user u ON co.author_id = u.user_id
-      WHERE s.user_id = ? AND s.target_type = '2' AND s.del_yn = 'N'
+      WHERE s.user_id = ? AND s.target_type = '2' AND s.del_yn = 'N' AND co.del_yn = 'N'
       ORDER BY s.reg_date DESC;
     `;
       return await conn.query(query, [userId]);
