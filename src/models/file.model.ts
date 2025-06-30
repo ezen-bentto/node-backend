@@ -19,6 +19,11 @@ import { getDBConnection } from '@/config/db.config';
  * @param 없음
  */
 
+interface FileRecord {
+  file_path: Buffer;
+  mime_type: string | null;
+}
+
 // reference 정보로 파일 조회
 const findByReference = async (reference_id: number, reference_type: number) => {
   const conn = await getDBConnection().getConnection();
@@ -30,7 +35,7 @@ const findByReference = async (reference_id: number, reference_type: number) => 
       WHERE reference_id = ? AND reference_type = ? AND del_yn = 'N' 
       ORDER BY id DESC LIMIT 1
     `;
-    const [rows] = await conn.query(sql, [reference_id, reference_type]);
+    const rows = await conn.query<FileRecord[]>(sql, [reference_id, reference_type]);
     return rows.length > 0 ? rows[0] : null;
   } finally {
     if (conn) conn.release();
