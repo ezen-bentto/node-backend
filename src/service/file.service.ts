@@ -1,12 +1,10 @@
 import { FileModel } from '@/models/file.model';
+import { modFile } from './file/modContestFile.service';
+import { regFile } from './file/regContestFile.service';
+import updateReferenceId from './file/updateReferenceId.service';
 import { handleDbError } from '@/utils/handleDbError';
 import { AppError } from '@/utils/AppError';
 import { StatusCodes } from 'http-status-codes';
-// 개별 서비스 파일들 import
-import updateReferenceId from './file/updateReferenceId.service';
-import { regFile } from './file/regContestFile.service';
-import { modFile } from './file/modContestFile.service';
-
 /**
  *
  * 파일 서비스 모음

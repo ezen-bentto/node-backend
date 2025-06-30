@@ -19,7 +19,7 @@ import { getDBConnection } from '@/config/db.config';
  * @param 없음
  */
 
-interface FileRecord {
+export interface FileRecord {
   file_path: Buffer;
   mime_type: string | null;
 }
