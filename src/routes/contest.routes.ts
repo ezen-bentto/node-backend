@@ -1,6 +1,5 @@
 import ContestController from '@/controllers/contest.controller';
 import { authMiddleware } from '@/middlewares/auth.middleware';
-import { verifyContestWriter } from '@/middlewares/verifyContestWriter';
 import { Router } from 'express';
 
 /**
@@ -23,8 +22,7 @@ router.get('/getDetail', ContestController.getContestDetail);
 router.get('/getList', ContestController.getContestList);
 router.post('/register', ContestController.regContest);
 router.post('/:id/modify', authMiddleware, ContestController.modContest);
-// router.post('/:id/modify', authMiddleware, verifyContestWriter, ContestController.modContest);
-router.post('/delete', ContestController.delContest);
+router.post('/:id/delete', authMiddleware, ContestController.delContest);
 router.post('/:target_id/bookmark', authMiddleware, ContestController.regBookmark);
 router.get('/:target_id/bookmark', ContestController.getIsBookmarked);
 router.get('/:target_id/bookmark/counter', ContestController.getBookmark);

@@ -31,8 +31,6 @@ export const verifyContestWriter = async (req: Request, res: Response, next: Nex
       return;
     }
 
-    console.log('뭐임?? 안되는거임???');
-
     next();
   } catch (err) {
     console.error('작성자 검증 중 에러:', err);

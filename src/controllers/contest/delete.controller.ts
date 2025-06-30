@@ -24,20 +24,24 @@ import { StatusCodes } from 'http-status-codes';
  * @param {Response} res - 응답 객체 (삭제 결과 반환)
  * @param {NextFunction} next - 에러 핸들러 호출 함수
  */
-export const delContest : RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const delContest: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
     const contestId = parseInt(id as string, 10);
-    const parsed = delContestSchema.safeParse({id: contestId});
+    const parsed = delContestSchema.safeParse({ id: contestId });
 
-    if(!parsed.success){
+    if (!parsed.success) {
       next(new AppError(StatusCodes.BAD_REQUEST, ERROR_CODES.VALIDATION_FAIL));
       return;
     }
 
     // TODO: 로그인 id와 witerId 비교
 
-    const data = ContestService.delContest({id: contestId});
+    const data = ContestService.delContest({ id: contestId });
     res.status(StatusCodes.OK).json({ data: data });
     return;
   } catch (err) {
