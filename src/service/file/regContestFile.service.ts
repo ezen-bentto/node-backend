@@ -52,7 +52,7 @@ export const regContestFile = async (data: FileParams) => {
       throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
     }
 
-    // ✅ sharp 적용: 800px 리사이즈, WebP 변환, 압축
+    // sharp 적용: 800px 리사이즈, WebP 변환, 압축
     const optimizedBuffer = await sharp(data.file_path)
       .resize({ width: 800, withoutEnlargement: true }) // 원본보다 크면 그대로
       .webp({ quality: 75 }) // WebP 압축 품질 설정

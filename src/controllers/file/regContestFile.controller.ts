@@ -25,7 +25,11 @@ import { StatusCodes } from 'http-status-codes';
  * @param {NextFunction} next - 오류 처리 미들웨어로 넘기는 함수
  */
 
-export const regContestFile: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const regContestFile: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     // multer로 파일 추출
     const file = req.file;
@@ -41,6 +45,7 @@ export const regContestFile: RequestHandler = async (req: Request, res: Response
       file_path: file.buffer,
       mime_type: file.mimetype,
     });
+
     res.status(StatusCodes.OK).json({ message: '업로드 성공' });
     return;
   } catch (err) {
