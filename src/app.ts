@@ -13,7 +13,6 @@ import { mypageRouter } from '@/routes/mypage.routes';
 import fileRouter from '@/routes/file.routes';
 import path from 'path';
 
-
 const app = express();
 
 // ✅ 1. 공통 미들웨어 설정
@@ -41,7 +40,7 @@ setInterval(
     // syncViewsToDb("community");
     // syncViewsToDb("policy");
   },
-  1000 * 60 * 1
+  1000 * 30 * 1
 );
 
 // ✅ 3. 에러 핸들러 등록
