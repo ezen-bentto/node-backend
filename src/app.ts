@@ -40,15 +40,15 @@ app.use('/api/file', fileRouter);
 app.use('/api/user', userRouter);
 
 // 레디스 값 DB에 삽입
-// setInterval(
-//   () => {
-//     console.log('조회수 동기화 시작');
-//     syncViewsToDb('contest');
-//     // syncViewsToDb("community");
-//     // syncViewsToDb("policy");
-//   },
-//   1000 * 60 * 1
-// );
+setInterval(
+  () => {
+    console.log('조회수 동기화 시작');
+    syncViewsToDb('contest');
+    // syncViewsToDb("community");
+    // syncViewsToDb("policy");
+  },
+  1000 * 60 * 1
+);
 
 // ✅ 3. 에러 핸들러 등록
 app.use(errorHandler);
