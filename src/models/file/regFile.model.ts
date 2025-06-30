@@ -1,3 +1,4 @@
+//node-backend\src\models\file\regFile.model.ts
 import { getDBConnection } from '@/config/db.config';
 import { InsertResult } from '@/types/db/response.type';
 

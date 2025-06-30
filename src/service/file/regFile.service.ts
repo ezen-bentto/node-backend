@@ -1,3 +1,4 @@
+//node-backend\src\service\file\regFile.service.ts
 import { FileModel } from '@/models/file.model';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
@@ -51,14 +52,16 @@ export const regFile = async (data: FileParams) => {
       throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
     }
 
-    const dbResult = await FileModel.regFile(data);
+    // DB에 파일 정보 저장
+    await FileModel.regFile(data);
 
-    // 파일이 웹에서 접근 가능한 URL 생성
-    // 실제 정적 파일 제공 설정과 일치해야 합니다. (예: /uploads/이미지파일명)
-    const fileUrl = `/uploads/${data.original_name}`;
+    // 파일이 웹에서 접근 가능한 URL을 생성
+    // file.routes.ts의 /view/:reference_type/:reference_id 경로와 일치
+    const fileUrl = `/api/file/view/${data.reference_type}/${data.reference_id}`;
 
-    // DB 저장 결과와 함께 생성된 fileUrl을 반환
-    return { dbResult, fileUrl };
+    // DB 저장 결과 대신 생성된 fileUrl을 객체에 담아 반환
+    return { fileUrl };
+
   } catch (err: unknown) {
     console.error(err);
     handleDbError(err);

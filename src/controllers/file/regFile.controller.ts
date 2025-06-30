@@ -1,3 +1,4 @@
+//node-backend\src\controllers\file\regFile.controller.ts
 import { ERROR_CODES } from '@/constants/error.constant';
 import { regContestSchema } from '@/schemas/content.schema';
 import { FileService } from '@/service/file.service';
@@ -59,27 +60,27 @@ export const regFile: RequestHandler = async (req: Request, res: Response, next:
     // type이 'profile'이면 reference_id는 userId가 되고, 그렇지 않으면 body에서 온 id를 사용
     const reference_id = type === 'profile' ? Number(userId) : Number(referenceIdFromBody);
     const reference_type = typeToRefType(type);
-
+    
     if (reference_type === 0) {
-      return next(new AppError(StatusCodes.BAD_REQUEST, '알 수 없는 파일 타입입니다.'));
+        return next(new AppError(StatusCodes.BAD_REQUEST, '알 수 없는 파일 타입입니다.'));
     }
 
     // 4. FileService 호출
     const result = await FileService.regFile({
-      reference_id: reference_id,
-      reference_type: reference_type,
-      original_name: file.originalname,
-      file_path: file.buffer,
-      mime_type: file.mimetype,
+        reference_id: reference_id,
+        reference_type: reference_type,
+        original_name: file.originalname,
+        file_path: file.buffer,
+        mime_type: file.mimetype,
     });
 
     // 5. 프론트엔드에 성공 메시지와 함께 이미지 URL을 반환
     res.status(StatusCodes.OK).json({
-      success: true,
-      message: '업로드 성공',
-      data: {
-        imageUrl: result.fileUrl,
-      },
+        success: true,
+        message: '업로드 성공',
+        data: {
+            fileUrl: result.fileUrl 
+        }
     });
   } catch (err) {
     next(err);

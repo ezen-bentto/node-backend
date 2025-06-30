@@ -1,3 +1,4 @@
+//node-backend\src\models\file\updateReferenceId.model.ts
 import { getDBConnection } from '@/config/db.config';
 
 const updateReferenceId = async (fileName: string, referenceId: number) => {

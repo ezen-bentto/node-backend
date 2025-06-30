@@ -46,11 +46,14 @@ export interface User {
   login_id: string;
   email?: string;
   password?: string;
+  phone?: string;
   nickname: string;
   profile_image?: string;
   user_type: '1' | '2' | '3'; // '1' 개인, '2' 기업, '3' 관리자
   approval_status?: '1' | '2' | '3' | null; // '1' 대기, '2' 승인, '3' 거절
   provider?: '1' | '2' | '3' | '4' | null; //'1' 카카오, '2' 네이버, '3' 구글, '4' 이메일
+  reg_date: string;
+  mod_date: string;
 }
 
 // JWT payload 및 req.user에 사용될 사용자 정보 (DB의 User 테이블과 매핑)

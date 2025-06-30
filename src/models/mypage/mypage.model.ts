@@ -27,7 +27,7 @@ export class MypageModel {
         WHERE co.author_id = ? AND co.del_yn = 'N' 
         ORDER BY co.reg_date DESC;
       `;
-      // userId를 두 번 전달해야 합니다 (scrapYn 서브쿼리, author_id)
+      // userId를 두 번 전달 (scrapYn 서브쿼리, author_id)
       return await conn.query(query, [userId, userId]);
     } catch (error) {
       console.error('findPostsByUserId 실패:', error);
@@ -73,7 +73,6 @@ export class MypageModel {
       // 3. DB ID에 해당하는 공모전 정보 조회
       let dbContests = [];
       if (dbContestIds.length > 0) {
-        // [수정된 부분] SQL 쿼리 수정
         const dbQuery = `
           SELECT 
             c.contest_id as id, 
