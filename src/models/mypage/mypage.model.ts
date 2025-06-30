@@ -9,15 +9,26 @@ export class MypageModel {
     try {
       conn = await getDBConnection().getConnection();
       const query = `
-      SELECT 
-        community_id as id, title, content, reg_date as createdDate, 
-        community_type as communityType, category_type as categoryType, 
-        recruit_end_date as recruitEndDate
-      FROM community 
-      WHERE author_id = ? AND del_yn = 'N' 
-      ORDER BY reg_date DESC;
-    `;
-      return await conn.query(query, [userId]);
+        SELECT 
+            co.community_id as id, 
+            co.title, 
+            co.content, 
+            co.reg_date as createdDate, 
+            co.community_type as communityType, 
+            co.category_type as categoryType, 
+            co.recruit_end_date as recruitEndDate,
+            (SELECT COUNT(*) FROM comment cm WHERE cm.post_id = co.community_id AND cm.del_yn = 'N') as commentCount,
+            (SELECT COUNT(*) FROM scrap sc WHERE sc.target_id = co.community_id AND sc.target_type = '2' AND sc.del_yn = 'N') as likesCount,
+            CASE WHEN EXISTS (
+                SELECT 1 FROM scrap sc_check 
+                WHERE sc_check.target_id = co.community_id AND sc_check.user_id = ? AND sc_check.target_type = '2' AND sc_check.del_yn = 'N'
+            ) THEN 'Y' ELSE 'N' END as scrapYn
+        FROM community co
+        WHERE co.author_id = ? AND co.del_yn = 'N' 
+        ORDER BY co.reg_date DESC;
+      `;
+      // userId를 두 번 전달해야 합니다 (scrapYn 서브쿼리, author_id)
+      return await conn.query(query, [userId, userId]);
     } catch (error) {
       console.error('findPostsByUserId 실패:', error);
       throw error;
@@ -102,17 +113,27 @@ export class MypageModel {
     try {
       conn = await getDBConnection().getConnection();
       const query = `
-      SELECT 
-        co.community_id as id, co.title, co.content, co.reg_date as createdDate, 
-        co.community_type as communityType, co.category_type as categoryType, 
-        co.recruit_end_date as recruitEndDate,
-        u.nickname as authorNickname 
-      FROM scrap s
-      JOIN community co ON s.target_id = co.community_id
-      JOIN user u ON co.author_id = u.user_id
-      WHERE s.user_id = ? AND s.target_type = '2' AND s.del_yn = 'N' AND co.del_yn = 'N'
-      ORDER BY s.reg_date DESC;
-    `;
+        SELECT 
+            co.community_id as id, 
+            co.title, 
+            co.content, 
+            co.reg_date as createdDate, 
+            co.community_type as communityType, 
+            co.category_type as categoryType, 
+            co.recruit_end_date as recruitEndDate,
+            u.nickname as authorNickname,
+            (SELECT COUNT(*) FROM comment cm WHERE cm.post_id = co.community_id AND cm.del_yn = 'N') as commentCount,
+            (SELECT COUNT(*) FROM scrap sc WHERE sc.target_id = co.community_id AND sc.target_type = '2' AND sc.del_yn = 'N') as likesCount,
+            'Y' as scrapYn
+        FROM scrap s
+        JOIN community co ON s.target_id = co.community_id
+        JOIN user u ON co.author_id = u.user_id
+        WHERE s.user_id = ? 
+          AND s.target_type = '2' 
+          AND s.del_yn = 'N' 
+          AND co.del_yn = 'N'
+        ORDER BY s.reg_date DESC;
+      `;
       return await conn.query(query, [userId]);
     } catch (error) {
       console.error('findBookmarkedCommunitiesByUserId 실패:', error);
