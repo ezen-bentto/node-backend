@@ -54,7 +54,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
                 LEFT JOIN file f
                   ON f.reference_id = c.contest_id`;
 
-  const conditions: string[] = ['c.del_yn = "N"'];
+  const conditions: string[] = [];
   const values: any[] = [];
 
   // 제목 검색 조건

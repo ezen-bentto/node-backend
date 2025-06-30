@@ -41,7 +41,6 @@ export const regFile: RequestHandler = async (req: Request, res: Response, next:
       file_path: file.buffer,
       mime_type: file.mimetype,
     });
-
     res.status(StatusCodes.OK).json({ message: '업로드 성공' });
     return;
   } catch (err) {
