@@ -3,7 +3,7 @@ import { FileModel } from '@/models/file.model';
 import { AppError } from '@/utils/AppError';
 import { handleDbError } from '@/utils/handleDbError';
 import { StatusCodes } from 'http-status-codes';
-import path from 'path';
+import sharp from 'sharp';
 
 /**
  *
@@ -52,8 +52,21 @@ export const regFile = async (data: FileParams) => {
       throw new AppError(StatusCodes.BAD_REQUEST, `허용되지 않은 MIME 타입: ${mimeType}`);
     }
 
+    // sharp 적용: 800px 리사이즈, WebP 변환, 압축
+    const optimizedBuffer = await sharp(data.file_path)
+      .resize({ width: 800, withoutEnlargement: true }) // 원본보다 크면 그대로
+      .webp({ quality: 75 }) // WebP 압축 품질 설정
+      .toBuffer();
+
+    // optimizedBuffer를 넣어서 새로운 FileParams 객체 생성
+    const fileData: FileParams = {
+      ...data,
+      file_path: optimizedBuffer,
+      mime_type: 'image/webp', // sharp으로 webp로 변환했으므로
+    };
+
     // DB에 파일 정보 저장
-    await FileModel.regFile(data);
+    await FileModel.regFile(fileData);
 
     // 파일이 웹에서 접근 가능한 URL을 생성
     // file.routes.ts의 /view/:reference_type/:reference_id 경로와 일치
@@ -61,7 +74,6 @@ export const regFile = async (data: FileParams) => {
 
     // DB 저장 결과 대신 생성된 fileUrl을 객체에 담아 반환
     return { fileUrl };
-
   } catch (err: unknown) {
     console.error(err);
     handleDbError(err);

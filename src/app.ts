@@ -14,7 +14,6 @@ import fileRouter from '@/routes/file.routes';
 import userRouter from '@/routes/user.route';
 import path from 'path';
 
-
 const app = express();
 
 // ✅ 1. 공통 미들웨어 설정
@@ -42,12 +41,12 @@ app.use('/api/user', userRouter);
 // 레디스 값 DB에 삽입
 setInterval(
   () => {
-    console.log('조회수 동기화 시작');
+    // console.log('조회수 동기화 시작');
     syncViewsToDb('contest');
     // syncViewsToDb("community");
     // syncViewsToDb("policy");
   },
-  1000 * 60 * 1
+  1000 * 10 * 1
 );
 
 // ✅ 3. 에러 핸들러 등록

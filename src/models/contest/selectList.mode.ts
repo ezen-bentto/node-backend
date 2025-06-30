@@ -1,6 +1,6 @@
-import { getDBConnection } from "@/config/db.config";
-import { getContestList } from "@/schemas/content.schema";
-import { optionResult } from "@/types/db/request.type";
+import { getDBConnection } from '@/config/db.config';
+import { getContestList } from '@/schemas/content.schema';
+import { optionResult } from '@/types/db/request.type';
 
 /**
  *
@@ -14,26 +14,20 @@ import { optionResult } from "@/types/db/request.type";
  *           변경일             작성자             변경내용
  * -------------------------------------------------------
  *
- *        2025/06/11          한유리             신규작성  
+ *        2025/06/11          한유리             신규작성
  * @param options
  * @returns getContestList
  */
 
 const selectList = async (options: optionResult = {}): Promise<getContestList[]> => {
-  const {
-    search, 
-    sortBy = 'latest',
-    sortOrder = 'DESC',
-    page = 1 ,
-    limit = 16
-  } = options;
-  
+  const { search, sortBy = 'latest', sortOrder = 'DESC', page = 1, limit = 16 } = options;
+
   const sortOptions = {
     views: 'views',
     latest: 'start_date',
-    deadline: 'end_date'
+    deadline: 'end_date',
   };
-  
+
   const sortColumn = sortOptions[sortBy];
 
   let sql = `SELECT c.contest_id id,
@@ -54,7 +48,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
                 LEFT JOIN file f
                   ON f.reference_id = c.contest_id`;
 
-  const conditions: string[] = [];
+  const conditions: string[] = ['c.del_yn = "N"'];
   const values: any[] = [];
 
   // 제목 검색 조건
@@ -75,7 +69,7 @@ const selectList = async (options: optionResult = {}): Promise<getContestList[]>
   sql += ` ORDER BY c.contest_id DESC, ${sortColumn} ${sortOrder === 'ASC' ? 'ASC' : 'DESC'}`;
 
   // 페이징
-  const offset = (page-1) * limit;
+  const offset = (page - 1) * limit;
   sql += ` LIMIT ? OFFSET ? `;
   values.push(limit, offset);
 
