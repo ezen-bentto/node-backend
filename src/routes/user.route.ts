@@ -8,7 +8,7 @@ import multer from 'multer';
 const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB 사이즈 제한
+  limits: { fileSize: 10 * 1024 * 1024 }, // 5MB 사이즈 제한
 });
 
 // PUT /api/user/profile : 프로필 정보(텍스트) 업데이트
