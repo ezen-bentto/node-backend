@@ -15,8 +15,8 @@ import { InsertResult } from '@/types/db/response.type';
  * -------------------------------------------------------
  *
  *        2025/06/27           한유리             신규작성
- * @param 
- * @param 
+ * @param
+ * @param
  * @returns InsertResult - 삽입 결과
  */
 
@@ -28,13 +28,19 @@ export interface FileParams {
   mime_type?: string;
 }
 
-const regFile = async (data:FileParams ) => {
+const regFile = async (data: FileParams) => {
   const sql = `INSERT INTO file (reference_id, reference_type, original_name, file_path, mime_type) VALUES (?, ?, ?, ?, ?);`;
 
   const conn = getDBConnection();
-  const result = await conn.query(sql, [data.reference_id, data.reference_type, data.original_name, data.file_path, data.mime_type || null]);
+  const result = await conn.query(sql, [
+    data.reference_id,
+    data.reference_type,
+    data.original_name,
+    data.file_path,
+    data.mime_type || null,
+  ]);
 
-  console.log("result", result)
+  // console.log("result", result)
   return result;
 };
 

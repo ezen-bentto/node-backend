@@ -28,11 +28,11 @@ export const registerMiddlewares = (app: express.Application) => {
   // must-revalidate: 리소스가 만료되었을 경우, 다시 요청을 보내기 전에 서버에 유효성을 검증하도록 강제
 
   // JSON 형태의 요청 바디(body)를 파싱할 수 있게 해줌
-  app.use(express.json());
+  app.use(express.json({ limit: '10mb' }));
 
   // URL-encoded 형식의 요청 바디를 파싱함 (form 데이터 처리 시 사용)
   // extended: true면 qs 라이브러리를 사용, false면 querystring 사용
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 쿠키 파싱을 위한 미들웨어
   // 쿠키를 읽어서 req.cookies 객체에 넣어주는 미들웨어
