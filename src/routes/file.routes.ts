@@ -9,7 +9,10 @@ import multer from 'multer';
 const router = Router();
 
 // 메모리에 버퍼 저장 -> 파일을 메모리 버퍼로 즉시 가져와 DB로 넘기기 위해
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 사이즈 제한
+});
 
 // API는 인증으로 authMiddleware 추가
 // :type 파라미터를 사용하여 동적으로 파일 업로드를 처리하는 라우트
